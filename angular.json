@@ -15,7 +15,11 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/assets"],
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "src/assets",
+              "src/favicon.ico"
+            ],
             "styles": [
       "src/styles.css",
       "src/assets/css/bootstrap.min.css",
@@ -89,7 +93,7 @@
     }
   },
   "cli": {
-    "analytics": "992fb08f-2feb-4c85-9f30-7d22eb3d62b7"
+    "analytics": "64b764d6-ae23-4cdf-9cd8-44209c3cac9f"
   }
 }
 

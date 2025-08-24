@@ -1,29 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-
-// import standalone header/footer
-import { UserHeaderComponent } from '../../../shared/user/header/header';
-import { UserFooterComponent } from '../../../shared/user/footer/footer';
+import { Component } from "@angular/core";
+import { RouterLink } from "@angular/router";
 
 @Component({
-  selector: 'app-home-page',
-  imports: [
-    FormsModule,
-    RouterModule,
-    UserHeaderComponent,
-    UserFooterComponent,
-    // ... các imports khác
-  ],
-  templateUrl: './home-page.html',
-  styleUrls: ['./home-page.scss']
+    selector: 'home-page',
+    standalone: true,
+    templateUrl: './home-page.html',
+    styleUrl: './home-page.css',
+    imports: [RouterLink]
 })
-export class HomePageComponent {
-  isCollapsed = true;
-  activeTab = 'topik1';
-  searchKeyword = '';
 
-  startLearning() {
-    console.log('Starting learning with email:', this.searchKeyword);
-  }
-}
+export class HomePageComponent{}

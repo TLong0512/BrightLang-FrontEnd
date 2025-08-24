@@ -76,7 +76,7 @@ export class LoginComponent {
           timerProgressBar: true
         }).then(() => {
         // Chuyển trang sau khi OK hoặc timer kết thúc
-          this.router.navigate(['/']); // đổi '/dashboard' thành route của bạn
+          this.router.navigate(['/home']); // đổi '/dashboard' thành route của bạn
         });
       },
       error: err => {

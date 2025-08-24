@@ -726,7 +726,7 @@ blockquote {
   TIMELINE              
 -----------------------------------------*/
 .timeline-section {
-  background-image: url('/assets/images/colleagues-working-cozy-office-medium-shot.jpg');
+  /* background-image: url('/assets/images/colleagues-working-cozy-office-medium-shot.jpg'); */
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -1151,5 +1151,38 @@ blockquote {
   h5 {
     font-size: 20px;
   }
+}
+/*luyện tập*/
+.practice-banner {
+  /* background-image: url(/assets/images/topics/banner-01.png); */
+  /* background-position: center left ; */
+  background: linear-gradient(180deg, #7ed6c8 0%, #6fbcd2 100%);
+  background-size: cover;
+  min-height: 500px;
+  border-radius: 23px;
+  padding: 80px 60px;
+}
+
+.practice-banner h2 {
+  color: #fff;
+  font-family: var(--title-font-family);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 25px;
+}
+
+.practice-banner h6 {
+  margin-bottom: 25px;
+}
+
+.custom-practice button[type="submit"] {
+  background: #fff;
+  border: none;
+  border-radius: var(--border-radius-large);
+  color: var(--bs-teal);
+  font-family: var(--title-font-family);
+  font-size: var(--p-font-size);
+  font-weight: var(--font-weight-semibold);
+  transition: all 0.3s;
+  margin-bottom: 0;
 }
 

@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg">
+ <nav class="navbar navbar-expand-lg">
             <div class="container">
                 <a class="navbar-brand mb-2" href="index.html">
                     <img src="assets/images/logos/logo.png" alt="Logo" style="height: 4rem;">
@@ -20,26 +20,29 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_2">Thông tin các bài thi</a>
+                            <a class="nav-link click-scroll" href="#section_2">Sổ từ vựng</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_3">Các lộ trình học</a>
+                            <a class="nav-link click-scroll" href="#section_3">Tạo lộ trình</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_4">Các câu hỏi</a>
+                            <a class="nav-link click-scroll" href="#section_4">Luyện tập</a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_5">Liên hệ</a>
-
+                         <li class="nav-item">
+                            <a class="nav-link click-scroll" href="#section_5">FAQs</a>
                         </li>
+                        
                     </ul>
-                    <div class="d-none d-lg-block">
-                        <a routerLink="/auth" class="navbar-icon bi-person smoothscroll"></a>
+                   <div class="d-none d-lg-block dropdown">
+                        <a href="#" class="navbar-icon bi-person" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false"></a>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </nav>
- 
