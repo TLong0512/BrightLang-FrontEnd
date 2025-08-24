@@ -1,54 +1,4 @@
  <main>
-        <nav class="navbar navbar-expand-lg">
-            <div class="container">
-                <a class="navbar-brand mb-2" href="index.html">
-                    <img src="assets/images/logos/logo.png" alt="Logo" style="height: 4rem;">
-                    <span>BrightLang</span>
-                </a>
-                <div class="d-lg-none ms-auto me-4">
-                    <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
-                </div>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-lg-5 me-lg-auto">
-                        <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_1">Trang chủ</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_2">Thông tin các bài thi</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_3">Các lộ trình học</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_4">Các câu hỏi</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_5">Liên hệ</a>
-
-                        </li>
-                    </ul>
-                    <div class="d-none d-lg-block dropdown">
-                        <a href="#" class="navbar-icon bi-person" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false"></a>
-                        
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" routerLink="/auth">Đăng nhập</a></li>
-                            <li><a class="dropdown-item" routerLink="/auth/register">Đăng ký</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
         <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
             <div class="container">
                 <div class="row">
@@ -77,7 +27,7 @@
 
                     <div class="col-lg-4 col-12 mb-4 mb-lg-0">
                         <div class="custom-block bg-white shadow-lg">
-                            <a routerLink="/topicsdetail">
+                            <a href="topics-detail.html">
                                 <div class="d-flex">
                                     <div>
                                         <h5 class="mb-2">Thi thử</h5>
@@ -104,7 +54,7 @@
 
                                         <p class="text-white">Bạn có thể tạo lộ trình của riêng mình và bắt đầu luyện tập ngay</p>
 
-                                        <a routerLink="/topicsdetail" class="btn custom-btn mt-2 mt-lg-3">신청!!!</a>
+                                        <a href="topics-detail.html" class="btn custom-btn mt-2 mt-lg-3">신청!!!</a>
                                     </div>
                                 </div>
                                 <div class="section-overlay"></div>
@@ -116,33 +66,15 @@
             </div>
         </section>
 
-
+        <!-- Sổ từ vựng -->
         <section class="explore-section section-padding" id="section_2">
             <div class="container">
 
                 <div class="col-12 text-center">
-                    <h2 class="mb-4">Các loại bài thi</h2>
+                    <h2 class="mb-4">Sổ từ vựng</h2>
                 </div>
 
             </div>
-            <div class="container-fluid">
-                <div class="row">
-                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="design-tab" data-bs-toggle="tab"
-                                data-bs-target="#design-tab-pane" type="button" role="tab"
-                                aria-controls="design-tab-pane" aria-selected="true">Topik I</button>
-                        </li>
-
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="marketing-tab" data-bs-toggle="tab"
-                                data-bs-target="#marketing-tab-pane" type="button" role="tab"
-                                aria-controls="marketing-tab-pane" aria-selected="false">Topik II</button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
             <div class="container">
                 <div class="row">
 
@@ -156,12 +88,9 @@
                                             <a href="topics-detail.html">
                                                 <div class="d-flex">
                                                     <div>
-                                                        <h5 class="mb-2">Bài thi nghe</h5>
-                                                        <p class="mb-0">Bài thi nghe kéo dài trong 50 phút với 40 câu
-                                                            hỏi</p>
+                                                        <h5 class="mb-2">TOPIK 1</h5>
+                                                        <p class="mb-0">Bao gồm các từ vựng Topik 1</p>
                                                     </div>
-
-                                                    <span class="badge bg-design rounded-pill ms-auto">50'</span>
                                                 </div>
 
                                                 <img src="assets/images/topics/listening.png"
@@ -175,74 +104,10 @@
                                             <a href="topics-detail.html">
                                                 <div class="d-flex">
                                                     <div>
-                                                        <h5 class="mb-2">Bài thi đọc</h5>
+                                                        <h5 class="mb-2">Topik 2</h5>
 
-                                                        <p class="mb-0">Bài thi đọc kéo dài 50 phút với 50 câu hỏi</p>
+                                                        <p class="mb-0">Gồm các từ vựng Topik 2</p>
                                                     </div>
-
-                                                    <span class="badge bg-design rounded-pill ms-auto">50'</span>
-                                                </div>
-
-                                                <img src="assets/images/topics/reading.png"
-                                                    class="custom-block-image img-fluid" alt="">
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="tab-pane fade" id="marketing-tab-pane" role="tabpanel"
-                                aria-labelledby="marketing-tab" tabindex="0">
-                                <div class="row">
-                                    <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-3">
-                                        <div class="custom-block bg-white shadow-lg">
-                                            <a href="topics-detail.html">
-                                                <div class="d-flex">
-                                                    <div>
-                                                        <h5 class="mb-2">Bài thi Nghe</h5>
-
-                                                        <p class="mb-0">Bài thi nghe kéo dài 60 phút với 50 câu hỏi</p>
-                                                    </div>
-
-                                                    <span class="badge bg-advertising rounded-pill ms-auto">50'</span>
-                                                </div>
-
-                                                <img src="assets/images/topics/listening.png"
-                                                    class="custom-block-image img-fluid" alt="">
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-3">
-                                        <div class="custom-block bg-white shadow-lg">
-                                            <a href="topics-detail.html">
-                                                <div class="d-flex">
-                                                    <div>
-                                                        <h5 class="mb-2">Bài thi viết</h5>
-
-                                                        <p class="mb-0">Bài thi kéo dài 50 phút với 4 câu hỏi</p>
-                                                    </div>
-
-                                                    <span class="badge bg-advertising rounded-pill ms-auto">50'</span>
-                                                </div>
-
-                                                <img src="assets/images/topics/writting.png"
-                                                    class="custom-block-image img-fluid" alt="">
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-4 col-md-6 col-12">
-                                        <div class="custom-block bg-white shadow-lg">
-                                            <a href="topics-detail.html">
-                                                <div class="d-flex">
-                                                    <div>
-                                                        <h5 class="mb-2">Bài thi đọc</h5>
-
-                                                        <p class="mb-0">Bài thi kéo dài 70 phút với 50 câu hỏi</p>
-                                                    </div>
-
-                                                    <span class="badge bg-advertising rounded-pill ms-auto">70'</span>
                                                 </div>
 
                                                 <img src="assets/images/topics/reading.png"
@@ -258,7 +123,7 @@
             </div>
         </section>
 
-
+        <!-- lộ trình -->
         <section class="timeline-section section-padding" id="section_3">
             <div class="section-overlay"></div>
             <div class="container">
@@ -310,16 +175,44 @@
                     </div>
 
                     <div class="col-12 text-center mt-5">
-                        <p class="text-white">
-                            <a href="#" class="btn custom-btn custom-border-btn ms-3">Học ngay thôi!</a>
-                        </p>
+                       <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5 text-center" role="search">
+                            <button type="submit" class="btn custom-btn">
+                                Học ngay
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!--luyện tập-->
+        <section class="section-padding" id="section_4">
+            <div class="custom-block custom-block-overlay">
+                <div class="practice-banner">
+                    <div class="row align-items-center">
+                        <!-- Nội dung bên phải -->
+                        <div class="col-lg-6">
+                            <div class="header-text">
+                                <h2>Chế độ luyện tập</h2>
+                                <h5>Làm các bài tập theo dạng với kho nội dung phong phú</h5>
+                                <form method="get" class="custom-practice mt-4 pt-2 mb-lg-0 mb-5 text-center" role="search">
+                                    <button type="submit" class="btn custom-btn">
+                                        Luyện tập ngay
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                         <!-- Ảnh bên trái -->
+                        <div class="col-lg-6 text-center">
+                            <img src="assets/images/topics/banner-01.png" alt="banner" class="img-fluid rounded">
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <section class="faq-section section-padding" id="section_4">
+        <section class="faq-section section-padding" id="section_5">
             <div class="container">
                 <div class="row">
 
@@ -394,10 +287,10 @@
             </div>
         </section>
 
-    <section class="contact-section section-padding section-bg" id="section_5">
-                <div class="container">
-                    <div class="row">
-                       
+
+        <section class="contact-section section-padding section-bg" id="section_5">
+            <div class="container">
+                <div class="row">
 
                     <div class="col-lg-12 col-12 text-center">
                         <h2 class="mb-5">Liên hệ</h2>
@@ -436,80 +329,6 @@
                 </div>
             </div>
         </section>
-        <footer class="site-footer section-padding">
-        <div class="container">
-            <div class="row">
-
-                <div class="col-lg-3 col-12 mb-4 pb-2">
-                    <a class="navbar-brand mb-2 d-flex flex-column align-items-center" href="index.html">
-                        <img src="assets/images/logos/logo.png" alt="Logo" style="height: 7rem;">
-                        <span class="fw-bold fs-3 mt-2">BrightLang</span>
-                    </a>
-
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-6">
-                    <h6 class="site-footer-title mb-3">Resources</h6>
-
-                    <ul class="site-footer-links">
-                        <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Trang chủ</a>
-                        </li>
-
-                        <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Thông tin các bài thi</a>
-                        </li>
-
-                        <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">FAQs</a>
-                        </li>
-
-                        <li class="site-footer-link-item">
-                            <a href="#" class="site-footer-link">Contact</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-6 mb-4 mb-lg-0">
-                    <h6 class="site-footer-title mb-3">Information</h6>
-
-                    <p class="text-white d-flex mb-1">
-                        <a href="tel: 305-240-9671" class="site-footer-link">
-                            305-240-9671
-                        </a>
-                    </p>
-
-                    <p class="text-white d-flex">
-                        <a href="mailto:info@company.com" class="site-footer-link">
-                            info@company.com
-                        </a>
-                    </p>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-12 mt-4 mt-lg-0 ms-auto">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            English</button>
-
-                        <ul class="dropdown-menu">
-                            <li><button class="dropdown-item" type="button">Korean</button></li>
-
-                            <li><button class="dropdown-item" type="button">Chinese</button></li>
-
-                            <li><button class="dropdown-item" type="button">Vietnamese</button></li>
-                        </ul>
-                    </div>
-
-                    <p class="copyright-text mt-lg-5 mt-4">Copyright ©2025
-                        <br/> From BrightLang with Love 💙
-                    </p>
-
-                </div>
-
-            </div>
-        </div>
-    </footer>
     </main>
 
-    
+
