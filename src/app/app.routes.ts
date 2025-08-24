@@ -5,18 +5,24 @@ import { VerifyComponent } from './features/auth/verify/verify';
 import { ForgetPassword } from './features/auth/forget-password/forget-password';
 import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
 import { TopicsDetail } from './features/home/topics-detail/topics-detail';
-import { HomeComponent } from './features/home/home';
+import { HomeComponent } from './features/user/home';
 import { HomePageComponent } from './features/home/home-page/home-page';
+import { UserHomeComponent } from './features/user/user-home/user-home';  
+
 import { AuthComponent } from './shared/auth/auth';
 
 export const routes: Routes = [
     {
     path: '',
+    component: HomePageComponent
+  },
+  {
+    path:'home',
     component: HomeComponent,
     children: [
       {
         path: '',
-        component: HomePageComponent
+        component: UserHomeComponent
       },
       {
         path: 'topik-detail',
@@ -24,7 +30,6 @@ export const routes: Routes = [
       }
     ]
   },
-
   {
     path: 'auth',
     component: AuthComponent,
@@ -49,6 +54,7 @@ export const routes: Routes = [
         path: 'reset-password',
         component: ResetPasswordComponent
       }
+      
 
     ]
   }

@@ -1,15 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import { HomePageComponent } from './home-page/home-page';
 import { UserHeaderComponent } from '../../shared/user/header/header';
 import { UserFooterComponent } from '../../shared/user/footer/footer';
 
 
 @Component({
   selector: 'app-home',
-  imports: [ RouterModule,HomePageComponent, UserHeaderComponent,
-    UserFooterComponent],
-  templateUrl: './home.html',
+  imports: [ RouterModule, UserFooterComponent, UserHeaderComponent
+    ],
+  templateUrl: '../user/home.html',
   styleUrls: [
     '../../../assets/css/bootstrap.min.css',
     '../../../assets/css/bootstrap-icons.css',

@@ -7,8 +7,8 @@ import { UserHeaderComponent } from './shared/user/header/header';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, AuthComponent, RouterModule, HomePageComponent, UserHeaderComponent,
-    UserFooterComponent],
+  imports: [RouterOutlet , RouterModule, 
+    ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
