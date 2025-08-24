@@ -1,0 +1,44 @@
+<div class="login">
+    <h2>Đăng ký</h2>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="inputBox">
+        <input type="text" formControlName="fullName" placeholder="Tên">
+        <span class="error-message" *ngIf="fullName?.touched && fullName?.invalid">
+          {{ fullName?.errors?.['required'] ? 'Vui lòng nhập họ tên.' : '' }}
+        </span>
+      </div>
+
+      <div class="inputBox">
+        <input type="text" formControlName="email" placeholder="Email">
+        <span class="error-message" *ngIf="email?.touched && email?.invalid">
+          {{ email?.errors?.['required'] ? 'Vui lòng nhập email.' : '' }}
+          {{ email?.errors?.['email'] ? 'Email không hợp lệ.' : '' }}
+        </span>
+      </div>
+
+      <div class="inputBox">
+        <input type="password" formControlName="password" placeholder="Mật khẩu">
+        <span class="error-message" *ngIf="password?.touched && password?.invalid">
+          {{ password?.errors?.['required'] ? 'Vui lòng nhập mật khẩu.' : '' }}
+          {{ password?.errors?.['minlength'] ? 'Mật khẩu phải có ít nhất 6 ký tự.' : '' }}
+        </span>
+      </div>
+
+      <div class="inputBox">
+        <input type="password" formControlName="confirmPassword" placeholder="Xác nhận mật khẩu">
+        <span class="error-message" *ngIf="confirmPassword?.touched && confirmPassword?.invalid">
+          {{ confirmPassword?.errors?.['required'] ? 'Vui lòng nhập lại mật khẩu.' : '' }}
+          {{ confirmPassword?.errors?.['mismatch'] ? 'Mật khẩu xác nhận không khớp.' : '' }}
+        </span>
+      </div>
+
+      <div class="inputBox">
+        <input type="submit" value="Đăng ký" id="btn">
+      </div>
+    </form>
+
+    <p id="message" style="text-align:center; color:red; font-weight:500;">{{ message }}</p>
+    <div class="group">
+      <a routerLink="/auth">Quay lại Đăng nhập</a>
+    </div>
+  </div>

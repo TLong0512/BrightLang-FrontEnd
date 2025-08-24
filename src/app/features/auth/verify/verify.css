@@ -1,0 +1,73 @@
+.login {
+    width: 600px;
+}
+.verification-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.verification-icon {
+    font-size: 48px;
+    color: #0B4D8D;
+    margin-bottom: 20px;
+}
+.verification-title {
+    color: #0B4D8D;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+.verification-message {
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+.verification-input {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.verification-input input {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 24px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+}
+.verification-input input:focus {
+    border-color: #0B4D8D;
+    outline: none;
+}
+.btn {
+    display: inline-block;
+    padding: 10px 30px;
+    font-size: 18px;
+    color: #fff;
+    background-color: #0B4D8D;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn:hover {
+    background-color: #093769;
+}
+.resend-code {
+    color: #0B4D8D;
+    text-decoration: none;
+    cursor: pointer;
+}
+.resend-code:hover {
+    text-decoration: underline;
+}
+.countdown {
+    color: #666;
+    font-size: 14px;
+    display: block;
+    margin-top: 5px;
+}
