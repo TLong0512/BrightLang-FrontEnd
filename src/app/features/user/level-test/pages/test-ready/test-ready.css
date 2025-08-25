@@ -1,0 +1,66 @@
+.min-vh-100 { 
+      min-height: 100vh; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .ready-card { 
+      border-radius: 20px;
+      width: 450px;
+      border: none;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .ready-header {
+      background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+      border-radius: 15px;
+      border: 2px solid #dee2e6;
+    }
+
+    .ready-icon {
+      color: #13547a;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .action-button { 
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      min-width: 120px;
+    }
+
+    .action-button:hover:not(:disabled) { 
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+
+    .action-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    h4 {
+      color: #333;
+      font-weight: 600;
+    }
+
+    p {
+      color: #666;
+      font-size: 14px;
+    }
