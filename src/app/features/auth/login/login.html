@@ -1,63 +1,42 @@
 <div class="login">
   <h2>Đăng nhập</h2>
-  
+
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <!-- Email -->
-    <div class="inputBox">
-      <input type="text" formControlName="email" placeholder="Email" 
-        [ngClass]="{
-          error: isInvalid('email','required') || isInvalid('email','email'),
-          success: loginForm.get('email')?.valid
-        }" (focus)="clearMessage()" />
-
-      <span class="error-message" *ngIf="isInvalid('email','required')">
-        Vui lòng nhập email!
-      </span>
-      <span class="error-message" *ngIf="isInvalid('email','email')">
-        Email không hợp lệ!
-      </span>
+    <div class="form-floating mb-3">
+      <input 
+        type="email" 
+        class="form-control" 
+        id="floatingInput" 
+        formControlName="email" 
+        placeholder="name@example.com">
+      <label for="floatingInput">Email</label>
     </div>
 
     <!-- Password -->
-    <div class="inputBox">
-      <input type="password" formControlName="password" placeholder="Mật khẩu"
-        [ngClass]="{
-          error: isInvalid('password','required'),
-          success: loginForm.get('password')?.valid
-        }" (focus)="clearMessage()"/>
-
-      <span class="error-message" *ngIf="isInvalid('password','required')">
-        Vui lòng nhập mật khẩu!
-      </span>
+    <div class="form-floating mb-3">
+      <input 
+        type="password" 
+        class="form-control" 
+        id="floatingPassword" 
+        formControlName="password" 
+        placeholder="Password">
+      <label for="floatingPassword">Mật khẩu</label>
     </div>
 
-    <!-- Remember -->
-    <!-- <div style="display:flex; align-items:center; gap:8px; margin-bottom:20px;">
-      <input type="checkbox" formControlName="rememberMe" />
-      <label style="color:#8f2c24; font-weight:500;">Ghi nhớ</label>
-    </div> -->
+    <!-- Thông báo chung -->
+    <p class="text-danger fs-6 fw-medium" style="min-height:30px;">
+      {{ message }}
+    </p>
 
     <!-- Button -->
     <div class="inputBox">
-      <input type="submit" value="Đăng nhập" id="btn"/>
+      <input type="submit" value="Đăng nhập" id="button" />
     </div>
   </form>
 
-  <!-- Thông báo -->
-  <p [style.color]="messageColor" style="text-align:center; font-weight:500;">
-    {{ message }}
-  </p>
-
-  <!-- Login bằng Google -->
-  <!-- <div style="text-align:center; margin-top:10px;">
-    <button
-      style="background:#db4437; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; font-size:1em;">
-      Đăng nhập với Google
-    </button>
-  </div> -->
-
   <div class="group">
     <a routerLink="/auth/forget-password">Quên mật khẩu?</a>
-    <a routerLink="/auth/register" routerLinkActive="active">Đăng ký</a>
+    <a routerLink="/auth/register">Đăng ký</a>
   </div>
 </div>

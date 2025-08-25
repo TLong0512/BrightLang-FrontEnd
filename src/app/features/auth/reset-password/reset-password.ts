@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { CommonModule } from '@angular/common';
 import { ResetPasswordDto, ResetPasswordService } from './reset-password-api';
 import { Router, RouterModule } from '@angular/router';
+import { SharedService } from '../share.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'reset-password',
@@ -15,13 +17,15 @@ export class ResetPasswordComponent {
   submitted = false;
   message = '';
   messageColor = 'red';
-  email = localStorage.getItem('email')
+  email = ''
+
 
   constructor(
     private fb: FormBuilder,
     private resetService: ResetPasswordService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sharedService: SharedService
   ) {
     this.resetForm = this.fb.group(
       {
@@ -67,19 +71,26 @@ export class ResetPasswordComponent {
       return;
     }
 
+    this.sharedService.currentData.subscribe(res => this.email = res)
     const dto: ResetPasswordDto = {
       Email: this.email ?? '',
-      VerificationCode: this.resetForm.value.otp, 
+      VerificationCode: this.resetForm.value.otp,
       NewPassword: this.resetForm.value.newPass,
       ConfirmNewPassword: this.resetForm.value.confirmPass
     };
 
     this.resetService.create(dto).subscribe({
       next: res => {
-        this.message = 'Đổi mật khẩu thành công!';
-        this.messageColor = 'green';
-        this.cdr.detectChanges();
-        setTimeout(() => this.router.navigate(['/login']), 1500);
+        Swal.fire({
+          title: 'Đổi mật khẩu thành công!',
+          text: 'Vui lòng đăng nhập để tiếp tục!',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          timer: 2000,
+          timerProgressBar: true
+        }).then(() => {
+          this.router.navigate(['/auth']);
+        });
       },
       error: err => {
         console.error('Đổi mật khẩu thất bại:', err);
