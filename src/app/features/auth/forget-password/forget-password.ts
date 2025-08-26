@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { ForgetPasswordDto, ForgetPasswordService } from './forget-password-api';
 import { Router, RouterModule } from '@angular/router';
+import { SharedService } from '../share.service';
 
 @Component({
   selector: 'forget-password',
@@ -24,7 +25,8 @@ export class ForgetPassword {
     private fb: FormBuilder,
     private forgetService: ForgetPasswordService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sharedService: SharedService
   ) {
     this.otpForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
@@ -54,7 +56,8 @@ export class ForgetPassword {
     this.forgetService.create(account).subscribe({
       next: res => {
         console.log('OTP đã gửi:', res);
-        localStorage.setItem('email', email)
+        // localStorage.setItem('email', email)
+        this.sharedService.updateData(email)
         this.router.navigate(['/auth/reset-password']);
       },
       error: err => {

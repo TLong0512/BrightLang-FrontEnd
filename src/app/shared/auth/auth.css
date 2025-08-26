@@ -3,6 +3,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
+
 }
 
 :root {
@@ -437,4 +438,38 @@ section .girl {
     top: 110%;
     transform: translateX(20px) rotate(225deg);
   }
+}
+
+#button {
+  background: var(--custom-btn-bg-hover-color);
+  border: none;
+  border-radius: var(--border-radius-large);
+  color: var(--white-color);
+  font-family: var(--title-font-family);
+  font-size: var(--p-font-size);
+  font-weight: var(--font-weight-semibold);
+  transition: all 0.3s;
+  margin-bottom: 0;
+}
+
+#button:hover,
+#button:focus {
+  background: var(--custom-btn-bg-hover-color);
+  border-color: transparent;
+}
+
+.error-message {
+  min-height: 30px important!;
+}
+
+.error-message {
+  display: block;        /* giữ chỗ */
+  min-height: 20px;      /* đảm bảo không bị nhảy form */
+  font-size: 0.9rem;
+  color: red;
+  visibility: hidden;    /* mặc định ẩn */
+}
+
+.error-message.visible {
+  visibility: visible;   /* chỉ hiển thị khi có lỗi */
 }

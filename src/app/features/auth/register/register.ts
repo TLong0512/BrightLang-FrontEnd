@@ -1,61 +1,91 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EmailToVerifyDto } from '../../../models/email.model';
 import { RegisterService } from './register-api';
+import { SharedService } from '../share.service';
 
 @Component({
   selector: 'register',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.html',
-  
 })
-export class RegisterComponent {
-  registerForm: FormGroup;
-  message: string = '';
 
-  constructor(private fb: FormBuilder, 
-    private router: Router, 
-    private registerService: RegisterService) {
+export class RegisterComponent {
+
+  registerForm: FormGroup;
+  passwordFocus = false;
+  message: string = '';
+  submitted: boolean = false;
+
+  constructor(private fb: FormBuilder,
+    private router: Router,
+    private registerService: RegisterService,
+    private cdr: ChangeDetectorRef,
+    private sharedService: SharedService) {
     this.registerForm = this.fb.group({
-      fullName: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
+      fullName: ['', [Validators.required, Validators.maxLength(50)]],
+      email: ['', [Validators.required, Validators.maxLength(50), Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50), this.passwordStrengthValidator()],],
+      confirmPassword: ['', [Validators.required, this.passwordMatchValidator]]
+    });
   }
 
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    if (password !== confirmPassword) {
-      form.get('confirmPassword')?.setErrors({ mismatch: true });
-    } else {
-      form.get('confirmPassword')?.setErrors(null);
-    }
-    return null;
+  isTyping: { [key: string]: boolean } = {};
+
+  onFocus(field: string) {
+    this.isTyping[field] = true;
+  }
+
+  onBlur(field: string) {
+    this.isTyping[field] = false;
+  }
+
+  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.parent) return null; 
+
+    const password = control.parent.get('password')?.value;
+    const confirmPassword = control.value;
+    return password !== confirmPassword
+      ? { mismatch: true }
+      : null;
+  }
+
+  passwordStrengthValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (!value) return null;
+
+      const hasUpperCase = /[A-Z]/.test(value);
+      const hasLowerCase = /[a-z]/.test(value);
+      const hasNumber = /[0-9]/.test(value);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+      const passwordValid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+      return !passwordValid ? { passwordStrength: true } : null;
+    };
   }
 
   onSubmit() {
+    //this.submitted = true; // Khi bấm submit thì bật flag
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
 
+    // Xử lý submit
     const { fullName, email, password, confirmPassword } = this.registerForm.value;
-    // Chuyển sang verify page
-    // Lưu tạm thông tin vào localStorage nếu muốn
-    localStorage.setItem('fullName', fullName);
-    localStorage.setItem('email', email);
-    localStorage.setItem('password', password);
-    localStorage.setItem('confirmPassword', confirmPassword);
     
-    this.router.navigate(['/auth/verify']);
-    
-    
+    this.sharedService.updateData({
+      fullName: fullName,
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword
+    });
+    this.SendEmail({Email: email})
   }
 
   get fullName() { return this.registerForm.get('fullName'); }
@@ -63,17 +93,16 @@ export class RegisterComponent {
   get password() { return this.registerForm.get('password'); }
   get confirmPassword() { return this.registerForm.get('confirmPassword'); }
 
-  SendEmail(emailToVerifyDto: EmailToVerifyDto) {     
+  SendEmail(emailToVerifyDto: EmailToVerifyDto) {
     this.registerService.create(emailToVerifyDto).subscribe({
       next: res => {
-        
         this.router.navigate(['/auth/verify']);
       },
       error: err => {
-        if(err.status == 409) {
+        if (err.status == 409) {
           this.message = 'Email đã được sử dụng!'
         }
-        if(err.status == 0) {
+        if (err.status == 0) {
           this.message = 'Lỗi kết nối!'
         }
       }

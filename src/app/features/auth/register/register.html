@@ -1,44 +1,71 @@
 <div class="login">
-    <h2>Đăng ký</h2>
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <div class="inputBox">
-        <input type="text" formControlName="fullName" placeholder="Tên">
-        <span class="error-message" *ngIf="fullName?.touched && fullName?.invalid">
-          {{ fullName?.errors?.['required'] ? 'Vui lòng nhập họ tên.' : '' }}
-        </span>
-      </div>
+  <h2 style="margin-top: 30px;">Đăng ký</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" style="margin-bottom: 0; margin-bottom: 0 !important;">
 
-      <div class="inputBox">
-        <input type="text" formControlName="email" placeholder="Email">
-        <span class="error-message" *ngIf="email?.touched && email?.invalid">
-          {{ email?.errors?.['required'] ? 'Vui lòng nhập email.' : '' }}
-          {{ email?.errors?.['email'] ? 'Email không hợp lệ.' : '' }}
-        </span>
-      </div>
-
-      <div class="inputBox">
-        <input type="password" formControlName="password" placeholder="Mật khẩu">
-        <span class="error-message" *ngIf="password?.touched && password?.invalid">
-          {{ password?.errors?.['required'] ? 'Vui lòng nhập mật khẩu.' : '' }}
-          {{ password?.errors?.['minlength'] ? 'Mật khẩu phải có ít nhất 6 ký tự.' : '' }}
-        </span>
-      </div>
-
-      <div class="inputBox">
-        <input type="password" formControlName="confirmPassword" placeholder="Xác nhận mật khẩu">
-        <span class="error-message" *ngIf="confirmPassword?.touched && confirmPassword?.invalid">
-          {{ confirmPassword?.errors?.['required'] ? 'Vui lòng nhập lại mật khẩu.' : '' }}
-          {{ confirmPassword?.errors?.['mismatch'] ? 'Mật khẩu xác nhận không khớp.' : '' }}
-        </span>
-      </div>
-
-      <div class="inputBox">
-        <input type="submit" value="Đăng ký" id="btn">
-      </div>
-    </form>
-
-    <p id="message" style="text-align:center; color:red; font-weight:500;">{{ message }}</p>
-    <div class="group">
-      <a routerLink="/auth">Quay lại Đăng nhập</a>
+    <div class="inputBox form-floating m-1">
+      <input type="text" formControlName="fullName" id="fullName" class="form-control" placeholder=""
+      (focus)="onFocus('fullName')" (blur)="onBlur('fullName')">
+      <label for="fullName">Họ và tên</label>
+      <span class="error-message" 
+      [style.visibility]="!isTyping['fullName'] && fullName?.touched && fullName?.invalid ? 'visible' : 'hidden'">
+        <ng-container *ngIf="fullName?.errors as errors">
+          <span *ngIf="errors['required']">Vui lòng nhập họ tên.</span>
+          <span *ngIf="!errors['required'] && errors['maxlength']">Họ và tên chỉ được dài tối đa 50 ký tự</span>
+        </ng-container>
+      </span>
     </div>
+
+    <div class="inputBox form-floating m-1">
+      <input type="text" formControlName="email" placeholder="" id="email" class="form-control"
+      (focus)="onFocus('email')" (blur)="onBlur('email')">
+      <label for="email">Email</label>
+      <span class="error-message" 
+      [style.visibility]="!isTyping['email'] && email?.touched && email?.invalid ? 'visible' : 'hidden'">
+        <ng-container *ngIf="email?.errors as errors">
+          <span *ngIf="errors['required']">Vui lòng nhập email.</span>
+          <span *ngIf="!errors['required'] && errors['maxlength']">Email chỉ được dài tối đa 200 ký tự</span>
+          <span *ngIf="!errors['required'] && !errors['maxlength'] && errors['email']">Email không hợp lệ</span>
+        </ng-container>
+      </span>
+    </div>
+
+<!-- Password input -->
+    <div class="inputBox form-floating m-1">
+      <input type="password" formControlName="password" id="Password" class="form-control" placeholder=""
+        (focus)="onFocus('password')" (blur)="onBlur('password')">
+      <label for="Password">Mật khẩu</label>
+      <span class="error-message"
+        [style.visibility]="!isTyping['password'] && password?.touched && password?.invalid ? 'visible' : 'hidden'">
+        <ng-container *ngIf="password?.errors as errors">
+          <span *ngIf="errors['required']">Vui lòng nhập mật khẩu.</span>
+          <span *ngIf="!errors['required'] && errors['minlength']">Mật khẩu phải có ít nhất 6 ký tự.</span>
+          <span *ngIf="!errors['required'] && !errors['minlength'] && errors['maxlength']">Mật khẩu chỉ có tối đa 50 ký tự.</span>
+          <span *ngIf="!errors['required'] && !errors['minlength'] && !errors['maxlength'] && errors['passwordStrength']">
+            Mật khẩu phải có chữ hoa, chữ thường, số và ký tự đặc biệt.
+          </span>
+        </ng-container>
+      </span>
+    </div>
+
+<!-- confirm password -->
+    <div class="inputBox form-floating m-1">
+      <input type="password" formControlName="confirmPassword" placeholder="" id="confirmPassword" class="form-control"
+      (focus)="onFocus('confirmPassword')" (blur)="onBlur('confirmPassword')">
+      <label for="confirmPassword">Xác nhận mật khẩu</label>
+      <span class="error-message"
+        [style.visibility]="!isTyping['confirmPassword'] && confirmPassword?.touched && confirmPassword?.invalid ? 'visible' : 'hidden'">
+        <ng-container *ngIf="confirmPassword?.errors as errors">
+          <span *ngIf="errors['required']">Vui lòng nhập lại mật khẩu.</span>
+          <span *ngIf="!errors['required'] && errors['mismatch']">Mật khẩu xác nhận không khớp.</span>
+        </ng-container>
+      </span>
+    </div>
+    <p id="message" style="text-align:center; color:red; font-weight:500;">{{ message }}</p>
+    <div class="inputBox">
+      <input type="submit" value="Đăng ký" id="button">
+    </div>
+  </form>
+  <div class="group" style="margin-bottom: 30px;">
+    <a routerLink="/auth">Quay lại Đăng nhập</a>
   </div>
+</div>
