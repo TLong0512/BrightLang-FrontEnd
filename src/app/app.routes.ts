@@ -10,6 +10,12 @@ import { HomePageComponent } from './features/home/home-page/home-page';
 import { UserHomeComponent } from './features/user/user-home/user-home';  
 
 import { AuthComponent } from './shared/auth/auth';
+import { BookComponent } from './features/user/book/book';
+import { MainBookComponent } from './features/user/book/book.component';
+import { VocabComponent } from './features/user/vocabulary/vocab.component';
+import { VocabularyComponent } from './features/user/vocabulary/vocab';
+import { FlashcardComponent } from './features/user/flashcard/flashcard';
+import { MainFlashCardComponent } from './features/user/flashcard/flashcard.component';
 
 export const routes: Routes = [
     {
@@ -29,6 +35,36 @@ export const routes: Routes = [
         component: TopicsDetail
       }
     ]
+  },
+  {
+    path: 'book',
+    component: MainBookComponent,
+    children: [
+      {
+      path: '',
+      component: BookComponent
+      }
+    ]
+  },
+  {
+    path: 'vocab/:id',
+    component: VocabComponent,
+    children:[{
+      path: '',
+      component: VocabularyComponent
+    }]
+  },
+  {
+    path: 'flashcard/:bookId',
+    component: MainFlashCardComponent,
+    children:[{
+      path: '',
+      component: FlashcardComponent
+    }]
+  },
+  {
+    path: '',
+    redirectTo: 'books', pathMatch: 'full'
   },
   {
     path: 'auth',
