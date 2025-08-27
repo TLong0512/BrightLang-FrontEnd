@@ -15,6 +15,12 @@ import { LevelTestEntryComponent } from './features/user/level-test/pages/level-
 import { TestReadyComponent } from './features/user/level-test/pages/test-ready/test-ready';
 import { TestQuestionsComponent } from './features/user/level-test/pages/test-questions/test-questions';
 import { TestResultComponent } from './features/user/level-test/pages/test-result/test-result';
+import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
+import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
+import { QuestionTypesComponent } from './features/user/practive/pages/question-types/question-types';
+import { PracticeSetupComponent } from './features/user/practive/pages/practice-setup/practice-setup';
+import { PracticeScreenComponent } from './features/user/practive/pages/practice-screen/practice-screen';
+import { ResultScreenComponent } from './features/user/practive/pages/result-screen/result-screen';
 
 export const routes: Routes = [
   
@@ -36,6 +42,20 @@ export const routes: Routes = [
     path:'home-user',
     component: UserComponent,
     children: [
+      { path: 'result-screen/:sessionId', component: ResultScreenComponent },
+      { path: 'practice-screen/:sessionId', component: PracticeScreenComponent },
+      { path: 'question-types/:level/:skillId', component: QuestionTypesComponent },
+
+      // Thêm route đúng cho bước tiếp theo
+      { path: 'practice-setup/:level/:skillId/:questionTypeId', component: PracticeSetupComponent },
+      {
+        path: 'skill-selection/:level',
+        component: SkillSelectionComponent
+      },
+      {
+        path: 'topik-selection',
+        component: TopikSelectionComponent
+      },
       {
         path: 'level-test',
         component: LevelTestEntryComponent
