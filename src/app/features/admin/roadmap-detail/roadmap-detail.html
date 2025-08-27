@@ -1,0 +1,59 @@
+<div class="container py-4">
+  <div class="accordion" id="lessonAccordion">
+    <div *ngFor="let lesson of lessons" class="accordion-item border-0 mb-3 shadow-sm rounded-3">
+      <div class="accordion-header">
+        <div class="lesson-btn collapsed" type="button" data-bs-toggle="collapse"
+             [attr.data-bs-target]="'#lessonContent' + lesson.id" aria-expanded="false">
+          <div>
+            <span class="lesson-type">{{ lesson.type }}</span>
+            <p class="lesson-title">{{ lesson.name }}</p>
+          </div>
+          <i class="fas fa-chevron-down lesson-arrow"></i>
+        </div>
+      </div>
+
+      <div [id]="'lessonContent' + lesson.id" class="accordion-collapse collapse">
+        <div class="accordion-body d-flex justify-content-center">
+          <div class="w-50">
+            <div class="lesson-dropdown">
+
+              <!-- Số ngày lặp lại -->
+              <div class="progress-item mb-3">
+                <span class="progress-label fw-semibold">Số ngày lặp lại</span>
+                <div class="d-flex align-items-center">
+                  <input type="range" class="form-range custom-range"
+                         min="0" max="100"
+                         [formControl]="getControl(lesson.id, 'days')">
+                </div>
+                <div class="progress-description small text-secondary">
+                  Số ngày liên tiếp cần học 
+                  <span class="range-value">{{ getControl(lesson.id, 'days').value }}</span>
+                </div>
+              </div>
+
+              <!-- Số câu trong ngày -->
+              <div class="progress-item">
+                <span class="progress-label fw-semibold">Số câu trong ngày</span>
+                <div class="d-flex align-items-center">
+                  <input type="range" class="form-range custom-range"
+                         min="0" max="100"
+                         [formControl]="getControl(lesson.id, 'sentences')">
+                </div>
+                <div class="progress-description small text-secondary">
+                  Lượng câu trong một ngày 
+                  <span class="range-value">{{ getControl(lesson.id, 'sentences').value }}</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nút lấy dữ liệu -->
+  <div class="text-center mt-4">
+    <button class="btn btn-primary" (click)="getData()">Lấy dữ liệu</button>
+  </div>
+</div>

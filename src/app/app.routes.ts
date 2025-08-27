@@ -23,6 +23,10 @@ import { LevelTestEntryComponent } from './features/user/level-test/pages/level-
 import { TestReadyComponent } from './features/user/level-test/pages/test-ready/test-ready';
 import { TestQuestionsComponent } from './features/user/level-test/pages/test-questions/test-questions';
 import { TestResultComponent } from './features/user/level-test/pages/test-result/test-result';
+import { AdminComponent } from './shared/admin/admin';
+import { StatisticsComponent } from './features/admin/statistics/statistics';
+import { RoadMapComponent } from './features/admin/roadmap/roadmap';
+import { RoadMapDetailComponent } from './features/admin/roadmap-detail/roadmap-detail';
 
 
 export const routes: Routes = [
@@ -128,6 +132,13 @@ export const routes: Routes = [
       
 
     ]
-  }
+  },
     
+  { path: 'admin', component: AdminComponent,
+        children: [
+            { path: '', component: StatisticsComponent},
+            { path: 'roadmap', component: RoadMapComponent},
+            { path: 'roadmap-detail', component: RoadMapDetailComponent}
+        ]
+    }
 ];
