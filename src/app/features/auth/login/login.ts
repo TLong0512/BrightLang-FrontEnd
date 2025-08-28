@@ -65,6 +65,8 @@ export class LoginComponent {
 
     this.loginService.create(acount).subscribe({
       next: res => {
+        localStorage.setItem("accessToken", res.accessToken);
+      localStorage.setItem("role", res.role);
         Swal.fire({
           title: 'Đăng nhập thành công!',
           text: 'Chào mừng bạn!',
@@ -73,8 +75,11 @@ export class LoginComponent {
           timer: 2000,       // tự đóng sau 2s (optional)
           timerProgressBar: true
         }).then(() => {
-          // Chuyển trang sau khi OK hoặc timer kết thúc
-          this.router.navigate(['/']); // đổi '/dashboard' thành route của bạn
+            if (res.role === "Admin") {
+            this.router.navigate(['/admin']);
+          } else {
+            this.router.navigate(['/user']);
+          }
         });
       },
       error: err => {

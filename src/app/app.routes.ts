@@ -46,7 +46,6 @@ export const routes: Routes = [
       { path: 'practice-screen/:sessionId', component: PracticeScreenComponent },
       { path: 'question-types/:level/:skillId', component: QuestionTypesComponent },
 
-      // Thêm route đúng cho bước tiếp theo
       { path: 'practice-setup/:level/:skillId/:questionTypeId', component: PracticeSetupComponent },
       {
         path: 'skill-selection/:level',
