@@ -10,17 +10,20 @@ import { HomePageComponent } from './features/home/home-page/home-page';
 import { UserHomeComponent } from './features/user/user-home/user-home';  
 
 import { AuthComponent } from './shared/auth/auth';
+
+import { BookComponent } from './features/user/book/book';
+import { MainBookComponent } from './features/user/book/book.component';
+import { VocabComponent } from './features/user/vocabulary/vocab.component';
+import { VocabularyComponent } from './features/user/vocabulary/vocab';
+import { FlashcardComponent } from './features/user/flashcard/flashcard';
+import { MainFlashCardComponent } from './features/user/flashcard/flashcard.component';
+
 import { UserComponent } from './features/user/user';
 import { LevelTestEntryComponent } from './features/user/level-test/pages/level-test-entry/level-test-entry';
 import { TestReadyComponent } from './features/user/level-test/pages/test-ready/test-ready';
 import { TestQuestionsComponent } from './features/user/level-test/pages/test-questions/test-questions';
 import { TestResultComponent } from './features/user/level-test/pages/test-result/test-result';
-import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
-import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
-import { QuestionTypesComponent } from './features/user/practive/pages/question-types/question-types';
-import { PracticeSetupComponent } from './features/user/practive/pages/practice-setup/practice-setup';
-import { PracticeScreenComponent } from './features/user/practive/pages/practice-screen/practice-screen';
-import { ResultScreenComponent } from './features/user/practive/pages/result-screen/result-screen';
+
 
 export const routes: Routes = [
   
@@ -82,6 +85,36 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'book',
+    component: MainBookComponent,
+    children: [
+      {
+      path: '',
+      component: BookComponent
+      }
+    ]
+  },
+  {
+    path: 'vocab/:id',
+    component: VocabComponent,
+    children:[{
+      path: '',
+      component: VocabularyComponent
+    }]
+  },
+  {
+    path: 'flashcard/:bookId',
+    component: MainFlashCardComponent,
+    children:[{
+      path: '',
+      component: FlashcardComponent
+    }]
+  },
+  {
+    path: '',
+    redirectTo: 'books', pathMatch: 'full'
+  },
+  {
     path: 'auth',
     component: AuthComponent,
     children: [
@@ -108,6 +141,13 @@ export const routes: Routes = [
       
 
     ]
-  }
+  },
     
+  { path: 'admin', component: AdminComponent,
+        children: [
+            { path: '', component: StatisticsComponent},
+            { path: 'roadmap', component: RoadMapComponent},
+            { path: 'roadmap-detail', component: RoadMapDetailComponent}
+        ]
+    }
 ];
