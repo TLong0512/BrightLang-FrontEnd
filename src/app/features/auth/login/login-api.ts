@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class LoginService extends BaseService<LoginDto> {
      
   constructor(http: HttpClient) {
-    super(http, 'https://localhost:7029/api/Authentication/login');
+    super(http, 'https://localhost:7030/api/Authentication/login');
   }
 
   override create(data: LoginDto): Observable<any> {
