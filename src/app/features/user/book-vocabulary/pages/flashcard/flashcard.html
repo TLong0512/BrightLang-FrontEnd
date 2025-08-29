@@ -1,0 +1,38 @@
+<div class="container py-5">
+  <h2 class="text-center mb-5 fw-bold">
+    Flashcard Học Từ Vựng
+  </h2>
+
+  <div class="d-flex justify-content-center">
+    <div class="flashcard"
+         [class.flipped]="showBack"
+         (click)="flipCard()">
+
+      <div class="front d-flex flex-column justify-content-center align-items-center">
+        <h3 class="fw-bold">{{ vocabularies[currentIndex]?.front }}</h3>
+      </div>
+
+      <div class="back d-flex flex-column justify-content-center align-items-center">
+        <h3 class="fs-4">{{ vocabularies[currentIndex]?.back }}</h3>
+      </div>
+
+      <div *ngIf="vocabularies.length === 0" class="no-vocab text-center">
+        <p class="fs-5 text-muted">Chưa có từ vựng để học.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-5 px-5">
+    <button class="btn btn-lg btn-outline-custom rounded-pill px-4" (click)="prevCard()">
+      ⬅️ Trước
+    </button>
+
+    <span class="fs-5 fw-semibold text-secondary">
+      {{ currentIndex + 1 }} / {{ vocabularies.length }}
+    </span>
+
+    <button class="btn btn-lg btn-outline-custom rounded-pill px-4" (click)="nextCard()">
+      Tiếp ➡️
+    </button>
+  </div>
+</div>

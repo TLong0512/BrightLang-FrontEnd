@@ -1,0 +1,41 @@
+<div class="login">
+<div class="verification-container" >
+  <div class="text-center">
+    <i class="fas fa-envelope verification-icon"></i>
+    <h2 class="verification-title">Xác nhận Email</h2>
+    <p class="verification-message">
+      Chúng tôi đã gửi mã xác nhận đến email của bạn.<br>
+      Vui lòng nhập mã xác nhận để hoàn tất quá trình đăng ký.
+    </p>
+  </div>
+
+  <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+    <div class="verification-input" *ngIf="verifyForm">
+      <input *ngFor="let ctrl of inputs; let i = index"
+             [formControlName]="'code' + i"
+             maxlength="1"
+             inputmode="numeric"
+             (keyup)="focusNext(i, $event)"
+             (keydown)="allowOnlyNumbers($event)">
+    </div>
+
+    <div class="text-center mb-2" *ngIf="message" style="color: red; margin-bottom: 20px;">
+        {{ message }}
+    </div>
+    <div class="text-center mb-4" style="margin-bottom: 20px;">
+      <button type="submit" class="btn btn-primary btn-lg px-5">Xác nhận</button>
+    </div>
+
+    <div class="text-center">
+      <p>Không nhận được mã?
+        <a class="resend-code"
+        (click)="timeLeft$.value <= 0 && onResend()"
+        >Gửi lại mã</a>
+      </p>
+      <p class="countdown mt-2" >
+        Có thể gửi lại mã sau: <span>{{ timeLeft$ | async }}</span> giây
+      </p>
+    </div>
+  </form>
+</div>
+</div>

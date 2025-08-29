@@ -1,0 +1,475 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+
+}
+
+:root {
+  --image-url: "../assets/images/";
+}
+
+section {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+section .bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+section .trees {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 100;
+  pointer-events: none;
+}
+
+section .girl {
+  position: absolute;
+  scale: 0.65;
+  pointer-events: none;
+  animation: animateGirl 10s linear infinite;
+}
+
+@keyframes animateGirl {
+  0% {
+    transform: translateX(calc(100% + 100vw));
+  }
+
+  50% {
+    transform: translateX(calc(-100% - 100vw));
+  }
+
+  50.01% {
+    transform: translateX(calc(-100% - 100vw)) rotateY(180deg);
+  }
+
+  100% {
+    transform: translateX(calc(100% + 100vw)) rotateY(180deg);
+  }
+}
+
+.login {
+  position: relative;
+  padding: 50px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(15px);
+  border: 1px solid #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+}
+
+.login h2 {
+  position: relative;
+  width: 100%;
+  text-align: center;
+  font-size: 2.5em;
+  font-weight: 600;
+  color: #8f2c24;
+  margin-bottom: 10px;
+}
+
+.login .inputBox {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.login .inputBox input {
+  position: relative;
+  width: 100%;
+  padding: 15px 20px;
+  outline: none;
+  font-size: 1.25em;
+  color: #8f2c24;
+  border-radius: 5px;
+  background: #fff;
+  border: none;
+}
+
+.login .inputBox ::placeholder {
+  color: #8f2c24;
+}
+
+.login .inputBox #btn {
+  position: relative;
+  border: none;
+  outline: none;
+  background: #8f2c24;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.25em;
+  font-weight: 500;
+  transition: 0.5s;
+}
+
+.login .inputBox #btn:hover {
+  background: #d64c42;
+}
+
+.login .group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.login .group a {
+  font-size: 1.25em;
+  color: #8f2c24;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.login .group a:nth-child(2) {
+  text-decoration: underline;
+}
+
+.leaves {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.leaves .set {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.leaves .set div {
+  position: absolute;
+  display: block;
+}
+
+.leaves .set div:nth-child(1) {
+  left: 20%;
+  animation: animate 20s linear infinite;
+}
+
+.leaves .set div:nth-child(2) {
+  left: 50%;
+  animation: animate 14s linear infinite;
+}
+
+.leaves .set div:nth-child(3) {
+  left: 70%;
+  animation: animate 12s linear infinite;
+}
+
+.leaves .set div:nth-child(4) {
+  left: 5%;
+  animation: animate 15s linear infinite;
+}
+
+.leaves .set div:nth-child(5) {
+  left: 85%;
+  animation: animate 18s linear infinite;
+}
+
+.leaves .set div:nth-child(6) {
+  left: 90%;
+  animation: animate 12s linear infinite;
+}
+
+.leaves .set div:nth-child(7) {
+  left: 15%;
+  animation: animate 14s linear infinite;
+}
+
+.leaves .set div:nth-child(8) {
+  left: 60%;
+  animation: animate 15s linear infinite;
+}
+
+/* SPRING */
+.season-spring .bg {
+  content: url("/assets/images/spring/bg.png");
+}
+
+.season-spring .trees {
+  content: url("/assets/images/spring/trees.png");
+}
+
+.season-spring .girl {
+  content: url("/assets/images/spring/girl.png");
+}
+
+.season-spring .leaves .set div:nth-child(1) img {
+  content: url("/assets/images/spring/leaf_01.png");
+}
+
+.season-spring .leaves .set div:nth-child(2) img {
+  content: url("/assets/images/spring/leaf_02.png");
+}
+
+.season-spring .leaves .set div:nth-child(3) img {
+  content: url("/assets/images/spring/leaf_03.png");
+}
+
+.season-spring .leaves .set div:nth-child(4) img {
+  content: url("/assets/images/spring/leaf_04.png");
+}
+
+.season-spring .leaves .set div:nth-child(5) img {
+  content: url("/assets/images/spring/leaf_01.png");
+}
+
+.season-spring .leaves .set div:nth-child(6) img {
+  content: url("/assets/images/spring/leaf_02.png");
+}
+
+.season-spring .leaves .set div:nth-child(7) img {
+  content: url("/assets/images/spring/leaf_03.png");
+}
+
+.season-spring .leaves .set div:nth-child(8) img {
+  content: url("/assets/images/spring/leaf_04.png");
+}
+
+/* SUMMER */
+.season-summer .bg {
+  content: url("/assets/images/summer/bg.png");
+}
+
+.season-summer .trees {
+  content: url("/assets/images/summer/trees.png");
+}
+
+.season-summer .girl {
+  content: url("/assets/images/summer/girl.png");
+}
+
+.season-summer .leaves .set div:nth-child(1) img {
+  content: url("/assets/images/summer/leaf_01.png");
+}
+
+.season-summer .leaves .set div:nth-child(2) img {
+  content: url("/assets/images/summer/leaf_02.png");
+}
+
+.season-summer .leaves .set div:nth-child(3) img {
+  content: url("/assets/images/summer/leaf_03.png");
+}
+
+.season-summer .leaves .set div:nth-child(4) img {
+  content: url("/assets/images/summer/leaf_04.png");
+}
+
+.season-summer .leaves .set div:nth-child(5) img {
+  content: url("/assets/images/summer/leaf_01.png");
+}
+
+.season-summer .leaves .set div:nth-child(6) img {
+  content: url("/assets/images/summer/leaf_02.png");
+}
+
+.season-summer .leaves .set div:nth-child(7) img {
+  content: url("/assets/images/summer/leaf_03.png");
+}
+
+.season-summer .leaves .set div:nth-child(8) img {
+  content: url("/assets/images/summer/leaf_04.png");
+}
+
+/* FALL */
+.season-fall .bg {
+  content: url("/assets/images/fall/bg.png");
+}
+
+.season-fall .trees {
+  content: url("/assets/images/fall/trees.png");
+}
+
+.season-fall .girl {
+  content: url("/assets/images/fall/girl.png");
+}
+
+.season-fall .leaves .set div:nth-child(1) img {
+  content: url("/assets/images/fall/leaf_01.png");
+}
+
+.season-fall .leaves .set div:nth-child(2) img {
+  content: url("/assets/images/fall/leaf_02.png");
+}
+
+.season-fall .leaves .set div:nth-child(3) img {
+  content: url("/assets/images/fall/leaf_03.png");
+}
+
+.season-fall .leaves .set div:nth-child(4) img {
+  content: url("/assets/images/fall/leaf_04.png");
+}
+
+.season-fall .leaves .set div:nth-child(5) img {
+  content: url("/assets/images/fall/leaf_01.png");
+}
+
+.season-fall .leaves .set div:nth-child(6) img {
+  content: url("/assets/images/fall/leaf_02.png");
+}
+
+.season-fall .leaves .set div:nth-child(7) img {
+  content: url("/assets/images/fall/leaf_03.png");
+}
+
+.season-fall .leaves .set div:nth-child(8) img {
+  content: url("/assets/images/fall/leaf_04.png");
+}
+
+/* WINTER */
+.season-winter .bg {
+  content: url("/assets/images/winter/bg.png");
+}
+
+.season-winter .trees {
+  content: url("/assets/images/winter/trees.png");
+}
+
+.season-winter .girl {
+  content: url("/assets/images/winter/girl.png");
+}
+
+.season-winter .leaves .set div:nth-child(1) img {
+  content: url("/assets/images/winter/leaf_01.png");
+}
+
+.season-winter .leaves .set div:nth-child(2) img {
+  content: url("/assets/images/winter/leaf_02.png");
+}
+
+.season-winter .leaves .set div:nth-child(3) img {
+  content: url("/assets/images/winter/leaf_03.png");
+}
+
+.season-winter .leaves .set div:nth-child(4) img {
+  content: url("/assets/images/winter/leaf_04.png");
+}
+
+.season-winter .leaves .set div:nth-child(5) img {
+  content: url("/assets/images/winter/leaf_01.png");
+}
+
+.season-winter .leaves .set div:nth-child(6) img {
+  content: url("/assets/images/winter/leaf_02.png");
+}
+
+.season-winter .leaves .set div:nth-child(7) img {
+  content: url("/assets/images/winter/leaf_03.png");
+}
+
+.season-winter .leaves .set div:nth-child(8) img {
+  content: url("/assets/images/winter/leaf_04.png");
+}
+
+/* Thêm style cho lỗi */
+.error-message {
+  font-size: 0.9em;
+  color: red;
+  margin-top: 5px;
+  display: block;
+}
+
+.inputBox input.error {
+  border: 1px solid red !important;
+}
+
+.inputBox input.success {
+  border: 1px solid green !important;
+}
+
+@keyframes animate {
+  0% {
+    opacity: 0;
+    top: -10%;
+    transform: translateX(20px) rotate(0deg);
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  20% {
+    transform: translateX(-20px) rotate(45deg);
+  }
+
+  40% {
+    transform: translateX(-20px) rotate(90deg);
+  }
+
+  60% {
+    transform: translateX(20px) rotate(180deg);
+  }
+
+  80% {
+    transform: translateX(-20px) rotate(45deg);
+  }
+
+  100% {
+    top: 110%;
+    transform: translateX(20px) rotate(225deg);
+  }
+}
+
+#button {
+  background: var(--custom-btn-bg-hover-color);
+  border: none;
+  border-radius: var(--border-radius-large);
+  color: var(--white-color);
+  font-family: var(--title-font-family);
+  font-size: var(--p-font-size);
+  font-weight: var(--font-weight-semibold);
+  transition: all 0.3s;
+  margin-bottom: 0;
+}
+
+#button:hover,
+#button:focus {
+  background: var(--custom-btn-bg-hover-color);
+  border-color: transparent;
+}
+
+.error-message {
+  min-height: 30px important!;
+}
+
+.error-message {
+  display: block;        /* giữ chỗ */
+  min-height: 20px;      /* đảm bảo không bị nhảy form */
+  font-size: 0.9rem;
+  color: red;
+  visibility: hidden;    /* mặc định ẩn */
+}
+
+.error-message.visible {
+  visibility: visible;   /* chỉ hiển thị khi có lỗi */
+}

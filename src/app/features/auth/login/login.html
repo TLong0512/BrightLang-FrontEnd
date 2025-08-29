@@ -1,0 +1,42 @@
+<div class="login">
+  <h2>Đăng nhập</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <!-- Email -->
+    <div class="form-floating mb-3">
+      <input 
+        type="email" 
+        class="form-control" 
+        id="floatingInput" 
+        formControlName="email" 
+        placeholder="name@example.com">
+      <label for="floatingInput">Email</label>
+    </div>
+
+    <!-- Password -->
+    <div class="form-floating mb-3">
+      <input 
+        type="password" 
+        class="form-control" 
+        id="floatingPassword" 
+        formControlName="password" 
+        placeholder="Password">
+      <label for="floatingPassword">Mật khẩu</label>
+    </div>
+
+    <!-- Thông báo chung -->
+    <p class="text-danger fs-6 fw-medium" style="min-height:30px;">
+      {{ message }}
+    </p>
+
+    <!-- Button -->
+    <div class="inputBox">
+      <input type="submit" value="Đăng nhập" id="button" />
+    </div>
+  </form>
+
+  <div class="group">
+    <a routerLink="/auth/forget-password">Quên mật khẩu?</a>
+    <a routerLink="/auth/register">Đăng ký</a>
+  </div>
+</div>

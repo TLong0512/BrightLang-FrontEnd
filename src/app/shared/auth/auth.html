@@ -1,0 +1,23 @@
+<section class="season-winter">
+    <div class="leaves">
+        <div class="set">
+            
+            @for (img of leaves; track img) {
+                <div>
+                    <img [src]="basePath + img" alt="leaf">
+                </div>
+            }
+            @for (img of leaves; track img) {
+                <div>
+                    <img [src]="basePath + img" alt="leaf">
+                </div>
+            }
+        </div>
+    </div>
+    @for (img of files; track img) {
+        <img [src]="basePath + img + '.png'" [class]="img">
+    }
+    <div class="custom-template">
+        <router-outlet />
+    </div>
+</section>
