@@ -1,0 +1,182 @@
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h1 class="card-title mb-0 h2">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Quản lý dạng bài thi
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form thêm dạng bài -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h2 class="card-title mb-0 h5">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Thêm dạng bài mới
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Chọn Level -->
+                        <div class="col-md-4">
+                            <label for="levelSelect" class="form-label fw-semibold">
+                                <i class="fas fa-layer-group me-1"></i>
+                                Chọn Level
+                            </label>
+                            <select id="levelSelect" class="form-select" [(ngModel)]="selectedLevel"
+                                (ngModelChange)="onLevelChange()">
+                                <option value="">-- Chọn Level --</option>
+                                <option value="1">Level 1</option>
+                                <option value="2">Level 2</option>
+                                <option value="3">Level 3</option>
+                                <option value="4">Level 4</option>
+                                <option value="5">Level 5</option>
+                                <option value="6">Level 6</option>
+                            </select>
+                        </div>
+
+                        <!-- Chọn Skill -->
+                        <div class="col-md-4">
+                            <label for="skillSelect" class="form-label fw-semibold">
+                                <i class="fas fa-tools me-1"></i>
+                                Chọn Skill
+                            </label>
+                            <select id="skillSelect" class="form-select" [(ngModel)]="selectedSkill"
+                                (ngModelChange)="onSkillChange()" [disabled]="!selectedLevel">
+                                <option value="">-- Chọn Skill --</option>
+                                <option *ngFor="let skill of getAvailableSkills()" [value]="skill">
+                                    {{ toTitleCase(skill) }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div *ngIf="selectedSkill">
+                        <div>Thêm dạng câu hỏi</div>
+                        <div class="row g-3">
+                            <!-- Các trường input chỉ hiện khi đã chọn skill -->
+                            <div class="col-md-4" >
+                                <label for="typeNameInput" class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-1"></i>
+                                    Tên dạng bài
+                                </label>
+                                <input id="typeNameInput" type="text" class="form-control" [(ngModel)]="typeName"
+                                    placeholder="Nhập tên dạng bài">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="startQuestionInput" class="form-label fw-semibold">
+                                    <i class="fas fa-play me-1"></i>
+                                    Câu bắt đầu
+                                </label>
+                                <input id="startQuestionInput" type="number" class="form-control"
+                                    [(ngModel)]="startQuestion" placeholder="Nhập số câu bắt đầu" min="1">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="endQuestionInput" class="form-label fw-semibold">
+                                    <i class="fas fa-stop me-1"></i>
+                                    Câu kết thúc
+                                </label>
+                                <input id="endQuestionInput" type="number" class="form-control"
+                                    [(ngModel)]="endQuestion" placeholder="Nhập số câu kết thúc"
+                                    [min]="startQuestion || 1">
+                            </div>
+                        </div>
+                        <!-- Nút thêm -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-center">
+                                <button type="button" class="btn btn-primary btn-lg px-5" (click)="addQuestionType()">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Thêm dạng bài
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách dạng bài -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="card-title mb-0 h5">
+                        <i class="fas fa-list me-2"></i>
+                        Danh sách dạng bài
+                        <span class="badge bg-light text-dark ms-2">{{ questionTypes.length }}</span>
+                    </h2>
+                </div>
+
+                <div class="card-body p-0">
+                    <!-- Empty state -->
+                    <div *ngIf="questionTypes.length === 0" class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-inbox text-muted" style="font-size: 4rem;"></i>
+                        </div>
+                        <h5 class="text-muted">Chưa có dạng bài nào được thêm</h5>
+                        <p class="text-muted mb-0">Hãy thêm dạng bài đầu tiên của bạn!</p>
+                    </div>
+
+                    <!-- Table -->
+                    <div *ngIf="questionTypes.length > 0" class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" class="text-center">#</th>
+                                    <th scope="col">Level</th>
+                                    <th scope="col">Skill</th>
+                                    <th scope="col">Tên dạng</th>
+                                    <th scope="col">Range</th>
+                                    <th scope="col" class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of questionTypes; let i = index">
+                                    <td class="text-center fw-bold">{{ i + 1 }}</td>
+                                    <td>
+                                        <span class="badge bg-primary rounded-pill">
+                                            Level {{ item.level }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success rounded-pill">
+                                            {{ toTitleCase(item.skill) }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold">{{ item.typeName }}</td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">
+                                            Câu {{ item.startQuestion }}-{{ item.endQuestion }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            (click)="removeQuestionType(item.id)" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" title="Xóa dạng bài">
+                                            <i class="fas fa-trash me-1"></i>
+                                            Xóa
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

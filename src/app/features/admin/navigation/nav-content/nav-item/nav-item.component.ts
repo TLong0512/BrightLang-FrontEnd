@@ -14,43 +14,42 @@ import { NavigationItem } from '../../navigation';
 })
 export class NavItemComponent {
   // public props
-    constructor(@Inject(DOCUMENT) private document: Document) {}
+  constructor(@Inject(DOCUMENT) private document: Document) { }
 
   @Input() item!: NavigationItem;
 
   // public method
   closeOtherMenu(event: MouseEvent) {
-    const ele = event.target as HTMLElement;
-    if (ele !== null && ele !== undefined) {
-      const parent = ele.parentElement as HTMLElement;
-      const up_parent = ((parent.parentElement as HTMLElement).parentElement as HTMLElement).parentElement as HTMLElement;
-      const last_parent = (up_parent.parentElement as HTMLElement).parentElement as HTMLElement;
-      if (last_parent.classList.contains('coded-submenu')) {
-        up_parent.classList.remove('coded-trigger');
-        up_parent.classList.remove('active');
-      } else {
-        const sections = this.document.querySelectorAll('.coded-hasmenu');
+    const ele = event.target as HTMLElement | null;
+    if (!ele) return;
 
-        for (let i = 0; i < sections.length; i++) {
-          sections[i].classList.remove('active');
-          sections[i].classList.remove('coded-trigger');
-        }
-      }
+    const parent = ele.parentElement;
+    const up_parent = parent?.parentElement?.parentElement ?? null;
+    const last_parent = up_parent?.parentElement?.parentElement ?? null;
 
-      if (parent.classList.contains('coded-hasmenu')) {
-        parent.classList.add('coded-trigger');
-        parent.classList.add('active');
-      } else if (up_parent.classList.contains('coded-hasmenu')) {
-        up_parent.classList.add('coded-trigger');
-        up_parent.classList.add('active');
-      } else if (last_parent.classList.contains('coded-hasmenu')) {
-        last_parent.classList.add('coded-trigger');
-        last_parent.classList.add('active');
-      }
+    if (last_parent?.classList?.contains('coded-submenu')) {
+      up_parent?.classList.remove('coded-trigger', 'active');
+    } else {
+      const sections = this.document.querySelectorAll('.coded-hasmenu');
+      sections.forEach((section) => {
+        section.classList.remove('active', 'coded-trigger');
+      });
     }
 
-    if ((this.document.querySelector('app-navigation.coded-navbar') as HTMLDivElement).classList.contains('mob-open')) {
-      (this.document.querySelector('app-navigation.coded-navbar') as HTMLDivElement).classList.remove('mob-open');
+    if (parent?.classList?.contains('coded-hasmenu')) {
+      parent.classList.add('coded-trigger', 'active');
+    } else if (up_parent?.classList?.contains('coded-hasmenu')) {
+      up_parent.classList.add('coded-trigger', 'active');
+    } else if (last_parent?.classList?.contains('coded-hasmenu')) {
+      last_parent.classList.add('coded-trigger', 'active');
+    }
+
+    const navEl = this.document.querySelector('app-navigation.coded-navbar') as HTMLDivElement | null;
+    if (navEl?.classList?.contains('mob-open')) {
+      navEl.classList.remove('mob-open');
+    } else if (!navEl) {
+      console.warn('[DEBUG] Không tìm thấy app-navigation.coded-navbar');
     }
   }
+
 }

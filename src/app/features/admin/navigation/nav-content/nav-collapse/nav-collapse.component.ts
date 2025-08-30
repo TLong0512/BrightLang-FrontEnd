@@ -20,7 +20,7 @@ export class NavCollapseComponent implements OnInit {
   windowWidth: number;
   // public props
   @Input() item!: NavigationItem;
-  
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object, @Inject(DOCUMENT) private document: Document) {
     this.windowWidth = 0
     if (isPlatformBrowser(this.platformId)) {
@@ -32,21 +32,19 @@ export class NavCollapseComponent implements OnInit {
   ngOnInit() {
     this.current_url = this.location.path();
 
-    // eslint-disable-next-line
-    //@ts-ignore
-    const baseHref = this.location['_baseHref'] || ''; // Use baseHref if necessary
+    // safer baseHref handling
+    const baseHref = (this.location as any)?._baseHref || '';
     this.current_url = baseHref + this.current_url;
 
-    // Timeout to allow DOM to fully render before checking for the links
+    // Wait for DOM to render
     setTimeout(() => {
       const links = this.document.querySelectorAll('a.nav-link') as NodeListOf<HTMLAnchorElement>;
       links.forEach((link: HTMLAnchorElement) => {
         if (link.getAttribute('href') === this.current_url) {
-          let parent = link.parentElement;
-          while (parent && parent.classList) {
-            if (parent.classList.contains('coded-hasmenu')) {
-              parent.classList.add('coded-trigger');
-              parent.classList.add('active');
+          let parent: HTMLElement | null = link.parentElement;
+          while (parent) {
+            if (parent.classList?.contains('coded-hasmenu')) {
+              parent.classList.add('coded-trigger', 'active');
             }
             parent = parent.parentElement;
           }
@@ -55,36 +53,49 @@ export class NavCollapseComponent implements OnInit {
     }, 0);
   }
 
+
   // Method to handle the collapse of the navigation menu
   navCollapse(e: MouseEvent) {
-    let parent = e.target as HTMLElement;
+  let target = e.target as HTMLElement | null;
 
-    if (parent?.tagName === 'SPAN') {
-      parent = parent.parentElement!;
-    }
+  if (!target) return;
 
-    parent = (parent as HTMLElement).parentElement!;
-
-    const sections = this.document.querySelectorAll('.coded-hasmenu');
-    for (let i = 0; i < sections.length; i++) {
-      if (sections[i] !== parent) {
-        sections[i].classList.remove('coded-trigger');
-      }
-    }
-
-    let first_parent = parent.parentElement!;
-    let pre_parent = ((parent as HTMLElement).parentElement as HTMLElement).parentElement!;
-    if (first_parent.classList.contains('coded-hasmenu')) {
-      do {
-        first_parent.classList.add('coded-trigger');
-        first_parent = (first_parent.parentElement as HTMLElement).parentElement!;
-      } while (first_parent.classList.contains('coded-hasmenu'));
-    } else if (pre_parent.classList.contains('coded-submenu')) {
-      do {
-        pre_parent.parentElement?.classList.add('coded-trigger');
-        pre_parent = (((pre_parent as HTMLElement).parentElement as HTMLElement).parentElement as HTMLElement).parentElement!;
-      } while (pre_parent.classList.contains('coded-submenu'));
-    }
-    parent.classList.toggle('coded-trigger');
+  // Nếu click vào span thì lấy cha
+  if (target.tagName === 'SPAN') {
+    target = target.parentElement;
   }
+
+  // parent = thẻ <li> coded-hasmenu
+  let parent = target?.parentElement;
+  if (!parent) return;
+
+  // Đóng tất cả các menu khác
+  const sections = this.document.querySelectorAll('.coded-hasmenu');
+  sections.forEach((section) => {
+    if (section !== parent) {
+      section.classList.remove('coded-trigger');
+    }
+  });
+
+  // Xử lý khi menu lồng nhau
+  let first_parent = parent.parentElement;
+  if (first_parent?.classList.contains('coded-hasmenu')) {
+    do {
+      first_parent.classList.add('coded-trigger');
+      first_parent = first_parent.parentElement?.parentElement || null;
+    } while (first_parent?.classList.contains('coded-hasmenu'));
+  }
+
+  let pre_parent = parent.parentElement?.parentElement || null;
+  if (pre_parent?.classList.contains('coded-submenu')) {
+    do {
+      pre_parent.parentElement?.classList.add('coded-trigger');
+      pre_parent = pre_parent.parentElement?.parentElement?.parentElement || null;
+    } while (pre_parent?.classList.contains('coded-submenu'));
+  }
+
+  // Toggle menu hiện tại
+  parent.classList.toggle('coded-trigger');
+}
+
 }

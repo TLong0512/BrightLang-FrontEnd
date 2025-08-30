@@ -12,7 +12,6 @@ import { NavCollapseComponent } from './nav-collapse/nav-collapse.component';
 import { NavGroupComponent } from './nav-group/nav-group.component';
 import { NavItemComponent } from './nav-item/nav-item.component';
 import { SharedModule } from '../../../../shared/shared.module';
-import { environment } from '../../../../../environments/environment.prod';
 
 // NgScrollbarModule
 
@@ -31,7 +30,6 @@ export class NavContentComponent implements OnInit {
 
   // version
   title = 'Demo application for version numbering';
-  currentApplicationVersion = environment.appVersion;
 
   navigations!: NavigationItem[];
   windowWidth: number;
@@ -48,38 +46,48 @@ export class NavContentComponent implements OnInit {
 
   // Life cycle events
   ngOnInit() {
-    if (this.windowWidth < 1025) {
-      setTimeout(() => {
-        (this.document.querySelector('.coded-navbar') as HTMLDivElement).classList.add('menupos-static');
-      }, 500);
-    }
+  if (this.windowWidth < 1025) {
+    setTimeout(() => {
+      const navBar = this.document.querySelector('.coded-navbar') as HTMLElement | null;
+      if (navBar) {
+        navBar.classList.add('menupos-static');
+      }
+    }, 500);
   }
+}
+
 
   fireOutClick() {
-    let current_url = this.location.path();
+  let current_url = this.location.path();
+
+  // eslint-disable-next-line
+  // @ts-ignore
+  if (this.location['_baseHref']) {
     // eslint-disable-next-line
     // @ts-ignore
-    if (this.location['_baseHref']) {
-      // eslint-disable-next-line
-      // @ts-ignore
-      current_url = this.location['_baseHref'] + this.location.path();
-    }
-    const link = "a.nav-link[ href='" + current_url + "' ]";
-    const ele = this.document.querySelector(link);
-    if (ele !== null && ele !== undefined) {
-      const parent = ele.parentElement;
-      const up_parent = parent?.parentElement?.parentElement;
-      const last_parent = up_parent?.parentElement;
-      if (parent?.classList.contains('coded-hasmenu')) {
-        parent.classList.add('coded-trigger');
-        parent.classList.add('active');
-      } else if (up_parent?.classList.contains('coded-hasmenu')) {
-        up_parent.classList.add('coded-trigger');
-        up_parent.classList.add('active');
-      } else if (last_parent?.classList.contains('coded-hasmenu')) {
-        last_parent.classList.add('coded-trigger');
-        last_parent.classList.add('active');
-      }
-    }
+    current_url = this.location['_baseHref'] + this.location.path();
   }
+
+  // ⚡ Dùng querySelector an toàn, chú ý bỏ khoảng trắng dư
+  const linkSelector = `a.nav-link[href='${current_url}']`;
+  const ele = this.document.querySelector(linkSelector) as HTMLElement | null;
+
+  if (!ele) {
+    console.warn(`[DEBUG fireOutClick] Không tìm thấy link với href=${current_url}`);
+    return;
+  }
+
+  const parent = ele.parentElement;
+  const up_parent = parent?.parentElement?.parentElement ?? null;
+  const last_parent = up_parent?.parentElement ?? null;
+
+  if (parent?.classList?.contains('coded-hasmenu')) {
+    parent.classList.add('coded-trigger', 'active');
+  } else if (up_parent?.classList?.contains('coded-hasmenu')) {
+    up_parent.classList.add('coded-trigger', 'active');
+  } else if (last_parent?.classList?.contains('coded-hasmenu')) {
+    last_parent.classList.add('coded-trigger', 'active');
+  }
+}
+
 }

@@ -34,6 +34,7 @@ import { RoadMapDetailComponent } from './features/admin/roadmap-detail/roadmap-
 import { AuthGuard } from './guards/auth.guard';
 import { AdminComponent } from './features/admin/admin.component';
 import { DefaultComponent } from './features/admin/demo/dashboard/default/default.component';
+import { ExamQuestionTypesComponent } from './features/admin/question-type/question-type';
 
 export const routes: Routes = [
   
@@ -87,7 +88,8 @@ export const routes: Routes = [
     children: [
       { path: '', component: DefaultComponent },
       { path: 'roadmap', component: RoadMapComponent },
-      { path: 'roadmap-detail', component: RoadMapDetailComponent }
+      { path: 'roadmap-detail', component: RoadMapDetailComponent },
+      {path: 'question-type', component: ExamQuestionTypesComponent}
     ]
   },
 

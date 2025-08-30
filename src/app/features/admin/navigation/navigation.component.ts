@@ -24,9 +24,9 @@ export class NavigationComponent {
     if (isPlatformBrowser(this.platformId)) {
       this.windowWidth = window.innerWidth;
     }
-    
+
   }
-  
+
   themeMode!: string;
 
   // public method
@@ -37,6 +37,9 @@ export class NavigationComponent {
   }
 
   navSubmenuCollapse() {
-    this.document.querySelector('app-navigation.coded-navbar')?.classList.add('coded-trigger');
+    const el = this.document.querySelector('app-navigation.coded-navbar');
+    if (el) {
+      el.classList.add('coded-trigger');
+    }
   }
 }

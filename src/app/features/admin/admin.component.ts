@@ -1,6 +1,6 @@
 // Angular import
-import { AfterViewInit, Component, inject } from '@angular/core';
-import { CommonModule, Location, LocationStrategy } from '@angular/common';
+import { AfterViewInit, Component, Inject, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser, Location, LocationStrategy } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 
@@ -13,10 +13,15 @@ import { BerryConfig } from '../../../app-config';
 
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule, NavigationComponent, NavBarComponent, ConfigurationComponent, RouterModule],
+  imports: [CommonModule, NavigationComponent, NavBarComponent, RouterModule],
   templateUrl: './admin.component.html'
 })
 export class AdminComponent implements AfterViewInit {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+
+
+
+  }
   private location = inject(Location);
   private locationStrategy = inject(LocationStrategy);
   cdr = inject(ChangeDetectorRef);
@@ -41,8 +46,10 @@ export class AdminComponent implements AfterViewInit {
     if (current_url === baseHref + '/layout/theme-compact' || current_url === baseHref + '/layout/box') {
       BerryConfig.isCollapse_menu = true;
     }
-
-    this.windowWidth = window.innerWidth;
+    this.windowWidth = 0;
+    if (isPlatformBrowser(this.platformId)) {
+      this.windowWidth = window.innerWidth;
+    }
     this.navCollapsed = this.windowWidth >= 1025 ? BerryConfig.isCollapse_menu : false;
     this.cdr.detectChanges();
   }
@@ -54,7 +61,10 @@ export class AdminComponent implements AfterViewInit {
 
   // public method
   navMobClick() {
-    if (this.navCollapsedMob && !document.querySelector('app-navigation.coded-navbar')?.classList.contains('mob-open')) {
+    const navEl = document.querySelector('app-navigation.coded-navbar');
+    const sidebarEl = document.querySelector('app-navigation.pc-sidebar');
+
+    if (this.navCollapsedMob && !(navEl?.classList.contains('mob-open'))) {
       this.navCollapsedMob = !this.navCollapsedMob;
       setTimeout(() => {
         this.navCollapsedMob = !this.navCollapsedMob;
@@ -62,10 +72,12 @@ export class AdminComponent implements AfterViewInit {
     } else {
       this.navCollapsedMob = !this.navCollapsedMob;
     }
-    if (document.querySelector('app-navigation.pc-sidebar')?.classList.contains('navbar-collapsed')) {
-      document.querySelector('app-navigation.pc-sidebar')?.classList.remove('navbar-collapsed');
+
+    if (sidebarEl?.classList.contains('navbar-collapsed')) {
+      sidebarEl.classList.remove('navbar-collapsed');
     }
   }
+
 
   handleKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
@@ -74,8 +86,10 @@ export class AdminComponent implements AfterViewInit {
   }
 
   closeMenu() {
-    if (document.querySelector('app-navigation.pc-sidebar')?.classList.contains('mob-open')) {
-      document.querySelector('app-navigation.pc-sidebar')?.classList.remove('mob-open');
+    const sidebarEl = document.querySelector('app-navigation.pc-sidebar');
+    if (sidebarEl?.classList.contains('mob-open')) {
+      sidebarEl.classList.remove('mob-open');
     }
   }
+
 }

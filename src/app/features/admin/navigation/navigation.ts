@@ -1,3 +1,4 @@
+// side bar
 export interface NavigationItem {
   id: string;
   title: string;
@@ -17,21 +18,13 @@ export interface NavigationItem {
 
 export const NavigationItems: NavigationItem[] = [
   {
-    id: 'dashboard',
-    title: 'Dashboard',
-    type: 'group',
-    icon: 'icon-navigation',
-    children: [
-      {
-        id: 'default',
-        title: 'Dashboard',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/default',
-        icon: 'ti ti-dashboard',
-        breadcrumbs: false
-      }
-    ]
+    id: 'default',
+    title: 'Tổng quan',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/admin',
+    icon: 'ti ti-dashboard',
+    breadcrumbs: false
   },
   {
     id: 'page',
@@ -67,13 +60,13 @@ export const NavigationItems: NavigationItem[] = [
   },
   {
     id: 'elements',
-    title: 'Elements',
+    title: 'Quản lý',
     type: 'group',
     icon: 'icon-navigation',
     children: [
       {
         id: 'typography',
-        title: 'Typography',
+        title: 'Dạng câu hỏi',
         type: 'item',
         classes: 'nav-item',
         url: '/typography',
@@ -81,7 +74,7 @@ export const NavigationItems: NavigationItem[] = [
       },
       {
         id: 'color',
-        title: 'Colors',
+        title: 'Câu hỏi',
         type: 'item',
         classes: 'nav-item',
         url: '/color',
@@ -89,37 +82,11 @@ export const NavigationItems: NavigationItem[] = [
       },
       {
         id: 'tabler',
-        title: 'Tabler',
+        title: 'Lộ trình',
         type: 'item',
         classes: 'nav-item',
         url: 'https://tabler-icons.io/',
         icon: 'ti ti-plant-2',
-        target: true,
-        external: true
-      }
-    ]
-  },
-  {
-    id: 'other',
-    title: 'Other',
-    type: 'group',
-    icon: 'icon-navigation',
-    children: [
-      {
-        id: 'sample-page',
-        title: 'Sample Page',
-        type: 'item',
-        url: '/sample-page',
-        classes: 'nav-item',
-        icon: 'ti ti-brand-chrome'
-      },
-      {
-        id: 'document',
-        title: 'Document',
-        type: 'item',
-        classes: 'nav-item',
-        url: 'https://codedthemes.gitbook.io/berry-angular/',
-        icon: 'ti ti-vocabulary',
         target: true,
         external: true
       }
