@@ -7,6 +7,9 @@ import { VerifyService } from './verify-api';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { SharedService } from '../share.service';
+import { EmailToVerifyDto } from '../../../models/email.model';
+import { RegisterService } from '../register/register-api';
 
 @Component({
   selector: 'verify',
@@ -20,15 +23,16 @@ export class VerifyComponent implements OnInit, OnDestroy {
   resend = true;
   timeLeft = 60; // 60 giây
   timeLeft$ = new BehaviorSubject<number>(10);
-
   verifyForm: FormGroup = new FormGroup({});
   private intervalId: any;
-    inputs = [0,1,2,3,4,5];
-  
-    constructor(private cdr: ChangeDetectorRef, 
-        private verifyService: VerifyService,
-        private router: Router
-    ) {}
+  inputs = [0, 1, 2, 3, 4, 5];
+  email = ''
+  constructor(private cdr: ChangeDetectorRef,
+    private verifyService: VerifyService,
+    private router: Router,
+    private sharedService: SharedService,
+    private registerService: RegisterService
+  ) { }
 
   ngOnInit() {
     const group: any = {};
@@ -36,7 +40,10 @@ export class VerifyComponent implements OnInit, OnDestroy {
       group['code' + i] = new FormControl('', [Validators.required]);
     });
     this.verifyForm = new FormGroup(group);
-    
+
+    this.sharedService.currentData.subscribe(res => {
+      this.email = res
+    });
     this.startCountdown();
   }
 
@@ -52,48 +59,45 @@ export class VerifyComponent implements OnInit, OnDestroy {
     this.message = ''; // reset message
     console.log(this.inputs)
     const code = this.inputs
-        .map((_, i) => this.getControl(i).value)
-        .join('');
+      .map((_, i) => this.getControl(i).value)
+      .join('');
 
-    // const validCode = '123456'; // ví dụ mã đúng
-
-    // if (code === validCode) {
-    //     alert('Xác nhận thành công!');
-    //     // Thực hiện chuyển trang hoặc logic khác
-    // } else {
-    //     this.message = 'Mã xác nhận không đúng. Vui lòng thử lại.';
-    //     this.verifyForm.reset(); // reset các ô input
-    // }
-
-    const registerDto: RegisterDto = {
-        FullName: localStorage.getItem('fullName') ?? '',
-        Email: localStorage.getItem('email') ?? '',
-        Password: localStorage.getItem('password') ?? '',
-        ConfirmPassword: localStorage.getItem('confirmPassword') ?? '',
+    this.sharedService.currentData.subscribe(res => {
+      this.email = res
+      const registerDto: RegisterDto = {
+        FullName: res['fullName'],
+        Email: res['email'],
+        Password: res['password'],
+        ConfirmPassword: res['confirmPassword'],
         VerificationCode: code
-    } 
-    this.Register(registerDto)
-}
+      }
+      this.Register(registerDto)
+    });
+  }
+
   onResend() {
     this.timeLeft$ = new BehaviorSubject<number>(10);
     if (this.intervalId) clearInterval(this.intervalId);
     this.intervalId = null;
     this.startCountdown();
+    this.sharedService.currentData.subscribe(res => {
+      this.SendEmail({Email: res['email']})
+    });
   }
 
-    startCountdown() {
-        if (this.intervalId) return;
+  startCountdown() {
+    if (this.intervalId) return;
 
-        this.intervalId = setInterval(() => {
-            const current = this.timeLeft$.value;
-            if (current > 0) {
-                this.timeLeft$.next(current - 1);
-            } else {
-                clearInterval(this.intervalId);
-                this.intervalId = null;
-            }
-        }, 1000);
-    }
+    this.intervalId = setInterval(() => {
+      const current = this.timeLeft$.value;
+      if (current > 0) {
+        this.timeLeft$.next(current - 1);
+      } else {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+      }
+    }, 1000);
+  }
 
   focusNext(i: number, event: KeyboardEvent) {
     const input = event.target as HTMLInputElement;
@@ -106,40 +110,56 @@ export class VerifyComponent implements OnInit, OnDestroy {
     }
   }
 
-    allowOnlyNumbers(event: KeyboardEvent) {
-        const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'];
-        if (allowedKeys.includes(event.key)) return;
+  allowOnlyNumbers(event: KeyboardEvent) {
+    const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    if (allowedKeys.includes(event.key)) return;
 
-        if (!/^[0-9]$/.test(event.key)) {
-            event.preventDefault(); // chặn ký tự không phải số
-        }
+    if (!/^[0-9]$/.test(event.key)) {
+      event.preventDefault(); // chặn ký tự không phải số
     }
-    Register(registerDto: RegisterDto) {
-      console.log(registerDto)
+  }
 
-        this.verifyService.create(registerDto).subscribe({
-          next: res => {
-            console.log('Đăng ký thành công:', res)
-            Swal.fire({
-              title: 'Đăng ký thành công!',
-              text: 'Vui lòng đăng nhập để tiếp tục!',
-              icon: 'success',
-              confirmButtonText: 'OK',
-              timer: 2000,       
-              timerProgressBar: true
-            }).then(() => {
-              this.router.navigate(['/auth']);
-            });
-        },
-          error: err => {
-            console.log(err)
-            if(err.status == 400) {
-              this.message = 'Mã xác nhận không chính xác!'
-            }
-            if(err.status == 0) {
-              this.message = 'Lỗi kết nối!'
-            }
-          }
+  Register(registerDto: RegisterDto) {
+    console.log(registerDto)
+
+    this.verifyService.create(registerDto).subscribe({
+      next: res => {
+        console.log('Đăng ký thành công:', res)
+        Swal.fire({
+          title: 'Đăng ký thành công!',
+          text: 'Vui lòng đăng nhập để tiếp tục!',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          timer: 2000,
+          timerProgressBar: true
+        }).then(() => {
+          this.router.navigate(['/auth']);
         });
-    }
+      },
+      error: err => {
+        console.log(err)
+        if (err.status == 400) {
+          this.message = 'Mã xác nhận không chính xác!'
+        }
+        if (err.status == 0) {
+          this.message = 'Lỗi kết nối!'
+        }
+      }
+    });
+  }
+
+  SendEmail(emailToVerifyDto: EmailToVerifyDto) {
+    this.registerService.create(emailToVerifyDto).subscribe({
+      next: res => {
+      },
+      error: err => {
+        if (err.status == 409) {
+          this.message = 'Email đã được sử dụng!'
+        }
+        if (err.status == 0) {
+          this.message = 'Lỗi kết nối!'
+        }
+      }
+    });
+  }
 }
