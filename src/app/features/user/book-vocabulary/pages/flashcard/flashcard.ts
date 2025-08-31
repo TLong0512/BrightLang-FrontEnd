@@ -31,14 +31,11 @@ export class FlashcardComponent {
 
   }
   ngOnInit() {
-  // const nav = this.router.getCurrentNavigation();
-  // const state = nav?.extras.state as { vocabs: Vocabulary[] };
-  // this.vocabularies = state?.vocabs || [];
   const bookId = this.route.snapshot.paramMap.get('bookId')!;
   
     this.vocabService.getVocabulariesByBook(bookId).subscribe({
-    next: (res) => {
-      this.vocabularies = res;
+    next: (res: any) => {
+      this.vocabularies = res.items;
     },
     error: (err) => {
       console.error("Lỗi khi load flashcards:", err);

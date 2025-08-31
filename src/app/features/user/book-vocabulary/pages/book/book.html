@@ -88,7 +88,7 @@
 </div>
 
 <!-- Enhanced Modal -->
-<div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="addBookModal" tabindex="-1" >
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius: 20px; border: none;">
       <div class="modal-header border-0 pb-0">
@@ -135,3 +135,58 @@
     </div>
   </div>
 </div>
+
+<!-- Update Modal -->
+<div class="modal fade show d-block" *ngIf="isUpdateModalOpen" tabindex="-1" >
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; border: none;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-pencil-square me-2 text-warning"></i>Cập nhật sổ từ vựng
+        </h5>
+        <button type="button" class="btn-close" (click)="closeUpdateModal()"></button>
+      </div>
+
+      <div class="modal-body px-4 pb-4">
+        <form [formGroup]="updateBookForm" (ngSubmit)="updateBook()">
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Tên sổ từ vựng</label>
+            <input type="text" formControlName="title" class="form-control form-control-lg">
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Mô tả</label>
+            <textarea formControlName="description" class="form-control" rows="3"></textarea>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-warning btn-lg text-white">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade show d-block" *ngIf="isDeleteModalOpen" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; border: none;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-danger">
+          <i class="bi bi-trash3 me-2"></i>Xóa sổ từ vựng
+        </h5>
+        <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p class="fs-5">Bạn có chắc muốn xóa <b>{{ selectedBook?.name }}</b>?</p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+          <button class="btn btn-secondary" (click)="closeDeleteModal()">Hủy</button>
+          <button class="btn btn-danger" (click)="confirmDeleteBook()">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
