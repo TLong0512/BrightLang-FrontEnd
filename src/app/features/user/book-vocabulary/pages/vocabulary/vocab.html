@@ -79,6 +79,8 @@
 </div>
 
 <!-- modal xóa -->
+  <div *ngIf="isDeleteModalOpen" class="custom-backdrop fade show"></div>
+
  <div class="modal fade show d-block" *ngIf="isDeleteModalOpen" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius: 20px; border: none;">
