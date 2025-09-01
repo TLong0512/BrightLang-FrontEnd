@@ -1,6 +1,6 @@
-<div class="container py-5">
+<!-- <div class="container py-5">
   <h2 class="text-center mb-5 fw-bold">
-    Flashcard Học Từ Vựng
+     Học Từ Vựng
   </h2>
 
   <div class="d-flex justify-content-center">
@@ -24,7 +24,7 @@
 
   <div class="d-flex justify-content-between align-items-center mt-5 px-5">
     <button class="btn btn-lg btn-outline-custom rounded-pill px-4" (click)="prevCard()">
-      ⬅️ Trước
+      Trước
     </button>
 
     <span class="fs-5 fw-semibold text-secondary">
@@ -32,7 +32,69 @@
     </span>
 
     <button class="btn btn-lg btn-outline-custom rounded-pill px-4" (click)="nextCard()">
-      Tiếp ➡️
+      Tiếp
     </button>
+  </div>
+</div> -->
+
+<div class="container py-5">
+  <h2 class="text-center mb-5 fw-bold">Học Từ Vựng</h2>
+
+  <!-- Chọn chế độ học -->
+  <div class="d-flex justify-content-center mb-4">
+    <button class="btn btn-outline-primary me-2" 
+            [class.active]="mode === 'flashcard'" 
+            (click)="mode='flashcard'">
+      Flashcard
+    </button>
+    <button class="btn btn-outline-success" 
+            [class.active]="mode === 'answer'" 
+            (click)="mode='answer'">
+      Trả lời trực tiếp
+    </button>
+  </div>
+
+  <!-- Flashcard Mode -->
+  <div *ngIf="mode === 'flashcard'" class="d-flex justify-content-center">
+    <div class="flashcard"
+         [class.flipped]="showBack"
+         (click)="flipCard()">
+      <div class="front d-flex justify-content-center align-items-center">
+        <h3>{{ vocabularies[currentIndex]?.front }}</h3>
+      </div>
+      <div class="back d-flex justify-content-center align-items-center">
+        <h3>{{ vocabularies[currentIndex]?.back }}</h3>
+      </div>
+    </div>
+  </div>
+    
+
+ <!-- Trả lời trực tiếp Mode -->
+<div *ngIf="mode === 'answer'" class="d-flex flex-column align-items-center">
+  <h3 class="fw-bold text-black mb-2">{{ vocabularies[answerIndex]?.back }}</h3>
+  <!-- <h5 class="text-muted mb-3"> {{ vocabularies[answerIndex]?.back }}</h5> -->
+
+  <input type="text" class="form-control w-50 mb-3" [(ngModel)]="userAnswer" placeholder="Nhập đáp án">
+
+  <button class="btn btn-primary mb-2" (click)="checkAnswer()">Kiểm tra</button>
+
+  <div *ngIf="answerResult !== null" class="mt-2">
+    <p [ngClass]="{'text-success': answerResult, 'text-danger': !answerResult}">
+      {{ answerResult ? 'Đúng rồi!' : 'Sai, đáp án: ' + vocabularies[answerIndex]?.front }}
+    </p>
+  </div>
+
+  <button class="btn btn-outline-secondary mt-2" (click)="nextAnswer()">Tiếp</button>
+</div>
+
+  <!-- Điều hướng Prev / Next -->
+<div *ngIf="mode === 'flashcard'" class="d-flex justify-content-between align-items-center mt-5 px-5">
+    <button class="btn btn-lg btn-outline-custom rounded-pill px-4" (click)="prevCard()">Trước</button>
+
+    <span class="fs-5 fw-semibold text-secondary">
+      {{ currentIndex + 1 }} / {{ vocabularies.length }}
+    </span>
+
+    <button class="btn btn-lg btn-outline-custom rounded-pill px-4" (click)="nextCard()">Tiếp</button>
   </div>
 </div>
