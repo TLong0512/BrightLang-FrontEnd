@@ -26,15 +26,10 @@ import { QuestionTypesComponent } from './features/user/practive/pages/question-
 import { PracticeSetupComponent } from './features/user/practive/pages/practice-setup/practice-setup';
 import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
-import { StatisticsComponent } from './features/admin/statistics/statistics';
-import { RoadMapComponent } from './features/admin/roadmap/roadmap';
-import { RoadMapDetailComponent } from './features/admin/roadmap-detail/roadmap-detail';
 
 // 👇 import guards
 import { AuthGuard } from './guards/auth.guard';
 import { AdminComponent } from './features/admin/admin.component';
-import { DefaultComponent } from './features/admin/demo/dashboard/default/default.component';
-import { ExamQuestionTypesComponent } from './features/admin/question-type/question-type';
 
 export const routes: Routes = [
   
@@ -83,14 +78,8 @@ export const routes: Routes = [
 
   {
     path: 'admin',
-    component: AdminComponent,
     // canActivate: [AuthGuard],   
-    children: [
-      { path: '', component: DefaultComponent },
-      { path: 'roadmap', component: RoadMapComponent },
-      { path: 'roadmap-detail', component: RoadMapDetailComponent },
-      {path: 'question-type', component: ExamQuestionTypesComponent}
-    ]
+    loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   },
 
   // fallback route

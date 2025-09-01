@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
 
     // Nếu login rồi nhưng không phải admin thì chuyển qua /user
     if (role !== 'Admin') {
-      return this.router.parseUrl('/user');
+      return this.router.parseUrl('/');
     }
 
     // Nếu là Admin thì cho vào route

@@ -1,7 +1,7 @@
 // Angular import
 import { CommonModule } from '@angular/common';
 import { Component, DOCUMENT, Inject, inject, OnInit, Renderer2 } from '@angular/core';
-import { BerryConfig } from '../../../../app-config';
+import { BerryConfig } from '../../../../../app-config';
 
 // project import
 

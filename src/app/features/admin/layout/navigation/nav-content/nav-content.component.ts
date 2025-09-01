@@ -11,7 +11,7 @@ import { NavigationItem, NavigationItems } from '../navigation';
 import { NavCollapseComponent } from './nav-collapse/nav-collapse.component';
 import { NavGroupComponent } from './nav-group/nav-group.component';
 import { NavItemComponent } from './nav-item/nav-item.component';
-import { SharedModule } from '../../../../shared/shared.module';
+import { SharedModule } from '../../../../../shared/shared.module';
 
 // NgScrollbarModule
 

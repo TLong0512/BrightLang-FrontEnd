@@ -6,9 +6,9 @@ import { ChangeDetectorRef } from '@angular/core';
 
 // Project import
 
-import { ConfigurationComponent } from './configuration/configuration.component';
-import { NavBarComponent } from './nav-bar/nav-bar.component';
-import { NavigationComponent } from './navigation/navigation.component';
+import { ConfigurationComponent } from './layout/configuration/configuration.component';
+import { NavBarComponent } from './layout/nav-bar/nav-bar.component';
+import { NavigationComponent } from './layout/navigation/navigation.component';
 import { BerryConfig } from '../../../app-config';
 
 @Component({

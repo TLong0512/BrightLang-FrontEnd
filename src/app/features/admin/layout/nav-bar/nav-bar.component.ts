@@ -6,7 +6,7 @@ import { Component, Inject, output, PLATFORM_ID } from '@angular/core';
 import { NavLeftComponent } from './nav-left/nav-left.component';
 import { NavLogoComponent } from './nav-logo/nav-logo.component';
 import { NavRightComponent } from './nav-right/nav-right.component';
-import { BerryConfig } from '../../../../app-config';
+import { BerryConfig } from '../../../../../app-config';
 import { isPlatformBrowser } from '@angular/common';
 
 @Component({
