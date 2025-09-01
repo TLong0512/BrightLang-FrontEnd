@@ -1,5 +1,5 @@
 export interface Vocabulary {
-  id: number;
+  id: string;
   bookId: string;
   front: string;
   back: string;
