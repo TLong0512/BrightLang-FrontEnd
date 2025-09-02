@@ -1,6 +1,4 @@
 import { Component, AfterViewInit, Renderer2, ElementRef, ViewChild, Inject, DOCUMENT } from '@angular/core';
-import { RoadMapComponent } from '../../features/admin/roadmap/roadmap';
-import { RoadMapDetailComponent } from '../../features/admin/roadmap-detail/roadmap-detail';
 import { RouterLink, RouterModule } from '@angular/router';
 
 @Component({
