@@ -7,7 +7,7 @@ import { ResetPasswordComponent } from './features/auth/reset-password/reset-pas
 import { TopicsDetail } from './features/home/topics-detail/topics-detail';
 import { HomeComponent } from './features/home/home';
 import { HomePageComponent } from './features/home/home-page/home-page';
-import { UserHomeComponent } from './features/user/user-home/user-home';  
+import { UserHomeComponent } from './features/user/user-home/user-home';
 
 import { AuthComponent } from './shared/auth/auth';
 import { UserComponent } from './features/user/user';
@@ -21,10 +21,11 @@ import { QuestionTypesComponent } from './features/user/practive/pages/question-
 import { PracticeSetupComponent } from './features/user/practive/pages/practice-setup/practice-setup';
 import { PracticeScreenComponent } from './features/user/practive/pages/practice-screen/practice-screen';
 import { ResultScreenComponent } from './features/user/practive/pages/result-screen/result-screen';
+import { TopikSubLevelSelectionComponent } from './features/user/practive/pages/topikSubLevel/topik-sub-level';
 
 export const routes: Routes = [
-  
-    {
+
+  {
     path: '',
     component: HomeComponent,
     children: [
@@ -39,15 +40,19 @@ export const routes: Routes = [
     ]
   },
   {
-    path:'home-user',
+    path: 'home-user',
     component: UserComponent,
     children: [
       { path: 'result-screen/:sessionId', component: ResultScreenComponent },
       { path: 'practice-screen/:sessionId', component: PracticeScreenComponent },
       { path: 'question-types/:level/:skillId', component: QuestionTypesComponent },
 
-      // Thêm route đúng cho bước tiếp theo
       { path: 'practice-setup/:level/:skillId/:questionTypeId', component: PracticeSetupComponent },
+      {
+        path: 'topik-sublevel/:level',
+        component: TopikSubLevelSelectionComponent
+      },
+
       {
         path: 'skill-selection/:level',
         component: SkillSelectionComponent
@@ -106,9 +111,7 @@ export const routes: Routes = [
         path: 'reset-password',
         component: ResetPasswordComponent
       }
-      
-
     ]
   }
-    
+
 ];

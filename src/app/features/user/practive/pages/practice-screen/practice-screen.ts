@@ -111,6 +111,7 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
       min-height: 100vh;
       background: linear-gradient(135deg, #80d0c7 0%, #13547a 100%);
       padding: 15px;
+      margin-top: 99px;
     }
 
     .practice-header {
@@ -408,7 +409,7 @@ export class PracticeScreenComponent implements OnInit, OnDestroy {
   private loadSession(sessionId: string) {
     // In real app, load session from service/API
     // For demo, generate a mock session
-    this.topikDataService.generatePracticeSession('topik1', 'listening', 'basic-conversation', 10, 'medium')
+    this.topikDataService.generatePracticeSession('topik1', 'listening', 'basic-conversation', 10)
       .subscribe(session => {
         this.practiceService.startSession(session);
       });
@@ -424,10 +425,10 @@ export class PracticeScreenComponent implements OnInit, OnDestroy {
   isAnswerSelected(answerIndex: number): boolean {
     const currentQuestion = this.practiceService.currentQuestion();
     if (!currentQuestion) return false;
-    
+
     const userAnswer = this.practiceService.userAnswers()
       .find(a => a.questionId === currentQuestion.id);
-    
+
     return userAnswer?.selectedAnswer === answerIndex;
   }
 
@@ -451,10 +452,10 @@ export class PracticeScreenComponent implements OnInit, OnDestroy {
   }
 
   submitPractice() {
-  if (confirm('Bạn có chắc chắn muốn nộp bài?')) {
-    this.practiceService.submitPractice().subscribe(result => {
-      this.router.navigate(['/home-user/result-screen', 99]); 
-    });
+    if (confirm('Bạn có chắc chắn muốn nộp bài?')) {
+      this.practiceService.submitPractice().subscribe(result => {
+        this.router.navigate(['/home-user/result-screen', 99]);
+      });
+    }
   }
-}
 }

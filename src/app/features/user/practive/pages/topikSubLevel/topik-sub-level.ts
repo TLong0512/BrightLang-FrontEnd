@@ -1,39 +1,30 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { TopikDataService } from '../../services/topik-data.service';
-import { TopikLevel } from '../../../../../models/topik.model';
-import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-topik-selection',
-  standalone: true,
-  imports: [CommonModule, LoadingSpinnerComponent],
-  template: `
+    selector: 'app-topik-sublevel-selection',
+    standalone: true,
+    imports: [CommonModule],
+    template: `
     <div class="topik-selection-container">
       <div class="header">
-        <h1>Luyện tập TOPIK</h1>
-        <p>Chọn cấp độ TOPIK để bắt đầu luyện tập</p>
+        <h1>Chọn Level</h1>
+        <p *ngIf="parentLevel === 'topik1'">TOPIK I có 2 level: 1, 2</p>
+        <p *ngIf="parentLevel === 'topik2'">TOPIK II có 4 level: 3, 4, 5, 6</p>
       </div>
-      
-      @if (loading()) {
-        <app-loading-spinner message="Đang tải dữ liệu..."></app-loading-spinner>
-      } @else {
-        <div class="options-grid">
-          @for (level of topikLevels(); track level.id) {
-            <button 
-              class="option-card" 
-              (click)="selectTopikLevel(level.level)"
-              [attr.data-level]="level.level">
-              <h3>{{ level.name }}</h3>
-              <p>{{ level.description }}</p>
-            </button>
-          }
-        </div>
-      }
+
+      <div class="options-grid">
+        <button 
+          class="option-card"
+          *ngFor="let level of subLevels"
+          (click)="selectSubLevel(level)">
+          <h3>Level {{ level }}</h3>
+        </button>
+      </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .topik-selection-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -140,32 +131,23 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
     }
   `]
 })
-export class TopikSelectionComponent implements OnInit {
-  private router = inject(Router);
-  private topikDataService = inject(TopikDataService);
+export class TopikSubLevelSelectionComponent implements OnInit {
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
 
-  protected loading = signal(true);
-  protected topikLevels = signal<TopikLevel[]>([]);
+    parentLevel: 'topik1' | 'topik2' | null = null;
+    subLevels: number[] = [];
 
-  ngOnInit() {
-    this.loadTopikLevels();
-  }
+    ngOnInit() {
+        this.parentLevel = this.route.snapshot.paramMap.get('level') as 'topik1' | 'topik2';
+        if (this.parentLevel === 'topik1') {
+            this.subLevels = [1, 2];
+        } else if (this.parentLevel === 'topik2') {
+            this.subLevels = [3, 4, 5, 6];
+        }
+    }
 
-  private loadTopikLevels() {
-    this.loading.set(true);
-    this.topikDataService.getTopikLevels().subscribe({
-      next: (levels) => {
-        this.topikLevels.set(levels);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading TOPIK levels:', error);
-        this.loading.set(false);
-      }
-    });
-  }
-
-  selectTopikLevel(level: 'topik1' | 'topik2') {
-    this.router.navigate(['/home-user/topik-sublevel', level]);
-  }
+    selectSubLevel(level: number) {
+        this.router.navigate(['/home-user/skill-selection', level]);
+    }
 }

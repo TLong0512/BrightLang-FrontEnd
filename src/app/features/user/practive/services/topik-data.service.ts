@@ -8,7 +8,7 @@ import { TopikLevel, Skill, QuestionType, PracticeSession, Context, Question } f
   providedIn: 'root'
 })
 export class TopikDataService {
-  
+
   private topikLevels: TopikLevel[] = [
     {
       id: 'topik1',
@@ -43,111 +43,96 @@ export class TopikDataService {
     // TOPIK I - Listening
     {
       id: 'basic-conversation',
-      name: 'Hội thoại cơ bản',
-      description: 'Nghe và chọn đáp án đúng',
+      name: '[1-3]',
       skillId: 'listening',
       topikLevel: 'topik1'
     },
     {
       id: 'short-dialogue',
-      name: 'Đối thoại ngắn',
-      description: 'Hiểu nội dung cuộc trò chuyện',
+      name: '[4-8]',
       skillId: 'listening',
       topikLevel: 'topik1'
     },
     {
       id: 'announcement',
-      name: 'Thông báo',
-      description: 'Nghe thông báo và trả lời câu hỏi',
+      name: '[9-12]',
       skillId: 'listening',
       topikLevel: 'topik1'
     },
     // TOPIK II - Listening
     {
       id: 'interview',
-      name: 'Phỏng vấn',
-      description: 'Nghe phỏng vấn và trả lời câu hỏi',
+      name: '[1-3]',
       skillId: 'listening',
       topikLevel: 'topik2'
     },
     {
       id: 'lecture',
-      name: 'Bài giảng',
-      description: 'Nghe bài giảng và hiểu nội dung',
+      name: '[4-8]',
       skillId: 'listening',
+      topikLevel: 'topik2'
+    },
+    // TOPIK II - Reading
+    {
+      id: 'short-text',
+      name: '[1-4]',
+      skillId: 'reading',
+      topikLevel: 'topik2'
+    },
+    {
+      id: 'notice',
+      name: '[5-8]',
+      skillId: 'reading',
+      topikLevel: 'topik2'
+    },
+    {
+      id: 'short-text1',
+      name: '[9-10]',
+      skillId: 'reading',
+      topikLevel: 'topik2'
+    },
+    {
+      id: 'notice1',
+      name: '[11-12]',
+      skillId: 'reading',
+      topikLevel: 'topik2'
+    },
+    {
+      id: 'short-text2',
+      name: '[13-15]',
+      skillId: 'reading',
+      topikLevel: 'topik2'
+    },
+    {
+      id: 'notice2',
+      name: '[1-3]',
+      skillId: 'reading',
+      topikLevel: 'topik2'
+    },
+    {
+      id: 'short-text3',
+      name: '[1-3]',
+      skillId: 'reading',
+      topikLevel: 'topik2'
+    },
+    {
+      id: 'notice3',
+      name: '[1-3]',
+      skillId: 'reading',
       topikLevel: 'topik2'
     },
     // TOPIK I - Reading
     {
-      id: 'short-text',
-      name: 'Đoạn văn ngắn',
-      description: 'Đọc hiểu đoạn văn ngắn',
-      skillId: 'reading',
-      topikLevel: 'topik1'
-    },
-    {
-      id: 'notice',
-      name: 'Thông báo',
-      description: 'Đọc thông báo và trả lời câu hỏi',
-      skillId: 'reading',
-      topikLevel: 'topik1'
-    },
-    {
-      id: 'short-text1',
-      name: 'Đoạn văn dài',
-      description: 'Đọc hiểu đoạn văn ngắn',
-      skillId: 'reading',
-      topikLevel: 'topik1'
-    },
-    {
-      id: 'notice1',
-      name: 'Thông báo 2',
-      description: 'Đọc thông báo và trả lời câu hỏi',
-      skillId: 'reading',
-      topikLevel: 'topik1'
-    },
-    {
-      id: 'short-text2',
-      name: 'Đoạn văn dài',
-      description: 'Đọc hiểu đoạn văn ngắn',
-      skillId: 'reading',
-      topikLevel: 'topik1'
-    },
-    {
-      id: 'notice2',
-      name: 'Thông báo 2',
-      description: 'Đọc thông báo và trả lời câu hỏi',
-      skillId: 'reading',
-      topikLevel: 'topik1'
-    },
-    {
-      id: 'short-text3',
-      name: 'Đoạn văn dài',
-      description: 'Đọc hiểu đoạn văn ngắn',
-      skillId: 'reading',
-      topikLevel: 'topik1'
-    },
-    {
-      id: 'notice3',
-      name: 'Thông báo 2',
-      description: 'Đọc thông báo và trả lời câu hỏi',
-      skillId: 'reading',
-      topikLevel: 'topik1'
-    },
-    // TOPIK II - Reading
-    {
       id: 'essay',
-      name: 'Bài luận',
-      description: 'Đọc hiểu bài luận dài',
+      name: '[1-3]',
       skillId: 'reading',
-      topikLevel: 'topik2'
+      topikLevel: 'topik1'
     },
     {
       id: 'article',
-      name: 'Bài báo',
-      description: 'Phân tích bài báo chuyên sâu',
+      name: '[1-3]',
       skillId: 'reading',
-      topikLevel: 'topik2'
+      topikLevel: 'topik1'
     }
   ];
 
@@ -273,11 +258,10 @@ export class TopikDataService {
     skillId: string,
     questionTypeId: string,
     questionCount: number,
-    difficulty: 'easy' | 'medium' | 'hard'
   ): Observable<PracticeSession> {
     // Mock generation - in real app, this would call API
     const sessionId = 'session-' + Date.now();
-    
+
     // Select contexts and questions based on parameters
     const selectedContexts = this.mockContexts.slice(0, Math.ceil(questionCount / 2));
     const selectedQuestions = this.mockQuestions.slice(0, questionCount);
@@ -289,7 +273,6 @@ export class TopikDataService {
       questionTypeId,
       contexts: selectedContexts,
       questions: selectedQuestions,
-      difficulty,
       totalQuestions: questionCount
     };
 

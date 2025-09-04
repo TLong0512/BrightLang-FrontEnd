@@ -18,14 +18,13 @@ import { TopikDataService } from '../../services/topik-data.service';
       
       <div class="setup-card">
         <div class="header">
-          <h1>{{ getQuestionTypeName() }}</h1>
-          <p>Thiết lập số lượng câu hỏi và độ khó</p>
+          <h1>{{ getSkillName() }}</h1>
+          <p>Chọn số lượng câu hỏi để luyện tập</p>
         </div>
-        
+
         <div class="setup-form">
           <div class="input-group">
             <label for="question-count">
-              <i class="fas fa-list-ol"></i>
               Số lượng câu hỏi:
             </label>
             <input 
@@ -36,22 +35,6 @@ import { TopikDataService } from '../../services/topik-data.service';
               max="50" 
               class="form-input">
             <div class="input-note">Từ 1 đến 50 câu hỏi</div>
-          </div>
-          
-          <div class="input-group">
-            <label for="difficulty">
-              <i class="fas fa-chart-line"></i>
-              Mức độ khó:
-            </label>
-            <select 
-              id="difficulty" 
-              [(ngModel)]="difficulty"
-              class="form-select">
-              <option value="easy">🟢 Dễ</option>
-              <option value="medium">🟡 Trung bình</option>
-              <option value="hard">🔴 Khó</option>
-            </select>
-            <div class="input-note">Chọn mức độ phù hợp với trình độ của bạn</div>
           </div>
           
           <button 
@@ -75,8 +58,10 @@ import { TopikDataService } from '../../services/topik-data.service';
       max-width: 800px;
       margin: 0 auto;
       padding: 20px;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #80d0c7 0%, #13547a 100%);
+      background-color: #80d0c7;
+      margin-top: 120px;
+      border-radius: 12px;       
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
     .navigation {
@@ -99,8 +84,6 @@ import { TopikDataService } from '../../services/topik-data.service';
     }
 
     .back-btn:hover {
-      background: #80d0c7;
-      color: white;
       transform: translateX(-5px);
     }
 
@@ -113,26 +96,24 @@ import { TopikDataService } from '../../services/topik-data.service';
     }
 
     .header {
-      background: linear-gradient(135deg, #80d0c7 0%, #4ecdc4 100%);
-      color: white;
       text-align: center;
       padding: 40px 20px;
     }
 
     .header h1 {
-      font-size: 2.2rem;
-      margin-bottom: 10px;
+      color: #13547a;
+      font-size: 2.5rem;
       font-weight: 700;
     }
 
     .header p {
-      opacity: 0.9;
-      font-size: 1.1rem;
+      color: #666;
+      font-size: 1.2rem;
       margin: 0;
     }
 
     .setup-form {
-      padding: 50px;
+      padding: 0 50px;
     }
 
     .input-group {
@@ -191,7 +172,7 @@ import { TopikDataService } from '../../services/topik-data.service';
       align-items: center;
       justify-content: center;
       gap: 12px;
-      margin-top: 30px;
+      margin: 30px 0;
     }
 
     .start-btn:hover:not(:disabled) {
@@ -223,10 +204,6 @@ import { TopikDataService } from '../../services/topik-data.service';
         padding: 30px 20px;
       }
       
-      .header h1 {
-        font-size: 1.8rem;
-      }
-      
       .start-btn {
         font-size: 1.1rem;
         padding: 18px;
@@ -238,52 +215,39 @@ export class PracticeSetupComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private topikDataService = inject(TopikDataService);
-  
+
   protected loading = signal(false);
   protected topikLevel = signal<'topik1' | 'topik2'>('topik1');
   protected skillId = signal<string>('');
   protected questionTypeId = signal<string>('');
-  
+
   protected questionCount = 10;
-  protected difficulty: 'easy' | 'medium' | 'hard' = 'medium';
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.topikLevel.set(params['topikLevel']);
+      this.topikLevel.set(params['level']);
       this.skillId.set(params['skillId']);
       this.questionTypeId.set(params['questionTypeId']);
     });
   }
 
-  getQuestionTypeName(): string {
-    // In real app, you would get this from the service
-    const typeNames: { [key: string]: string } = {
-      'basic-conversation': 'Hội thoại cơ bản',
-      'short-dialogue': 'Đối thoại ngắn',
-      'announcement': 'Thông báo',
-      'interview': 'Phỏng vấn',
-      'lecture': 'Bài giảng',
-      'short-text': 'Đoạn văn ngắn',
-      'notice': 'Thông báo',
-      'essay': 'Bài luận',
-      'article': 'Bài báo'
-    };
-    return typeNames[this.questionTypeId()] || 'Dạng câu hỏi';
+  getSkillName(): string {
+    const skillName = this.skillId() === 'listening' ? 'Kỹ năng Nghe' : 'Kỹ năng Đọc';
+    return `${this.topikLevel() === 'topik1' ? 'TOPIK I' : 'TOPIK II'} - ${skillName}`;
   }
 
   startPractice() {
     this.loading.set(true);
-    
+
     this.topikDataService.generatePracticeSession(
       this.topikLevel(),
       this.skillId(),
       this.questionTypeId(),
       this.questionCount,
-      this.difficulty
     ).subscribe({
       next: (session) => {
         this.loading.set(false);
-        this.router.navigate(['/home-user/practice-screen', session.id]); 
+        this.router.navigate(['/home-user/practice-screen', session.id]);
       },
       error: (error) => {
         console.error('Error generating practice session:', error);

@@ -45,8 +45,10 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #80d0c7 0%, #13547a 100%);
+      background-color: #80d0c7;
+      margin-top: 120px;
+      border-radius: 12px;       
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
     .navigation {
@@ -69,8 +71,6 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
     }
 
     .back-btn:hover {
-      background: #80d0c7;
-      color: white;
       transform: translateX(-5px);
     }
 
@@ -105,14 +105,13 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
     }
 
     .option-card {
-      background: rgba(255, 255, 255, 0.95);
-      color: #13547a;
-      padding: 50px 30px;
+      color: white;
+      padding: 40px;
       border-radius: 20px;
       text-align: center;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      border: 3px solid #80d0c7;
+      border: 3px solid transparent;
       font-size: 1.1rem;
       position: relative;
       overflow: hidden;
@@ -125,7 +124,7 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(128, 208, 199, 0.2), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
       transition: left 0.5s;
     }
 
@@ -134,10 +133,9 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
     }
 
     .option-card:hover {
-      transform: translateY(-10px) scale(1.05);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-      background: linear-gradient(135deg, #80d0c7 0%, #4ecdc4 100%);
-      color: white;
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border-color: rgba(255,255,255,0.5);
     }
 
     .skill-icon {
@@ -186,17 +184,17 @@ export class SkillSelectionComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private topikDataService = inject(TopikDataService);
-  
+
   protected loading = signal(true);
   protected skills = signal<Skill[]>([]);
   protected topikLevel = signal<'topik1' | 'topik2'>('topik1');
 
   ngOnInit() {
-  this.route.params.subscribe(params => {
-    this.topikLevel.set(params['level'] as 'topik1' | 'topik2'); // ✅ đúng key
-    this.loadSkills();
-  });
-}
+    this.route.params.subscribe(params => {
+      this.topikLevel.set(params['level'] as 'topik1' | 'topik2'); // ✅ đúng key
+      this.loadSkills();
+    });
+  }
 
   private loadSkills() {
     this.loading.set(true);
@@ -221,6 +219,6 @@ export class SkillSelectionComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/home-user/topik-selection']);
+    this.router.navigate(['/home-user/topik-sublevel']);
   }
 }

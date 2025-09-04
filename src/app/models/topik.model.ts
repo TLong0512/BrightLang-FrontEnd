@@ -15,7 +15,6 @@ export interface Skill {
 export interface QuestionType {
   id: string;
   name: string;
-  description: string;
   skillId: string;
   topikLevel: 'topik1' | 'topik2';
 }
@@ -46,7 +45,6 @@ export interface PracticeSession {
   questionTypeId: string;
   contexts: Context[];
   questions: Question[];
-  difficulty: 'easy' | 'medium' | 'hard';
   totalQuestions: number;
 }
 

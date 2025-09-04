@@ -623,40 +623,40 @@ export class ReviewScreenComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private practiceService = inject(PracticeService);
-  
+
   protected result = signal<PracticeResult | null>(null);
   protected session = signal<PracticeSession | null>(null);
   protected filter: 'all' | 'correct' | 'incorrect' | 'unanswered' = 'all';
-  
+
   // Computed values
   private reviewData = computed<ReviewItem[]>(() => {
-  const res = this.result();
-  const sess = this.session();
-  
-  if (!res || !sess) return [];
+    const res = this.result();
+    const sess = this.session();
 
-  const reviewItems: ReviewItem[] = [];
-  
-  for (const userAnswer of res.userAnswers) {
-    const question = sess.questions.find(q => q.id === userAnswer.questionId);
-    if (!question) continue; // Skip if question not found
-    
-    const context = sess.contexts.find(c => c.id === question.contextId);
-    
-    reviewItems.push({
-      question,
-      userAnswer,
-      isCorrect: userAnswer.isCorrect === true,
-      context
-    });
-  }
-  
-  return reviewItems;
-});
+    if (!res || !sess) return [];
+
+    const reviewItems: ReviewItem[] = [];
+
+    for (const userAnswer of res.userAnswers) {
+      const question = sess.questions.find(q => q.id === userAnswer.questionId);
+      if (!question) continue; // Skip if question not found
+
+      const context = sess.contexts.find(c => c.id === question.contextId);
+
+      reviewItems.push({
+        question,
+        userAnswer,
+        isCorrect: userAnswer.isCorrect === true,
+        context
+      });
+    }
+
+    return reviewItems;
+  });
 
   protected filteredReviewData = computed<ReviewItem[]>(() => {
     const data = this.reviewData();
-    
+
     switch (this.filter) {
       case 'correct':
         return data.filter(item => item.isCorrect);
@@ -735,7 +735,6 @@ export class ReviewScreenComponent implements OnInit {
           order: 3
         }
       ],
-      difficulty: 'medium',
       totalQuestions: 3
     };
 

@@ -31,8 +31,6 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
               class="option-card" 
               (click)="selectQuestionType(questionType.id)">
               <h3>{{ questionType.name }}</h3>
-              <p>{{ questionType.description }}</p>
-              <div class="card-overlay"></div>
             </button>
           }
         </div>
@@ -44,8 +42,10 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #80d0c7 0%, #13547a 100%);
+      background-color: #80d0c7;
+      margin-top: 120px;
+      border-radius: 12px;       
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
     .navigation {
@@ -68,8 +68,6 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
     }
 
     .back-btn:hover {
-      background: #80d0c7;
-      color: white;
       transform: translateX(-5px);
     }
 
@@ -98,44 +96,42 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
 
     .options-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 25px;
       margin: 30px 0;
     }
 
     .option-card {
-      background: rgba(255, 255, 255, 0.95);
-      color: #13547a;
-      padding: 35px 25px;
-      border-radius: 18px;
+      padding: 40px;
+      border-radius: 20px;
       text-align: center;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      border: 2px solid #80d0c7;
-      font-size: 1rem;
+      border: 3px solid transparent;
+      font-size: 1.1rem;
       position: relative;
       overflow: hidden;
     }
 
-    .card-overlay {
+    .option-card::before {
+      content: '';
       position: absolute;
       top: 0;
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #80d0c7 0%, #4ecdc4 100%);
-      transition: left 0.5s ease;
-      z-index: 1;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
     }
 
-    .option-card:hover .card-overlay {
-      left: 0;
+    .option-card:hover::before {
+      left: 100%;
     }
 
     .option-card:hover {
-      transform: translateY(-8px) scale(1.03);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-      color: white;
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border-color: rgba(255,255,255,0.5);
     }
 
     .option-card h3 {
@@ -178,19 +174,19 @@ export class QuestionTypesComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private topikDataService = inject(TopikDataService);
-  
+
   protected loading = signal(true);
   protected questionTypes = signal<QuestionType[]>([]);
   protected topikLevel = signal<'topik1' | 'topik2'>('topik1');
   protected skillId = signal<string>('');
 
   ngOnInit() {
-  this.route.params.subscribe(params => {
-    this.topikLevel.set(params['level']);   // đổi từ topikLevel -> level
-    this.skillId.set(params['skillId']);
-    this.loadQuestionTypes();
-  });
-}
+    this.route.params.subscribe(params => {
+      this.topikLevel.set(params['level']);   // đổi từ topikLevel -> level
+      this.skillId.set(params['skillId']);
+      this.loadQuestionTypes();
+    });
+  }
 
   private loadQuestionTypes() {
     this.loading.set(true);
