@@ -8,7 +8,7 @@ import { ExamType, Level, SkillLevel, Range, Context, Question, Answer, Question
   providedIn: 'root' // hoặc chỉ trong UserModule
 })
 export class AdminService {
-  private apiUrl = `${environment.apiUrl}`;
+  private apiUrl = `${environment.apiUrlQuestionBank}`;
 
   constructor(private http: HttpClient) { }
 

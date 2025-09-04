@@ -27,9 +27,9 @@ import { PracticeSetupComponent } from './features/user/practive/pages/practice-
 import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
 import { AdminComponent } from './shared/admin/admin';
+import { RoleGuard } from './guards/auth.guard';
 
 // 👇 import guards
-import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -77,7 +77,8 @@ export const routes: Routes = [
     
   {
     path: 'admin',
-    // canActivate: [AuthGuard],   
+    canActivate: [RoleGuard], 
+    data: { roles: ['admin'] },
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   },
 

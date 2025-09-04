@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:7141/api'  // đường dẫn API local
+  apiUrlAuth: 'https://localhost:7030/api',
+  apiUrlQuestionBank: 'https://localhost:7141/api'  
 };

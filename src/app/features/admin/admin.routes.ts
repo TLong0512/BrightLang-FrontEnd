@@ -8,12 +8,12 @@ import { ExamQuestionTypeComponent } from "./pages/question-type/question-type";
 import { QuestionListComponent } from "./pages/question/question-list/question-list";
 import { AddQuestionComponent } from "./pages/question/add-question/add-question";
 import { UpdateQuestionComponent } from "./pages/question/update-question/update-question";
+import { RoleGuard } from "../../guards/auth.guard";
 
 export const adminRoutes: Routes = [
     {
         path: '',
         component: AdminComponent,
-        // canActivate: [AuthGuard],   
         children: [
           { path: '', component: DefaultComponent },
           { path: 'roadmap', component: RoadMapComponent },
