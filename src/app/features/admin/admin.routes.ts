@@ -20,7 +20,7 @@ export const adminRoutes: Routes = [
           { path: 'roadmap-detail', component: RoadMapDetailComponent },
           {path: 'question-type', component: ExamQuestionTypeComponent},
           {path: 'question-list', component: QuestionListComponent},
-          {path: 'update-question', component: UpdateQuestionComponent},
+          {path: 'update-question/:id', component: UpdateQuestionComponent},
           {path: 'question', component: QuestionComponent,
             children: [
               {path: 'add', component: AddQuestionComponent}
