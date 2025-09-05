@@ -5,9 +5,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AdminService } from '../../../services/admin.service';
 import { Context } from 'vm';
 import { QuestionAddService } from '../services/question-add.service';
+import { EditorComponent } from '@tinymce/tinymce-angular';
+
+
 @Component({
   selector: 'app-add-question',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, EditorComponent],
   standalone: true,
   templateUrl: './add-question.html',
   styles: [`
@@ -82,8 +85,47 @@ import { QuestionAddService } from '../services/question-add.service';
 })
 
 
-export class AddQuestionComponent{
-  
+
+export class AddQuestionComponent {
+  content: string = '';
+  init = {
+    height: 500,
+    menubar: true,
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'insertdatetime', 'media', 'table', 'help', 'wordcount'
+    ],
+    toolbar:
+      'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | ' +
+      'bullist numlist outdent indent | removeformat | help | image media',
+
+    // Cho phép paste ảnh dạng base64
+    automatic_uploads: true,
+    file_picker_types: 'image media',
+
+    // Custom file picker (chọn file từ local)
+    file_picker_callback: (callback: any, value: any, meta: any) => {
+      if (meta.filetype === 'image' || meta.filetype === 'media') {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', meta.filetype === 'image' ? 'image/*' : 'audio/*,video/*');
+
+        input.onchange = function () {
+          const file = (this as HTMLInputElement).files![0];
+          const reader = new FileReader();
+          reader.onload = function () {
+            const base64 = reader.result as string;
+            callback(base64, { title: file.name });
+          };
+          reader.readAsDataURL(file);
+        };
+        input.click();
+      }
+    }
+  };
+
+
   isForExam: boolean = false;
   passage: string = '';
   passageExplanation: string = '';
@@ -96,7 +138,7 @@ export class AddQuestionComponent{
 
   // ngOnInit(): void {
   //   this.sharedService.values$.subscribe((data) => {
-      
+
   //   });
   // }
   addQuestion(): void {
@@ -168,8 +210,9 @@ export class AddQuestionComponent{
       return;
     }
 
+  
     const context: Context = {
-      content: this.createContextContent(this.passage, this.imageUrl, this.audioUrl),
+      content: this.content,
       explain: this.passageExplanation,
       isBelongTest: this.isForExam,
       rangeId: this.rangeId
@@ -178,9 +221,9 @@ export class AddQuestionComponent{
     let examTypeId, skillId
     this.sharedService.values$.subscribe(data => {
       examTypeId = data.examTypeId,
-      skillId = data.skillId
+        skillId = data.skillId
     })
-    
+
     this.adminService.postQuestion(examTypeId!, skillId!, this.questions).subscribe({
       next: () => {
         console.log('ok')
@@ -191,13 +234,7 @@ export class AddQuestionComponent{
     })
   }
 
-  createContextContent(text: string, imageUrl?: string, audioUrl?: string): string {
-    return `
-    <div class="question-content">
-      <p class="question-text">${text}</p>
-      ${imageUrl ? `<div class="question-image"><img src="${imageUrl}" alt="Question Image" style="max-width: 300px; height: auto;" /></div>` : ""}
-      ${audioUrl ? `<div class="question-audio"><audio controls><source src="${audioUrl}" type="audio/mpeg">Trình duyệt không hỗ trợ audio</audio></div>` : ""}
-    </div>
-  `;
-  }
+  
+
+  
 }

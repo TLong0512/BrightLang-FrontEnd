@@ -66,6 +66,9 @@ export class AdminService {
   }
 
   // Question
+  getAllQuestions(): Observable<Question[]> {
+    return this.http.get<Question[]>(`${this.apiUrl}/Question`)
+  }
   getQuestionsByContextId(id: string): Observable<Question[]> {
     return this.http.get<Question[]>(`${this.apiUrl}/Question/filter/context/${id}`, { withCredentials: true });
   }
@@ -77,8 +80,12 @@ export class AdminService {
   postQuestion(examTypeId: string, skillId: string, questions: QuestionAdd[]): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/Question/quick-add/skill/${skillId}/exam-type/${examTypeId}`, questions, { withCredentials: true });
   }
-  updateQuestion(id: string, question: Question) {
+  updateQuestion(id: string, question: Question): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/Question/${id}`, question, { withCredentials: true });
+  }
+
+  deleteQuestion(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/Question/${id}`);
   }
 
   // Answer

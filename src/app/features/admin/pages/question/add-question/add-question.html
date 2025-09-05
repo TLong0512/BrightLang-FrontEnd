@@ -1,259 +1,119 @@
 <div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-10">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-gradient-primary text-white py-4">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-plus-circle fa-2x me-3"></i>
-                        <div>
-                            <h2 class="mb-1">Thêm câu hỏi mới</h2>
-                            <p class="mb-0 opacity-75">Tạo bài tập với câu hỏi và đáp án chi tiết</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-body p-4">
-                    <form>
-                        <!-- Checkbox for Exam Usage -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="form-check form-switch form-check-lg">
-                                    <input class="form-check-input" type="checkbox" id="examUsage"
-                                        [(ngModel)]="isForExam" name="examUsage">
-                                    <label class="form-check-label fw-bold" for="examUsage">
-                                        <i class="fas fa-graduation-cap text-primary me-2"></i>
-                                        Sử dụng câu hỏi này làm bài thi
-                                    </label>
-                                </div>
-                                <small class="text-muted ms-5">Đánh dấu nếu câu hỏi này có thể được dùng trong các bài
-                                    kiểm tra</small>
-                            </div>
-                        </div>
-
-                        <!-- Passage Input -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <label for="passage" class="form-label fw-bold">
-                                    <i class="fas fa-file-text text-success me-2"></i>
-                                    Đoạn văn:
-                                </label>
-                                <textarea class="form-control form-control-lg" id="passage" rows="4"
-                                    [(ngModel)]="passage" name="passage"
-                                    placeholder="Nhập đoạn văn hoặc nội dung chính của bài tập...">
-                    </textarea>
-                            </div>
-                        </div>
-
-                        <!-- Passage Explanation -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <label for="passageExplanation" class="form-label fw-bold">
-                                    <i class="fas fa-lightbulb text-warning me-2"></i>
-                                    Giải thích đoạn văn:
-                                </label>
-                                <textarea class="form-control" id="passageExplanation" rows="3"
-                                    [(ngModel)]="passageExplanation" name="passageExplanation"
-                                    placeholder="Nhập giải thích, hướng dẫn hoặc gợi ý cho đoạn văn...">
-                    </textarea>
-                            </div>
-                        </div>
-
-                        <!-- Media Section -->
-                        <div class="row mb-4">
-                            <!-- Image URL -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">
-                                    <i class="fas fa-image text-primary me-2"></i>
-                                    Link hình ảnh:
-                                </label>
-                                <input type="url" class="form-control" [(ngModel)]="imageUrl" [name]="'imageUrl'"
-                                    placeholder="https://example.com/image.jpg">
-
-                                <!-- Image Preview -->
-                                <div *ngIf="imageUrl" class="mt-3">
-                                    <img [src]="imageUrl" class="img-thumbnail rounded shadow-sm"
-                                        style="max-height: 200px; max-width: 100%;" alt="Question Image">
-                                </div>
-                            </div>
-
-                            <!-- Audio URL -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">
-                                    <i class="fas fa-volume-up text-success me-2"></i>
-                                    Link audio:
-                                </label>
-                                <input type="url" class="form-control" [(ngModel)]="audioUrl" [name]="'audioUrl'"
-                                    placeholder="https://example.com/audio.mp3">
-
-                                <!-- Audio Player -->
-                                <div *ngIf="audioUrl" class="mt-3">
-                                    <audio controls class="w-100" style="max-width: 350px;">
-                                        <source [src]="audioUrl" type="audio/mpeg">
-                                        <source [src]="audioUrl" type="audio/wav">
-                                        <source [src]="audioUrl" type="audio/ogg">
-                                        Trình duyệt của bạn không hỗ trợ audio.
-                                    </audio>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Questions Section -->
-                        <div class="border-top pt-4">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h4 class="text-primary mb-0">
-                                    <i class="fas fa-question-circle me-2"></i>
-                                    Danh sách câu hỏi ({{ questions.length }})
-                                </h4>
-                                <button type="button" class="btn btn-success btn-lg" (click)="addQuestion()">
-                                    <i class="fas fa-plus me-2"></i>
-                                    Thêm câu hỏi
-                                </button>
-                            </div>
-
-                            <!-- Questions List -->
-                            <div *ngFor="let question of questions; let i = index" class="mb-5" [@slideIn]="i"
-                                style="animation: slideIn 0.5s ease-out;">
-                                <div class="card border-start border-primary border-4 shadow-sm">
-                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                        <h5 class="mb-0 text-primary">
-                                            <i class="fas fa-hashtag me-2"></i>
-                                            Câu hỏi {{ i + 1 }}
-                                            <span class="badge bg-primary ms-2">Mới</span>
-                                        </h5>
-                                        <button type="button" class="btn btn-outline-danger btn-sm"
-                                            (click)="removeQuestion(i)">
-                                            <i class="fas fa-trash me-1"></i>
-                                            Xóa
-                                        </button>
-                                    </div>
-
-                                    <div class="card-body">
-                                        <!-- Question Text -->
-                                        <div class="row mb-3">
-                                            <div class="col-12">
-                                                <label class="form-label fw-bold">
-                                                    <i class="fas fa-question text-info me-2"></i>
-                                                    Câu số:
-                                                </label>
-                                                <input type="number" class="form-control form-control-lg"
-                                                    [(ngModel)]="question.questionNumber" [name]="'questionText' + i"
-                                                    placeholder="10">
-                                            </div>
-                                        </div>
-                                        <!-- Question Text -->
-                                        <div class="row mb-3">
-                                            <div class="col-12">
-                                                <label class="form-label fw-bold">
-                                                    <i class="fas fa-question text-info me-2"></i>
-                                                    Câu hỏi:
-                                                </label>
-                                                <input type="text" class="form-control form-control-lg"
-                                                    [(ngModel)]="question.content" [name]="'questionText' + i"
-                                                    placeholder="Nhập nội dung câu hỏi...">
-                                            </div>
-                                        </div>
-
-                                        <!-- Question Explanation -->
-                                        <div class="row mb-3">
-                                            <div class="col-12">
-                                                <label class="form-label fw-bold">
-                                                    <i class="fas fa-comment-dots text-secondary me-2"></i>
-                                                    Giải thích câu hỏi:
-                                                </label>
-                                                <textarea class="form-control" rows="2" [(ngModel)]="question.explain"
-                                                    [name]="'questionExplanation' + i"
-                                                    placeholder="Nhập giải thích hoặc hướng dẫn cho câu hỏi...">
-                            </textarea>
-                                            </div>
-                                        </div>
-
-
-
-                                        <!-- Answers Section -->
-                                        <div class="border-top pt-3">
-                                            <h6 class="text-primary mb-3">
-                                                <i class="fas fa-list-ul me-2"></i>
-                                                Các đáp án:
-                                            </h6>
-
-                                            <div class="row">
-                                                <div *ngFor="let answer of question.answerList; let j = index"
-                                                    class="col-lg-6 mb-3">
-                                                    <div class="card h-100" [class.border-success]="answer.isCorrect"
-                                                        [class.bg-light]="answer.isCorrect">
-                                                        <div class="card-body">
-                                                            <!-- Answer Selection -->
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input" type="radio"
-                                                                    [name]="'correctAnswer' + i" [id]="'answer' + i + j"
-                                                                    [checked]="answer.isCorrect"
-                                                                    (change)="setCorrectAnswer(question, j)">
-                                                                <label class="form-check-label fw-bold"
-                                                                    [for]="'answer' + i + j">
-                                                                    <i class="fas fa-check-circle text-success me-1"
-                                                                        *ngIf="answer.isCorrect"></i>
-                                                                    Đáp án {{ j + 1 }}
-                                                                    <span *ngIf="answer.isCorrect"
-                                                                        class="badge bg-success ms-2">Đúng</span>
-                                                                </label>
-                                                            </div>
-
-                                                            <!-- Answer Text -->
-                                                            <div class="mb-2">
-                                                                <input type="text" class="form-control"
-                                                                    [(ngModel)]="answer.value"
-                                                                    [name]="'answerText' + i + j"
-                                                                    placeholder="Nhập nội dung đáp án...">
-                                                            </div>
-
-                                                            <!-- Answer Explanation -->
-                                                            <div>
-                                                                <textarea class="form-control form-control-sm" rows="2"
-                                                                    [(ngModel)]="answer.explain"
-                                                                    [name]="'answerExplanation' + i + j"
-                                                                    placeholder="Giải thích đáp án...">
-                                    </textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Empty State -->
-                            <div *ngIf="questions.length === 0" class="text-center py-5">
-                                <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">Chưa có câu hỏi nào</h5>
-                                <p class="text-muted mb-4">Nhấn nút "Thêm câu hỏi" để bắt đầu tạo câu hỏi đầu tiên</p>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="border-top pt-4 mt-4">
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary btn-lg">
-                                    <i class="fas fa-times me-2"></i>
-                                    Hủy
-                                </button>
-
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-outline-primary btn-lg">
-                                        <i class="fas fa-eye me-2"></i>
-                                        Xem trước
-                                    </button>
-                                    <button type="submit" class="btn btn-primary btn-lg" [disabled]="!isFormValid()"
-                                        (click)="saveQuestions()">
-                                        <i class="fas fa-save me-2"></i>
-                                        Lưu câu hỏi
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h1 class="card-title mb-0 h2">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Quản lý câu hỏi
+                    </h1>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Form chọn dạng bài -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h2 class="card-title mb-0 h5">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Danh sách câu hỏi
+                    </h2>
+                </div>
+                <div class="card-body" style="padding: 30px; overflow: visible;">
+                    <!-- Row 1: Exam Type và Level -->
+                    <div class="row g-3">
+                        <!-- Chọn Exam Type -->
+                        <div class="col-md-4">
+                            <label for="examTypeSelect" class="form-label fw-semibold">
+                                <i class="fas fa-layer-group me-1"></i>
+                                Chọn dạng bài thi
+                            </label>
+                            <select id="examTypeSelect" class="form-select" [(ngModel)]="selectedExamType"
+                                (ngModelChange)="onExamTypeChange()">
+                                <option value="">-- Chọn dạng bài --</option>
+                                @for(examType of examTypes$ | async; track examType.id) {
+                                <option [value]="examType.id">{{ examType.name }}</option>
+                                }
+                            </select>
+                        </div>
+                        
+                        <!-- Chọn Level -->
+                        @if(selectedExamType) {
+                        <div class="col-md-4">
+                            <label for="levelSelect" class="form-label fw-semibold">
+                                <i class="fas fa-layer-group me-1"></i>
+                                Chọn cấp độ
+                            </label>
+                            <select id="levelSelect" class="form-select" [(ngModel)]="selectedLevel"
+                                (ngModelChange)="onLevelChange()">
+                                <option value="">-- Chọn cấp độ --</option>
+                                @for(level of levels$ | async; track level.id) {
+                                <option [value]="level.id">{{ level.name }}</option>
+                                }
+                            </select>
+                        </div>
+                        }
+                    </div>
+
+                    <!-- Row 2: Skill Level - Tách riêng để tránh overlap -->
+                    @if(selectedLevel) {
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="skillSelect" class="form-label fw-semibold">
+                                <i class="fas fa-tools me-1"></i>
+                                Chọn kỹ năng
+                            </label>
+                            <select id="skillSelect" class="form-select dropdown-with-space" 
+                                    [(ngModel)]="selectedSkillLevel"
+                                    (ngModelChange)="onSkillLevelChange()">
+                                <option value="">-- Chọn kỹ năng --</option>
+                                @for(skillLevel of skillLevels; track skillLevel.id) {
+                                <option [value]="skillLevel.id">
+                                    {{ skillLevel.skillName }}
+                                </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    }
+
+                    <!-- Row 3: Range - Tách riêng và có khoảng cách -->
+                    @if(selectedSkillLevel) {
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="rangeSelect" class="form-label fw-semibold">
+                                <i class="fas fa-list me-1 text-brightlang"></i>
+                                Chọn dạng bài
+                            </label>
+                            <select id="rangeSelect" class="form-select dropdown-with-space" 
+                                    [(ngModel)]="selectedRange"
+                                    (ngModelChange)="onRangeChange()"
+                                    [attr.aria-label]="'Chọn dạng bài'">
+                                <option value="" disabled>-- Chọn dạng bài --</option>
+                                @for(range of ranges$ | async; track range.id) {
+                                <option [value]="range.id">
+                                    {{ range.name }}
+                                </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if(selectedRange) {
+    <!-- Danh sách dạng bài -->
+    <div class="row">
+        <div class="col-12">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+    }
 </div>

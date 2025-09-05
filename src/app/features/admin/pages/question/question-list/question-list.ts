@@ -2,19 +2,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-export interface Question {
-  id: string;
-  questionNumber: number;
-  content: string;
-  explain: string;
-}
+import { AdminService } from '../../../services/admin.service';
+import { Question } from '../../../models/question-bank.model';
+import Swal from 'sweetalert2';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-question-list',
   templateUrl: './question-list.html',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterModule],
   styles: `
   /* question-list.component.css */
 .question-list-container {
@@ -208,129 +205,95 @@ export interface Question {
   `
 })
 export class QuestionListComponent implements OnInit {
-  questionsData: Question[] = [
-    {
-      id: "77eef27e-b896-4cbe-d3d9-08dde98ea73d",
-      questionNumber: 5,
-      content: "cau hoi aaaaaaaaaaaaaaaaaaaaaaaaa  aaaaaaa aaaaa aaaaaaa aaaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      explain: "giai thich cau hoi"
-    },
-    {
-      id: "7d313f98-306c-4bf6-feab-08ddea0086c4",
-      questionNumber: 1,
-      content: "cau hoi",
-      explain: ""
-    },
-    {
-      id: "ef879672-d105-4428-726e-08ddea33b106",
-      questionNumber: 2,
-      content: "aaa",
-      explain: ""
-    }
-  ];
+  constructor(private adminService: AdminService,
+    private router: Router
+  ) {}
+  questionsData: Question[] = [];
 
-  filteredQuestions: Question[] = [];
-  searchTerm: string = '';
-  sortBy: string = 'number';
+  // filteredQuestions: Question[] = [];
+  // searchTerm: string = '';
+  // sortBy: string = 'number';
 
   ngOnInit(): void {
-    this.filterQuestions();
+    // this.filterQuestions();
+    this.getAllQuestions()
+
   }
 
-  filterQuestions(): void {
-    let filtered = this.questionsData.filter(q => 
-      q.content.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      q.explain.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      q.questionNumber.toString().includes(this.searchTerm)
-    );
-
-    // Sort data
-    filtered.sort((a, b) => {
-      if (this.sortBy === 'number') {
-        return a.questionNumber - b.questionNumber;
-      } else if (this.sortBy === 'content') {
-        return a.content.localeCompare(b.content);
+  getAllQuestions() {
+    this.adminService.getAllQuestions().subscribe({
+      next: (data) => {
+        this.questionsData = data
       }
-      return 0;
-    });
-
-    this.filteredQuestions = filtered;
+    })
   }
 
-  onSearchChange(): void {
-    this.filterQuestions();
+
+  // filterQuestions(): void {
+  //   let filtered = this.questionsData.filter(q => 
+  //     q.content.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+  //     q.explain.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+  //     q.questionNumber.toString().includes(this.searchTerm)
+  //   );
+
+  //   // Sort data
+  //   filtered.sort((a, b) => {
+  //     if (this.sortBy === 'number') {
+  //       return a.questionNumber - b.questionNumber;
+  //     } else if (this.sortBy === 'content') {
+  //       return a.content.localeCompare(b.content);
+  //     }
+  //     return 0;
+  //   });
+
+  //   this.filteredQuestions = filtered;
+  // }
+
+  // onSearchChange(): void {
+  //   this.filterQuestions();
+  // }
+
+  // onSortChange(): void {
+  //   this.filterQuestions();
+  // }
+
+  editQuestion(questionId: string): void {
+    this.router.navigate(['/admin/update-question', questionId])
   }
 
-  onSortChange(): void {
-    this.filterQuestions();
+  deleteQuestion(questionId: string): void {
+    Swal.fire({
+          title: 'Bạn có chắc muốn xoá?',
+          text: 'Dữ liệu sẽ không thể khôi phục!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Xoá',
+          cancelButtonText: 'Huỷ'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.adminService.deleteQuestion(questionId).subscribe({
+              next: () => {
+                Swal.fire({
+                  title: 'Đã xoá!',
+                  text: 'Câu hỏi đã được xoá.',
+                  icon: 'success',
+                  timer: 1500,
+                  showConfirmButton: false
+                }).then(() => {
+                  this.getAllQuestions()
+                })
+              }
+            })
+          }
+        });
   }
 
-  editQuestion(question: Question): void {
-    console.log('Edit question:', question);
-    // Implement edit functionality
-  }
-
-  deleteQuestion(question: Question): void {
-    console.log('Delete question:', question);
-    // Implement delete functionality
-    const index = this.questionsData.findIndex(q => q.id === question.id);
-    if (index > -1) {
-      this.questionsData.splice(index, 1);
-      this.filterQuestions();
-    }
-  }
-
-  getShortId(id: string): string {
-    return id.substring(0, 8) + '...';
-  }
+  // getShortId(id: string): string {
+  //   return id.substring(0, 8) + '...';
+  // }
 }
 
 
 
 
 
-/*
-// app.module.ts
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
-
-import { AppComponent } from './app.component';
-import { QuestionListComponent } from './question-list/question-list.component';
-
-@NgModule({
-  declarations: [
-    AppComponent,
-    QuestionListComponent
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
-*/
-
-/*
-// angular.json - Add Bootstrap and FontAwesome to styles array:
-"styles": [
-  "node_modules/bootstrap/dist/css/bootstrap.min.css",
-  "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-  "src/styles.css"
-],
-"scripts": [
-  "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-]
-*/
-
-/*
-// package.json dependencies to install:
-npm install bootstrap@5.3.0 @fortawesome/fontawesome-free
-*/
-
-/*
-// Usage in app.component.html:
-<app-question-list></app-question-list>
-*/
