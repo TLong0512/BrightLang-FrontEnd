@@ -1,5 +1,55 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { ExamData, ExamResult, Question, ExamContext } from '../../../../models/exam.model';
+import { Observable } from 'rxjs';
+import { TestService, TestInProgressDto, SubmitTestRequestDto, QuestionSummaryDto} from './exam.service';
+
+// Updated models to match backend structure exactly
+export interface Question {
+  id: string;
+  questionText: string;
+  type: 'single' | 'multiple';
+  userAnswers?: string[];
+  correctAnswers?: string[];
+  answers?: Answer[];
+  questionNumber?: number;
+  contextContent?: string;
+  skillName?: string;
+}
+
+export interface Answer {
+  id: string;
+  answerText: string;
+  isCorrect?: boolean;
+}
+
+export interface ExamContext {
+  id: number;
+  type: 'reading' | 'listening' | 'mixed';
+  title?: string;
+  content?: string;
+  audioUrl?: string;
+  imageUrl?: string;
+  questions: Question[];
+}
+
+export interface ExamData {
+  id: string;
+  testId: string;
+  level: string;
+  duration: number;
+  contexts: ExamContext[];
+  listQuestion?: Question[];
+}
+
+export interface ExamResult {
+  examId: string;
+  correct: number;
+  total: number;
+  percentage: number;
+  listeningScore: number;
+  readingScore: number;
+  timeSpent: number;
+  level: string;
+}
 
 export interface FlatQuestion extends Question {
   contextId: number;
@@ -22,6 +72,7 @@ export class ExamStateService {
   private readonly _examResult = signal<ExamResult | null>(null);
   private readonly _isExamStarted = signal<boolean>(false);
   private readonly _isExamPaused = signal<boolean>(false);
+  private readonly _userAnswers = signal<Map<string, string[]>>(new Map());
 
   // Readonly signals
   readonly examData = this._examData.asReadonly();
@@ -31,12 +82,21 @@ export class ExamStateService {
   readonly examResult = this._examResult.asReadonly();
   readonly isExamStarted = this._isExamStarted.asReadonly();
   readonly isExamPaused = this._isExamPaused.asReadonly();
+  readonly userAnswers = this._userAnswers.asReadonly();
 
   // Computed signals
   readonly currentQuestion = computed(() => {
     const questions = this._flatQuestions();
     const index = this._currentQuestionIndex();
-    return questions[index] || null;
+    const question = questions[index] || null;
+    
+    if (question) {
+      // Attach user answers from our separate tracking
+      const answers = this._userAnswers().get(question.id) || [];
+      return { ...question, userAnswers: answers };
+    }
+    
+    return question;
   });
 
   readonly currentContext = computed(() => {
@@ -44,7 +104,7 @@ export class ExamStateService {
     if (!question) return null;
 
     const examData = this._examData();
-    if (!examData) return null;
+    if (!examData || !examData.contexts) return null;
 
     return examData.contexts.find(context => context.id === question.contextId) || null;
   });
@@ -61,13 +121,15 @@ export class ExamStateService {
 
   readonly answeredQuestions = computed(() => {
     const questions = this._flatQuestions();
+    const userAnswers = this._userAnswers();
+    
     if (!questions.length) return [];
     
     return questions.map((question, index) => ({
       index,
       questionId: question.id,
       contextId: question.contextId,
-      isAnswered: question.userAnswers && question.userAnswers.length > 0,
+      isAnswered: userAnswers.has(question.id) && (userAnswers.get(question.id)?.length || 0) > 0,
       isCurrent: index === this._currentQuestionIndex(),
       contextType: question.contextType
     }));
@@ -107,13 +169,20 @@ export class ExamStateService {
   readonly questionsByContext = computed(() => {
     const questions = this._flatQuestions();
     const contexts = this._examData()?.contexts || [];
+    const userAnswers = this._userAnswers();
     
     return contexts.map(context => ({
       context,
       questions: questions.filter(q => q.contextId === context.id),
-      answered: questions.filter(q => q.contextId === context.id && (q.userAnswers ?? []).length > 0).length
+      answered: questions.filter(q => 
+        q.contextId === context.id && 
+        userAnswers.has(q.id) && 
+        (userAnswers.get(q.id)?.length || 0) > 0
+      ).length
     }));
   });
+
+  constructor(private testService: TestService) {}
 
   // Auto-save effect
   private autoSaveEffect = effect(() => {
@@ -124,34 +193,85 @@ export class ExamStateService {
     }
   });
 
+  /**
+   * Initialize exam from backend TestInProgressDto - FIXED MAPPING
+   */
+  setExamDataFromTest(testData: TestInProgressDto): void {
+    const examData: ExamData = {
+      id: testData.testId,
+      testId: testData.testId,
+      level: 'intermediate', // Default or get from another source
+      duration: 3600, // Default 1 hour or get from config
+      contexts: [],
+      listQuestion: testData.listQuestion.map(q => ({
+        id: q.id,
+        questionText: q.questionText || q.content, // Map content to questionText
+        // type: q.type.toLowerCase() as 'single' | 'multiple',
+
+        type: 'single',
+        userAnswers: [],
+        questionNumber: q.questionNumber,
+        contextContent: q.contextContent,
+        skillName: q.skillName,
+        // Map AnswerContents to answers
+        answers: q.answerContents?.map(answer => ({
+          id: answer.id,
+          answerText: answer.answerText,
+          isCorrect: answer.isCorrect
+        })) || []
+      }))
+    };
+    
+    this.setExamData(examData);
+  }
+
   setExamData(data: ExamData): void {
     this._examData.set(data);
     this._timeRemaining.set(data.duration);
     this._currentQuestionIndex.set(0);
     this._isExamStarted.set(false);
     this._examResult.set(null);
+    this._userAnswers.set(new Map());
     
-    // Flatten questions from contexts
+    // Flatten questions from contexts or use direct list
     this.flattenQuestions(data);
   }
 
   private flattenQuestions(data: ExamData): void {
     const flatQuestions: FlatQuestion[] = [];
     
-    data.contexts.forEach(context => {
-      context.questions.forEach(question => {
+    // If we have contexts, flatten from contexts
+    if (data.contexts && data.contexts.length > 0) {
+      data.contexts.forEach(context => {
+        context.questions.forEach(question => {
+          flatQuestions.push({
+            ...question,
+            userAnswers: question.userAnswers ?? [],
+            contextId: context.id,
+            contextType: context.type,
+            contextTitle: context.title,
+            contextContent: context.content,
+            contextAudioUrl: context.audioUrl,
+            contextImageUrl: context.imageUrl
+          });
+        });
+      });
+    } 
+    // If we have a direct list of questions (from TestInProgressDto)
+    else if (data.listQuestion && data.listQuestion.length > 0) {
+      data.listQuestion.forEach((question, index) => {
         flatQuestions.push({
           ...question,
           userAnswers: question.userAnswers ?? [],
-          contextId: context.id,
-          contextType: context.type,
-          contextTitle: context.title,
-          contextContent: context.content,
-          contextAudioUrl: context.audioUrl,
-          contextImageUrl: context.imageUrl
+          contextId: index + 1, // Create virtual context IDs
+          contextType: 'mixed', // Default type
+          contextTitle: `${question.skillName || 'Câu hỏi'} ${question.questionNumber || index + 1}`,
+          contextContent: question.contextContent,
+          contextAudioUrl: undefined,
+          contextImageUrl: undefined
         });
       });
-    });
+    }
     
     this._flatQuestions.set(flatQuestions);
   }
@@ -220,7 +340,6 @@ export class ExamStateService {
     if (!currentQuestion) return;
 
     const questions = this._flatQuestions();
-    const currentIndex = this._currentQuestionIndex();
     
     // Find first question of current context
     const firstQuestionOfCurrentContext = questions.findIndex(q => q.contextId === currentQuestion.contextId);
@@ -237,38 +356,10 @@ export class ExamStateService {
     this._timeRemaining.set(Math.max(0, time));
   }
 
-  updateQuestionAnswer(questionIndex: number, answers: number[]): void {
-    const flatQuestions = this._flatQuestions();
-    if (questionIndex >= 0 && questionIndex < flatQuestions.length) {
-      const updatedQuestions = [...flatQuestions];
-      updatedQuestions[questionIndex] = {
-        ...updatedQuestions[questionIndex],
-        userAnswers: [...answers]
-      };
-      
-      this._flatQuestions.set(updatedQuestions);
-      
-      // Update original exam data as well
-      this.syncBackToExamData(updatedQuestions);
-    }
-  }
-
-  private syncBackToExamData(flatQuestions: FlatQuestion[]): void {
-    const examData = this._examData();
-    if (!examData) return;
-
-    const updatedContexts = examData.contexts.map(context => ({
-      ...context,
-      questions: context.questions.map(question => {
-        const flatQuestion = flatQuestions.find(fq => fq.id === question.id && fq.contextId === context.id);
-        return flatQuestion ? { ...question, userAnswers: flatQuestion.userAnswers } : question;
-      })
-    }));
-
-    this._examData.set({
-      ...examData,
-      contexts: updatedContexts
-    });
+  updateQuestionAnswer(questionId: string, answerIds: string[]): void {
+    const currentAnswers = new Map(this._userAnswers());
+    currentAnswers.set(questionId, [...answerIds]);
+    this._userAnswers.set(currentAnswers);
   }
 
   setExamResult(result: ExamResult): void {
@@ -283,11 +374,47 @@ export class ExamStateService {
     this._examResult.set(null);
     this._isExamStarted.set(false);
     this._isExamPaused.set(false);
+    this._userAnswers.set(new Map());
+  }
+
+  /**
+   * Submit exam using the backend API
+   */
+  submitExam(): Observable<string> {
+    const examData = this._examData();
+    if (!examData?.testId) {
+      throw new Error('No exam data available');
+    }
+
+    const userAnswers = this._userAnswers();
+    const listAnswerIds = Array.from(userAnswers.values()).flat();
+    
+    // Get correct answers from questions
+    const flatQuestions = this._flatQuestions();
+    const listTrueAnswerIds: string[] = [];
+    
+    flatQuestions.forEach(question => {
+      if (question.answers) {
+        const correctAnswers = question.answers
+          .filter(answer => answer.isCorrect)
+          .map(answer => answer.id);
+        listTrueAnswerIds.push(...correctAnswers);
+      }
+    });
+
+    const submitRequest: SubmitTestRequestDto = {
+      listAnswerIds,
+      listTrueAnswerIds
+    };
+
+    return this.testService.submitTest(examData.testId, submitRequest);
   }
 
   calculateResult(): ExamResult | null {
     const data = this._examData();
     const flatQuestions = this._flatQuestions();
+    const userAnswers = this._userAnswers();
+    
     if (!data || !flatQuestions.length) return null;
 
     let correct = 0;
@@ -297,7 +424,8 @@ export class ExamStateService {
     let readingTotal = 0;
 
     flatQuestions.forEach(question => {
-      const isCorrect = this.isAnswerCorrect(question);
+      const questionAnswers = userAnswers.get(question.id) || [];
+      const isCorrect = this.isAnswerCorrect(question, questionAnswers);
       
       if (question.contextType === 'listening') {
         listeningTotal++;
@@ -327,17 +455,21 @@ export class ExamStateService {
     };
   }
 
-  private isAnswerCorrect(question: Question): boolean {
-    if (!question.userAnswers || question.userAnswers.length === 0) {
+  private isAnswerCorrect(question: FlatQuestion, userAnswers: string[]): boolean {
+    if (!userAnswers || userAnswers.length === 0 || !question.answers) {
       return false;
     }
 
+    const correctAnswers = question.answers
+      .filter(answer => answer.isCorrect)
+      .map(answer => answer.id);
+
     if (question.type === 'single') {
-      return question.userAnswers.length === 1 && 
-             question.correctAnswers.includes(question.userAnswers[0]);
+      return userAnswers.length === 1 && 
+             correctAnswers.includes(userAnswers[0]);
     } else if (question.type === 'multiple') {
-      const userSet = new Set(question.userAnswers);
-      const correctSet = new Set(question.correctAnswers);
+      const userSet = new Set(userAnswers);
+      const correctSet = new Set(correctAnswers);
       return userSet.size === correctSet.size && 
              [...userSet].every(answer => correctSet.has(answer));
     }
@@ -348,15 +480,17 @@ export class ExamStateService {
   private saveExamProgress(): void {
     // Implementation for auto-saving exam progress
     const data = this._examData();
+    const userAnswers = this._userAnswers();
+    
     if (data) {
       const progress = {
         examId: data.id,
+        testId: data.testId,
         currentIndex: this._currentQuestionIndex(),
         timeRemaining: this._timeRemaining(),
-        answers: this._flatQuestions().map(q => ({
-          id: q.id,
-          contextId: q.contextId,
-          userAnswers: q.userAnswers
+        answers: Array.from(userAnswers.entries()).map(([questionId, answers]) => ({
+          questionId,
+          answerIds: answers
         }))
       };
       

@@ -9,7 +9,7 @@ import { EmailToVerifyDto } from '../../../models/email.model';
 })
 export class RegisterService extends BaseService<EmailToVerifyDto> {
   constructor(http: HttpClient) {
-    super(http, 'https://localhost:7029/api/Authentication/verify-email-request');
+    super(http, 'https://localhost:7030/api/Authentication/verify-email-request');
   }
 
   override create(data: EmailToVerifyDto): Observable<any> {

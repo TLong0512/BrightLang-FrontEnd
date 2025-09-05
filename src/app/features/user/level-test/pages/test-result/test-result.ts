@@ -1,15 +1,13 @@
 import { Component, OnInit, output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ExamStateService } from '../../services/exam-state.service';
-import { ExamService } from '../../services/exam.service';
-import { ExamResult, ExamSubmission } from '../../../../../models/exam.model';
+import { ExamStateService, ExamResult } from '../../services/exam-state.service';
+import { TestService, SubmitTestRequestDto } from '../../services/exam.service';
 
 @Component({
   selector: 'app-test-result',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './test-result.html'
-  ,
+  templateUrl: './test-result.html',
   styleUrls: ['./test-result.css']
 })
 export class TestResultComponent implements OnInit {
@@ -20,11 +18,12 @@ export class TestResultComponent implements OnInit {
   saveResult = output<ExamResult>();
   
   examStateService = inject(ExamStateService);
-  examService = inject(ExamService);
+  testService = inject(TestService);
   
   examResult = signal<ExamResult | null>(null);
   isProcessing = signal<boolean>(false);
   showRoadmapConfirm = signal<boolean>(false);
+  submitError = signal<string | null>(null);
 
   ngOnInit(): void {
     this.submitExamAndCalculateResult();
@@ -32,48 +31,93 @@ export class TestResultComponent implements OnInit {
 
   private async submitExamAndCalculateResult(): Promise<void> {
     const examData = this.examStateService.examData();
-    const flatQuestions = this.examStateService.flatQuestions();
+    const userAnswers = this.examStateService.userAnswers();
     
-    if (!examData || !flatQuestions.length) return;
+    if (!examData || !examData.testId) {
+      this.calculateLocalResult();
+      return;
+    }
 
-    // Create submission object
-    const submission: ExamSubmission = {
-      examId: examData.id,
-      level: examData.level,
-      answers: flatQuestions.map(q => ({
-        questionId: q.id,
-        selectedAnswers: q.userAnswers || []
-      })),
-      timeSpent: examData.duration - this.examStateService.timeRemaining(),
-      startTime: new Date(),
-      endTime: new Date()
-    };
+    this.isProcessing.set(true);
+    this.submitError.set(null);
 
     try {
-      // Submit to backend and get result
-      this.examService.submitExam(submission).subscribe({
-        next: (result) => {
-          this.examResult.set(result);
-          this.examStateService.setExamResult(result);
-        },
-        error: (error) => {
-          // Fallback to local calculation
-          console.error('Failed to submit exam, using local calculation:', error);
+      // Prepare submission data for backend
+      const submitRequest = this.prepareSubmissionData();
+      
+      // Submit to backend
+      this.testService.submitTest(examData.testId, submitRequest).subscribe({
+        next: (response) => {
+          console.log('Test submitted successfully:', response);
+          
+          // Calculate local result for immediate display
           const localResult = this.examStateService.calculateResult();
           if (localResult) {
             this.examResult.set(localResult);
             this.examStateService.setExamResult(localResult);
           }
+          this.isProcessing.set(false);
+        },
+        error: (error) => {
+          console.error('Failed to submit exam:', error);
+          this.submitError.set('Không thể gửi bài lên server. Hiển thị kết quả tạm thời.');
+          
+          // Fallback to local calculation
+          this.calculateLocalResult();
+          this.isProcessing.set(false);
         }
       });
     } catch (error) {
-      // Fallback to local calculation
-      const localResult = this.examStateService.calculateResult();
-      if (localResult) {
-        this.examResult.set(localResult);
-        this.examStateService.setExamResult(localResult);
-      }
+      console.error('Error in submission process:', error);
+      this.calculateLocalResult();
+      this.isProcessing.set(false);
     }
+  }
+
+  private prepareSubmissionData(): SubmitTestRequestDto {
+    const userAnswers = this.examStateService.userAnswers();
+    const flatQuestions = this.examStateService.flatQuestions();
+    
+    const listAnswerIds: string[] = [];
+    const listTrueAnswerIds: string[] = [];
+
+    // Collect all user-selected answer IDs
+    flatQuestions.forEach(question => {
+      const questionUserAnswers = userAnswers.get(question.id) || [];
+      
+      // Convert answer indices to answer IDs
+      questionUserAnswers.forEach(answerIndex => {
+        if (typeof answerIndex === 'number' && question.answers && question.answers[answerIndex]) {
+          listAnswerIds.push(question.answers[answerIndex].id);
+        } else if (typeof answerIndex === 'string') {
+          // If answerIndex is already an ID
+          listAnswerIds.push(answerIndex);
+        }
+      });
+
+      // Collect correct answer IDs
+      if (question.answers) {
+        question.answers.forEach(answer => {
+          if (answer.isCorrect) {
+            listTrueAnswerIds.push(answer.id);
+          }
+        });
+      }
+    });
+
+    return {
+      listAnswerIds,
+      listTrueAnswerIds
+    };
+  }
+
+  private calculateLocalResult(): void {
+    const localResult = this.examStateService.calculateResult();
+    if (localResult) {
+      this.examResult.set(localResult);
+      this.examStateService.setExamResult(localResult);
+    }
+    this.isProcessing.set(false);
   }
 
   // Result display methods
@@ -153,22 +197,18 @@ export class TestResultComponent implements OnInit {
     return 'alert-danger';
   }
 
-  // Section scoring methods
+  // Section scoring methods using ExamResult data
   getListeningScore(): number {
-    const questions = this.examStateService.flatQuestions();
-    const listeningQuestions = questions.filter(q => q.contextType === 'listening');
-    return listeningQuestions.filter(q => this.isQuestionCorrect(q)).length;
+    return this.examResult()?.listeningScore || 0;
+  }
+
+  getReadingScore(): number {
+    return this.examResult()?.readingScore || 0;
   }
 
   getListeningTotal(): number {
     const questions = this.examStateService.flatQuestions();
     return questions.filter(q => q.contextType === 'listening').length;
-  }
-
-  getReadingScore(): number {
-    const questions = this.examStateService.flatQuestions();
-    const readingQuestions = questions.filter(q => q.contextType === 'reading');
-    return readingQuestions.filter(q => this.isQuestionCorrect(q)).length;
   }
 
   getReadingTotal(): number {
@@ -177,29 +217,11 @@ export class TestResultComponent implements OnInit {
   }
 
   getListeningPercentage(): number {
-    const total = this.getListeningTotal();
-    if (total === 0) return 0;
-    return Math.round((this.getListeningScore() / total) * 100);
+    return this.examResult()?.listeningScore || 0;
   }
 
   getReadingPercentage(): number {
-    const total = this.getReadingTotal();
-    if (total === 0) return 0;
-    return Math.round((this.getReadingScore() / total) * 100);
-  }
-
-  private isQuestionCorrect(question: any): boolean {
-    if (!question.userAnswers || question.userAnswers.length === 0) return false;
-    
-    if (question.type === 'single') {
-      return question.userAnswers.length === 1 && 
-             question.correctAnswers.includes(question.userAnswers[0]);
-    } else {
-      const userSet = new Set(question.userAnswers);
-      const correctSet = new Set(question.correctAnswers);
-      return userSet.size === correctSet.size && 
-             [...userSet].every(answer => correctSet.has(answer));
-    }
+    return this.examResult()?.readingScore || 0;
   }
 
   // Roadmap methods
