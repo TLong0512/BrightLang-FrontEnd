@@ -27,12 +27,9 @@ import { PracticeSetupComponent } from './features/user/practive/pages/practice-
 import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
 import { AdminComponent } from './shared/admin/admin';
-import { StatisticsComponent } from './features/admin/statistics/statistics';
-import { RoadMapComponent } from './features/admin/roadmap/roadmap';
-import { RoadMapDetailComponent } from './features/admin/roadmap-detail/roadmap-detail';
+import { RoleGuard } from './guards/auth.guard';
 
 // 👇 import guards
-import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -80,13 +77,9 @@ export const routes: Routes = [
     
   {
     path: 'admin',
-    component: AdminComponent,
-    canActivate: [AuthGuard],   
-    children: [
-      { path: '', component: StatisticsComponent },
-      { path: 'roadmap', component: RoadMapComponent },
-      { path: 'roadmap-detail', component: RoadMapDetailComponent }
-    ]
+    // canActivate: [RoleGuard], 
+    // data: { roles: ['Admin'] },
+    loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   },
 
   // fallback route

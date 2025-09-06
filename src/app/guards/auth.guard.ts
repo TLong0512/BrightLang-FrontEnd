@@ -1,29 +1,20 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router, UrlTree } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { AuthService } from '../features/auth/auth.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AuthGuard implements CanActivate {
+export const RoleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
 
-  constructor(private router: Router) {}
+  console.log('canActivateFn guard running');
 
-  canActivate(): boolean | UrlTree {
-    // Lấy token & role từ localStorage
-    const token = localStorage.getItem('role');
-    const role = localStorage.getItem('role');
+  const expectedRoles = route.data['roles'] as string[];
+  const userRole = auth.getRole();
 
-    // Nếu chưa login thì chuyển về trang login
-    if (!token) {
-      return this.router.parseUrl('/login');
-    }
-
-    // Nếu login rồi nhưng không phải admin thì chuyển qua /user
-    if (role !== 'Admin') {
-      return this.router.parseUrl('/user');
-    }
-
-    // Nếu là Admin thì cho vào route
+  if (auth.isAuthenticated() && expectedRoles.includes(userRole!)) {
+    console.log(16)
     return true;
   }
-}
+
+  return router.parseUrl('/auth');
+};

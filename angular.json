@@ -21,7 +21,7 @@
               "src/favicon.ico"
             ],
             "styles": [
-      "src/styles.css",
+      "src/styles.scss",
       "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
       "src/assets/css/bootstrap.min.css",
       "src/assets/css/bootstrap-icons.css",
@@ -87,7 +87,7 @@
             "tsConfig": "tsconfig.spec.json",
             "assets": ["src/assets"],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ]
           }
         }
