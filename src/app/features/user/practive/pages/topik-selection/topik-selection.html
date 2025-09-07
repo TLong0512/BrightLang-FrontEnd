@@ -1,0 +1,18 @@
+<div class="container">
+    <div class="header">
+        <h1>Luyện tập TOPIK</h1>
+        <p>Chọn cấp độ TOPIK để bắt đầu luyện tập</p>
+    </div>
+
+    @if (loading()) {
+    <app-loading-spinner message="Đang tải dữ liệu..."></app-loading-spinner>
+    } @else {
+    <div class="options-grid">
+        @for (level of topikLevels(); track level.id) {
+        <button class="option-card" (click)="selectTopikLevel(level.id, level)" [attr.data-level]="level.id">
+            <h3>{{ level.name }}</h3>
+        </button>
+        }
+    </div>
+    }
+</div>

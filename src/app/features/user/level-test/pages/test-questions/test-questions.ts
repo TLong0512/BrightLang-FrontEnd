@@ -278,10 +278,10 @@ import { Router } from '@angular/router';
 export class TestQuestionsComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   examFinished = output<void>();
-  
+
   examStateService = inject(ExamStateService);
   mockDataService = inject(MockDataService);
-  
+
   showConfirmFinish = signal<boolean>(false);
   timerSubscription: Subscription | null = null;
 
@@ -335,7 +335,7 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
   getCurrentContextQuestions(): any[] {
     const currentContext = this.examStateService.currentContext();
     if (!currentContext) return [];
-    
+
     const allQuestions = this.examStateService.flatQuestions();
     return allQuestions.filter(q => q.contextId === currentContext.id);
   }
@@ -375,10 +375,10 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
     const currentSection = this.getCurrentSection();
     const currentContext = this.examStateService.currentContext();
     if (!currentContext || !currentSection) return false;
-    
+
     const contextsInSection = this.examStateService.questionsByContext()
       .filter(c => c.context.type === currentSection);
-    
+
     return contextsInSection[contextsInSection.length - 1]?.context.id === currentContext.id;
   }
 
@@ -404,7 +404,7 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
   onAnswerChange(question: any, optionIndex: number, event: Event): void {
     const input = event.target as HTMLInputElement;
     const questionIndex = this.getQuestionGlobalIndex(question);
-    
+
     if (questionIndex === -1) return;
 
     let selectedAnswers: number[] = [];
@@ -468,7 +468,7 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
 
   getSectionDisplayName(): string {
     const section = this.getCurrentSection();
-    switch(section) {
+    switch (section) {
       case 'listening': return 'PHẦN NGHE';
       case 'reading': return 'PHẦN ĐỌC';
       default: return 'KIỂM TRA';
@@ -477,7 +477,7 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
 
   getSectionBadgeClass(): string {
     const section = this.getCurrentSection();
-    switch(section) {
+    switch (section) {
       case 'listening': return 'badge bg-danger';
       case 'reading': return 'badge bg-success';
       default: return 'badge bg-info';

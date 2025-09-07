@@ -3,10 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
-import { LoginService } from './login-api';
-import { LoginDto } from '../../../models/login.model';
 import { ChangeDetectorRef } from '@angular/core';
 import Swal from 'sweetalert2';
+import { AuthService } from '../auth.service';
 
 
 @Component({
@@ -23,7 +22,7 @@ export class LoginComponent {
   messageColor: string = 'red';
 
   constructor(private fb: FormBuilder,
-    private loginService: LoginService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private router: Router) {
     this.loginForm = this.fb.group({
@@ -61,10 +60,9 @@ export class LoginComponent {
   }
 
   Login(email: string, password: string) {
-    const acount: LoginDto = { Email: email, Password: password };
-
-    this.loginService.create(acount).subscribe({
+    this.authService.login(email, password).subscribe({
       next: res => {
+      localStorage.setItem("role", res.roles[0]);
         Swal.fire({
           title: 'Đăng nhập thành công!',
           text: 'Chào mừng bạn!',
@@ -73,8 +71,11 @@ export class LoginComponent {
           timer: 2000,       // tự đóng sau 2s (optional)
           timerProgressBar: true
         }).then(() => {
-          // Chuyển trang sau khi OK hoặc timer kết thúc
-          this.router.navigate(['/']); // đổi '/dashboard' thành route của bạn
+            if (res.roles[0] === "Admin") {
+            this.router.navigate(['/admin']);
+          } else {
+            this.router.navigate(['/home-user']);
+          }
         });
       },
       error: err => {

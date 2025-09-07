@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="navigation">
+        <button class="back-btn" (click)="goBack()">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </button>
+    </div>
+
+    <div class="header">
+        <h1 *ngIf="topikLevel && subTopikLevel">
+            {{ topikLevel.name }} {{ subTopikLevel.name }}
+        </h1>
+
+        <p>Chọn kỹ năng bạn muốn luyện tập</p>
+    </div>
+
+    @if (loading()) {
+    <app-loading-spinner message="Đang tải kỹ năng..."></app-loading-spinner>
+    } @else {
+    <div class="options-grid">
+        @for (skill of skills(); track skill.id) {
+        <button class="option-card" (click)="selectSkill(skill)" [attr.data-skill]="skill.id">
+            <div class="skill-icon"></div>
+            <h3>{{ skill.skillName }}</h3>
+        </button>
+        }
+    </div>
+    }
+</div>
