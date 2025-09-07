@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Router, Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { VerifyComponent } from './features/auth/verify/verify';
@@ -7,7 +7,7 @@ import { ResetPasswordComponent } from './features/auth/reset-password/reset-pas
 import { TopicsDetail } from './features/home/topics-detail/topics-detail';
 import { HomeComponent } from './features/home/home';
 import { HomePageComponent } from './features/home/home-page/home-page';
-import { UserHomeComponent } from './features/user/user-home/user-home';  
+import { UserHomeComponent } from './features/user/user-home/user-home';
 
 import { AuthComponent } from './shared/auth/auth';
 
@@ -28,21 +28,45 @@ import { SkillSelectionComponent } from './features/user/practive/pages/skill-se
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
 import { AdminComponent } from './shared/admin/admin';
 import { RoleGuard } from './guards/auth.guard';
+import { UserState } from './features/auth/services/user.state';
+import { inject } from '@angular/core';
+import { map } from 'rxjs';
 
 // 👇 import guards
 
 export const routes: Routes = [
   {
     path: '',
+    canActivate: [() => {
+      const router = inject(Router);
+      const userState = inject(UserState);
+      return userState.currentUser$.pipe(
+        map(user => user == null
+          ? true // cho phép đăng nhập đăng ký
+          : router.navigateByUrl('/home-user') // đã đăng nhập. điều hướng về trang chủ.
+        )
+      )
+    }],
     component: HomeComponent,
     children: [
       { path: '', component: HomePageComponent },
       { path: 'topik-detail', component: TopicsDetail }
+      // { path: '', component: TopicsDetail }
     ]
   },
 
   {
-    path:'home-user',
+    path: 'home-user',
+    canActivate: [() => {
+      const router = inject(Router);
+      const userState = inject(UserState);
+      return userState.currentUser$.pipe(
+        map(user => user != null
+          ? true // cho phép đăng nhập đăng ký
+          : router.navigateByUrl('/') // đã đăng nhập. điều hướng về trang chủ.
+        )
+      )
+    }],
     component: UserComponent,
     children: [
       { path: 'result-screen/:sessionId', component: ResultScreenComponent },
@@ -65,6 +89,18 @@ export const routes: Routes = [
 
   {
     path: 'auth',
+    canActivate: [() => {
+      const router = inject(Router);
+      const userState = inject(UserState);
+      return userState.currentUser$.pipe(
+        map(user => {
+        if (user == null) {
+          return true; // cho phép đi tiếp
+        }
+        return router.parseUrl('/home-user'); // redirect an toàn
+      })
+      )
+    }],
     component: AuthComponent,
     children: [
       { path: '', component: LoginComponent },
@@ -74,7 +110,7 @@ export const routes: Routes = [
       { path: 'reset-password', component: ResetPasswordComponent }
     ]
   },
-    
+
   {
     path: 'admin',
     // canActivate: [RoleGuard], 

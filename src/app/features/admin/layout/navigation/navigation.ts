@@ -55,8 +55,6 @@ export const NavigationItems: NavigationItem[] = [
         classes: 'nav-item',
         url: '/admin/roadmap',
         icon: 'ti ti-plant-2',
-        target: true,
-        external: true
       }
     ]
   }
