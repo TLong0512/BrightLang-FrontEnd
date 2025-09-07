@@ -1,0 +1,41 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    @for(plan of pricingPlans; track plan.title) {
+      <div class="col-md-4 mb-4">
+      <div class="card pricing-card h-100" [class.popular]="plan.isPopular">
+        <div class="card-body d-flex flex-column">
+          <!-- Header -->
+          <div class="text-center mb-4">
+            <h5 class="card-title plan-title">{{ plan.title }}</h5>
+            <div class="price-section">
+              <span class="price">{{ plan.price }}</span>
+              <span class="price-currency">câu</span>
+              <span class="price-period">{{ plan.period }}</span>
+            </div>
+          </div>
+
+          <!-- Features List -->
+          <ul class="features-list flex-grow-1">
+            @for(feature of plan.features; track $index) {
+            <li class="feature-item">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>
+              {{ feature }}
+            </li>
+            }
+
+          </ul>
+
+          <!-- Button -->
+          <div class="mt-auto">
+            <button type="button" class="btn btn-select w-100" [class.btn-popular]="plan.isPopular"
+              (click)="onSelectPlan(plan.id!)">
+              {{ plan.buttonText }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    } 
+    
+  </div>
+</div>

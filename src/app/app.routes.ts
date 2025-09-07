@@ -110,6 +110,12 @@ export const routes: Routes = [
         component: ResetPasswordComponent
       }
     ]
+  },
+   
+  {
+    path: 'admin',
+    // canActivate: [RoleGuard], 
+    // data: { roles: ['Admin'] },
+    loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   }
-
 ];

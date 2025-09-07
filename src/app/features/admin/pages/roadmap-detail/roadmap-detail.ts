@@ -1,86 +1,64 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import Sortable from 'sortablejs';
-
-interface Lesson {
-    id: number;
-    type: string;
-    name: string;
-    days: number;
-    sentences: number;
-}
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { RoadMap, RoadMapElement } from "../../models/road-map.model";
+import { CommonModule } from "@angular/common";
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { RoadMapApiService } from "../../services/road-map-api.service";
 
 @Component({
-    selector: 'roadmap-detail',
-    templateUrl: './roadmap-detail.html',
-    styleUrls: ['./roadmap-detail.css'],
-    imports: [ReactiveFormsModule, CommonModule],
-    standalone: true,
+  selector: 'roadmap-detail',
+  templateUrl: './roadmap-detail.html',
+  styleUrls: ['./roadmap-detail.css'],
+  imports: [ReactiveFormsModule, CommonModule],
+  standalone: true,
 })
-export class RoadMapDetailComponent implements OnInit, AfterViewInit {
-    lessons: Lesson[] = [
-        { id: 1, type: 'Practice', name: 'Dạng câu 9-10: Tìm nghĩa phần phù hợp', days: 50, sentences: 30 },
-        { id: 2, type: 'Theory', name: 'Ngữ pháp cơ bản', days: 50, sentences: 30 },
-        { id: 3, type: 'Test', name: 'Bài kiểm tra số 1', days: 50, sentences: 30 },
-    ];
+export class RoadMapDetailComponent implements OnInit {
 
-    formGroups: { [key: number]: FormGroup } = {};
+  roadMapElements!: RoadMapElement[];
 
-    constructor(private fb: FormBuilder) { }
+  formGroups: { [key: string]: FormGroup } = {};
 
-    ngOnInit(): void {
-        // Tạo form group cho từng lesson
-        this.lessons.forEach(lesson => {
-            this.formGroups[lesson.id] = this.fb.group({
-                days: [lesson.days],
-                sentences: [lesson.sentences]
-            });
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private apiService: RoadMapApiService,
+    private cd: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id') || '';
+    this.apiService.getRoadMapElementsByRoadMapId(id).subscribe({
+      next: (res) => {
+        this.roadMapElements = res;
+        
+
+        // Tạo form group cho từng range duy nhất
+        this.roadMapElements.forEach(r => {
+          this.formGroups[r.range!.id!] = this.fb.group({
+            days: [r.repeatDays ?? 50],
+            sentences: [r.questionPerDay ?? 30]
+          });
         });
-    }
 
-    ngAfterViewInit(): void {
-        // Simple check for browser environment
-        if (typeof document !== 'undefined') {
-            this.initializeSortable();
-        }
-    }
+        this.cd.detectChanges();
+      }
+    });
+  }
 
-    private initializeSortable(): void {
-        const el = document.getElementById('lessonAccordion');
-        if (!el) return;
+  getData() {
+    const data = this.roadMapElements.map(el => {
+      const fg = this.formGroups[el.range!.id!];
+      return {
+        id: el.range!.id!,
+        name: el.range!.name,
+        days: fg.get('days')?.value,
+        sentences: fg.get('sentences')?.value
+      };
+    });
+    console.log('Dữ liệu:', data);
+  }
 
-        new Sortable(el, {
-            animation: 200,
-            ghostClass: 'dragging',
-            draggable: '.accordion-item',
-            handle: '.lesson-btn', // optional, chỉ kéo khi bấm header
-            onEnd: (evt) => {
-                // Optional: cập nhật thứ tự lessons array sau khi kéo
-                const oldIndex = evt.oldIndex!;
-                const newIndex = evt.newIndex!;
-                const moved = this.lessons.splice(oldIndex, 1)[0];
-                this.lessons.splice(newIndex, 0, moved);
-                console.log('Mảng lessons sau khi kéo:', this.lessons);
-            }
-        });
-    }
-
-    getData() {
-        const data = this.lessons.map(lesson => {
-            const fg = this.formGroups[lesson.id];
-            return {
-                id: lesson.id,
-                type: lesson.type,
-                name: lesson.name,
-                days: fg.get('days')?.value,
-                sentences: fg.get('sentences')?.value
-            };
-        });
-        console.log('Dữ liệu theo thứ tự giao diện:', data);
-    }
-
-    getControl(lessonId: number, controlName: 'days' | 'sentences'): FormControl {
-        return this.formGroups[lessonId].get(controlName) as FormControl;
-    }
+  getControl(rangeId: string, controlName: 'days' | 'sentences'): FormControl {
+    return this.formGroups[rangeId].get(controlName) as FormControl;
+  }
 }

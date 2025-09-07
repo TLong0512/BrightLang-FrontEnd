@@ -9,6 +9,7 @@ import { QuestionListComponent } from "./pages/question/question-list/question-l
 import { AddQuestionComponent } from "./pages/question/add-question/add-question";
 import { UpdateQuestionComponent } from "./pages/question/update-question/update-question";
 import { RoleGuard } from "../../guards/auth.guard";
+import { RoadMapElementComponent } from "./pages/question/road-map-element/road-map-element";
 
 export const adminRoutes: Routes = [
     {
@@ -17,10 +18,11 @@ export const adminRoutes: Routes = [
         children: [
           { path: '', component: DefaultComponent },
           { path: 'roadmap', component: RoadMapComponent },
-          { path: 'roadmap-detail', component: RoadMapDetailComponent },
+          { path: 'road-map-detail/:id', component: RoadMapDetailComponent },
           {path: 'question-type', component: ExamQuestionTypeComponent},
           {path: 'question-list', component: QuestionListComponent},
-          {path: 'update-question', component: UpdateQuestionComponent},
+          {path: 'road-map-element', component: RoadMapElementComponent},
+          {path: 'update-question/:id', component: UpdateQuestionComponent},
           {path: 'question', component: QuestionComponent,
             children: [
               {path: 'add', component: AddQuestionComponent}

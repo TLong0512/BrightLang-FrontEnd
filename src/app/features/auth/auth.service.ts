@@ -13,14 +13,15 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/Authentication/login`, { email, password }, { withCredentials: true })
+    this.loggedIn = true
+    return this.http.post<any>(`${this.apiUrl}/Authentication/login`, { email, password })
   }
 
   logout() {
-    return this.http.post(`${this.apiUrl}/Authentication/logout`, {}, { withCredentials: true }).subscribe(() => {
+    return this.http.post(`${this.apiUrl}/Authentication/logout`, null , { withCredentials: true }).subscribe(() => {
       this.loggedIn = false;
       this.role = null;
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth']);
     });
   }
 
