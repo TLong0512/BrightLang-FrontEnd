@@ -20,21 +20,26 @@ import { LevelTestEntryComponent } from './features/user/level-test/pages/level-
 import { TestReadyComponent } from './features/user/level-test/pages/test-ready/test-ready';
 import { TestQuestionsComponent } from './features/user/level-test/pages/test-questions/test-questions';
 import { TestResultComponent } from './features/user/level-test/pages/test-result/test-result';
-import { ResultScreenComponent } from './features/user/practive/pages/result-screen/result-screen';
-import { PracticeScreenComponent } from './features/user/practive/pages/practice-screen/practice-screen';
 import { QuestionTypesComponent } from './features/user/practive/pages/question-types/question-types';
-import { PracticeSetupComponent } from './features/user/practive/pages/practice-setup/practice-setup';
+import { PracticeComponent } from './features/user/practive/pages/practice-screen/practice-screen';
 import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
+
 import { AdminComponent } from './shared/admin/admin';
 import { RoleGuard } from './guards/auth.guard';
 import { UserState } from './features/auth/services/user.state';
 import { inject } from '@angular/core';
 import { map } from 'rxjs';
+import { TopikSubLevelSelectionComponent } from './features/user/practive/pages/topik-SubLevel/topik-sub-level';
+import { ResultComponent } from './features/user/practive/pages/result-screen/result-screen';
 
 // 👇 import guards
 
+
+
+
 export const routes: Routes = [
+
   {
     path: '',
     canActivate: [() => {
@@ -57,6 +62,7 @@ export const routes: Routes = [
 
   {
     path: 'home-user',
+
     canActivate: [() => {
       const router = inject(Router);
       const userState = inject(UserState);
@@ -67,23 +73,49 @@ export const routes: Routes = [
         )
       )
     }],
+
     component: UserComponent,
     children: [
-      { path: 'result-screen/:sessionId', component: ResultScreenComponent },
-      { path: 'practice-screen/:sessionId', component: PracticeScreenComponent },
-      { path: 'question-types/:level/:skillId', component: QuestionTypesComponent },
-      { path: 'practice-setup/:level/:skillId/:questionTypeId', component: PracticeSetupComponent },
-      { path: 'skill-selection/:level', component: SkillSelectionComponent },
-      { path: 'topik-selection', component: TopikSelectionComponent },
-      { path: 'level-test', component: LevelTestEntryComponent },
-      { path: 'test-ready', component: TestReadyComponent },
-      { path: 'test-question', component: TestQuestionsComponent },
-      { path: 'test-result', component: TestResultComponent },
-      { path: '', component: UserHomeComponent },
-      { path: 'topik-detail', component: TopicsDetail },
-      { path: 'book', component: BookComponent },
-      { path: 'vocab/:id', component: VocabularyComponent },
-      { path: 'flashcard/:bookId', component: FlashcardComponent }
+      { path: 'result-screen', component: ResultComponent },
+      { path: 'practice-screen/:rangeId', component: PracticeComponent },
+      { path: 'question-types/:skillId', component: QuestionTypesComponent },
+      {
+        path: 'skill-selection/:levelId',
+        component: SkillSelectionComponent
+      },
+      {
+        path: 'topik-selection',
+        component: TopikSelectionComponent
+      },
+      {
+        path: 'topik-sublevel/:examTypeId',
+        component: TopikSubLevelSelectionComponent
+      },
+
+      {
+        path: 'level-test',
+        component: LevelTestEntryComponent
+      },
+      {
+        path: 'test-ready',
+        component: TestReadyComponent
+      },
+      {
+        path: 'test-question',
+        component: TestQuestionsComponent
+      },
+      {
+        path: 'test-result',
+        component: TestResultComponent
+      },
+      {
+        path: '',
+        component: UserHomeComponent
+      },
+      {
+        path: 'topik-detail',
+        component: TopicsDetail
+      }
     ]
   },
 
@@ -103,11 +135,26 @@ export const routes: Routes = [
     }],
     component: AuthComponent,
     children: [
-      { path: '', component: LoginComponent },
-      { path: 'register', component: RegisterComponent },
-      { path: 'verify', component: VerifyComponent },
-      { path: 'forget-password', component: ForgetPassword },
-      { path: 'reset-password', component: ResetPasswordComponent }
+      {
+        path: '',
+        component: LoginComponent
+      },
+      {
+        path: 'register',
+        component: RegisterComponent
+      },
+      {
+        path: 'verify',
+        component: VerifyComponent
+      },
+      {
+        path: 'forget-password',
+        component: ForgetPassword
+      },
+      {
+        path: 'reset-password',
+        component: ResetPasswordComponent
+      }
     ]
   },
 
@@ -116,8 +163,5 @@ export const routes: Routes = [
     // canActivate: [RoleGuard], 
     // data: { roles: ['Admin'] },
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
-  },
-
-  // fallback route
-  { path: '**', redirectTo: '' }
+  }
 ];
