@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Context, Question } from "../../../models/question-bank.model";
-import { AdminService } from "../../../services/admin.service";
+import { QuestionBankApiService } from "../../../services/question-bank-api.service";
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -184,7 +184,7 @@ export class UpdateQuestionComponent implements OnInit {
     showQuestionExplanation: boolean = false;
     selectedAnswerId: string | null = null;
 
-    constructor(private adminService: AdminService) { }
+    constructor(private adminService: QuestionBankApiService) { }
 
     ngOnInit(): void {
         this.question = {

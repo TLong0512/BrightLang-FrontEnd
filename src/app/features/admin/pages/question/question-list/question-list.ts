@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AdminService } from '../../../services/admin.service';
+import { QuestionBankApiService } from '../../../services/question-bank-api.service';
 import { Question } from '../../../models/question-bank.model';
 import Swal from 'sweetalert2';
 import { Router, RouterModule } from '@angular/router';
@@ -205,7 +205,7 @@ import { Router, RouterModule } from '@angular/router';
   `
 })
 export class QuestionListComponent implements OnInit {
-  constructor(private adminService: AdminService,
+  constructor(private adminService: QuestionBankApiService,
     private router: Router
   ) {}
   questionsData: Question[] = [];

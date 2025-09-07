@@ -7,9 +7,9 @@ import { ExamType, Level, SkillLevel, Range, Context, Question, Answer, Question
 @Injectable({
   providedIn: 'root' // hoặc chỉ trong UserModule
 })
-export class AdminService {
+export class QuestionBankApiService {
   private apiUrl = `${environment.apiUrlQuestionBank}`;
-
+  
   constructor(private http: HttpClient) { }
 
   getExamTypes(): Observable<ExamType[]> {
@@ -102,4 +102,7 @@ export class AdminService {
   updateAnswer(id: string, answer: Answer): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/Answer/${id}`, answer, { withCredentials: true });
   }
+
+  // Road map
+  
 }

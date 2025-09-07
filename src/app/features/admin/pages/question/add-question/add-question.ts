@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Answer, Question, QuestionAdd } from '../../../models/question-bank.model';
 import { Component, Input, OnInit } from '@angular/core';
-import { AdminService } from '../../../services/admin.service';
+import { QuestionBankApiService } from '../../../services/question-bank-api.service';
 import { Context } from 'vm';
 import { QuestionAddService } from '../services/question-add.service';
 import { EditorComponent } from '@tinymce/tinymce-angular';
@@ -135,7 +135,7 @@ export class AddQuestionComponent {
   nextQuestionId: number = 1;
   rangeId: string | null = ''
   selectedRange: string | null = ''
-  constructor(private adminService: AdminService, private sharedService: QuestionAddService) { }
+  constructor(private adminService: QuestionBankApiService, private sharedService: QuestionAddService) { }
 
   // ngOnInit(): void {
   //   this.sharedService.values$.subscribe((data) => {

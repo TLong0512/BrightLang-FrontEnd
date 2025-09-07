@@ -16,6 +16,5 @@ export class UserHeaderComponent {
 
   onLogout() {
     this.authService.logout()
-    this.router.navigate(['/home-user'])
   }
 }
