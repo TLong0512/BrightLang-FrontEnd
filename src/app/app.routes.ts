@@ -25,8 +25,6 @@ import { PracticeComponent } from './features/user/practive/pages/practice-scree
 import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
 
-import { AdminComponent } from './shared/admin/admin';
-import { RoleGuard } from './guards/auth.guard';
 import { TestReviewComponent } from './features/user/level-test/pages/test-review/test-review';
 import { TestHistoryComponent } from './features/user/level-test/pages/test-history/test-history';
 import { UserState } from './features/auth/services/user.state';
@@ -34,13 +32,8 @@ import { inject } from '@angular/core';
 import { map } from 'rxjs';
 import { TopikSubLevelSelectionComponent } from './features/user/practive/pages/topik-SubLevel/topik-sub-level';
 import { ResultComponent } from './features/user/practive/pages/result-screen/result-screen';
-import { RoadmapComponent } from './features/user/road-map/road-map';
 
 // 👇 import guards
-
-
-
-
 export const routes: Routes = [
 
   {
@@ -106,11 +99,6 @@ export const routes: Routes = [
         path: 'topik-sublevel/:examTypeId',
         component: TopikSubLevelSelectionComponent
       },
-      {
-        path: 'road-map',
-        component: RoadmapComponent
-      },
-      
       {
         path: '',
         component: UserHomeComponent
