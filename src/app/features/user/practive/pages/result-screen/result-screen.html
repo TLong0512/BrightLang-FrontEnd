@@ -164,12 +164,8 @@
 
                     <!-- Audio Context -->
                     <div *ngIf="hasAudioContent(selectedQuestion.contextInformation.content)" class="media-content">
-                        <div class="audio-player">
-                            <audio controls [src]="getAudioUrl(selectedQuestion.contextInformation.content)"
-                                preload="metadata">
-                                <p>Trình duyệt không hỗ trợ audio.</p>
-                            </audio>
-                        </div>
+                        <div class="audio-player"
+                            [innerHTML]="getAudioHtml(selectedQuestion.contextInformation.content)"></div>
                     </div>
 
                     <!-- Image Context -->
@@ -216,7 +212,22 @@
                                 <div class="answer-text-section">
                                     <div class="answer-option-text">
                                         <span class="option-marker">{{ answer.value.charAt(0) }}</span>
-                                        <span class="option-text">{{ answer.value.substring(2) }}</span>
+
+                                        <!-- Audio trong answer -->
+                                        <div *ngIf="hasAudioContent(answer.value)" class="option-audio">
+                                            <div [innerHTML]="getAudioHtml(answer.value)"></div>
+                                        </div>
+
+                                        <!-- Image trong answer -->
+                                        <div *ngIf="hasImageContent(answer.value)" class="option-image">
+                                            <img [src]="getImageUrl(answer.value)" alt="Answer Image"
+                                                class="answer-image">
+                                        </div>
+
+                                        <!-- Text trong answer -->
+                                        <div class="option-content">
+                                            <span class="option-text" [innerHTML]="getSafeHtml(answer.value)"></span>
+                                        </div>
                                     </div>
 
                                     <div class="answer-indicators">

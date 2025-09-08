@@ -41,6 +41,14 @@ export interface Question {
   answerList?: Answer[];
 }
 
+export interface QuestionDto {
+  questionInformation?: Question;
+  contextInformation?: Context;
+  rangeName?: string;
+  skillName?: string;
+  levelName?: string;
+  answerDetails?: Answer[];
+}
 export interface QuestionAdd {
   id?: string;
   content?: string;
@@ -50,10 +58,26 @@ export interface QuestionAdd {
   answerList?: Answer[];
 }
 
+export interface QuestionUpdate {
+  questionNumber: number
+  content: string
+  explain: string
+  context: Context
+  listAnswers: Answer[];
+}
+
 export interface Answer {
   id?: string;
   value?: string;
   explain?: string;
   isCorrect?: boolean;
   questionId?: string;
+}
+
+export interface QuestionPage {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  items: Question[];
 }

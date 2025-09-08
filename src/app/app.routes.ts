@@ -68,7 +68,7 @@ export const routes: Routes = [
       const userState = inject(UserState);
       return userState.currentUser$.pipe(
         map(user => user != null
-          ? true // cho phép đăng nhập đăng ký
+          ? true // cho phép vào đăng ký
           : router.navigateByUrl('/') // đã đăng nhập. điều hướng về trang chủ.
         )
       )

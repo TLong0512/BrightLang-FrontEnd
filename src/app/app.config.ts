@@ -9,6 +9,7 @@ import { apiInterceptor } from './features/auth/api.interceptor';
 import { UserState } from './features/auth/services/user.state';
 import { AuthService } from './features/auth/services/auth.service';
 import { firstValueFrom } from 'rxjs';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,6 +33,9 @@ export const appConfig: ApplicationConfig = {
       // const userState = inject(UserState);
       const authService = inject(AuthService);
       return firstValueFrom(authService.refresh()); // angular waits.
-    })
+    }),
+    provideAnimations()
   ]
 };
+
+
