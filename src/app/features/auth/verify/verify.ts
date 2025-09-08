@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { RegisterDto } from '../../../models/register.model';
-import { VerifyService } from './verify-api';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { SharedService } from '../share.service';
+import { SharedService } from '../services/share.service';
 import { EmailToVerifyDto } from '../../../models/email.model';
-import { RegisterService } from '../register/register-api';
+import { AuthService } from '../services/auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'verify',
@@ -28,10 +28,9 @@ export class VerifyComponent implements OnInit, OnDestroy {
   inputs = [0, 1, 2, 3, 4, 5];
   email = ''
   constructor(private cdr: ChangeDetectorRef,
-    private verifyService: VerifyService,
+    private authService: AuthService,
     private router: Router,
-    private sharedService: SharedService,
-    private registerService: RegisterService
+    private sharedService: SharedService
   ) { }
 
   ngOnInit() {
@@ -73,6 +72,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
       }
       this.Register(registerDto)
     });
+    console.log('76', this.email)
   }
 
   onResend() {
@@ -122,7 +122,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
   Register(registerDto: RegisterDto) {
     console.log(registerDto)
 
-    this.verifyService.create(registerDto).subscribe({
+    this.authService.register(registerDto).subscribe({
       next: res => {
         console.log('Đăng ký thành công:', res)
         Swal.fire({
@@ -143,16 +143,20 @@ export class VerifyComponent implements OnInit, OnDestroy {
         }
         if (err.status == 0) {
           this.message = 'Lỗi kết nối!'
+        } else {
+          console.log(err)
         }
       }
     });
   }
 
   SendEmail(emailToVerifyDto: EmailToVerifyDto) {
-    this.registerService.create(emailToVerifyDto).subscribe({
+    this.authService.registerEmailRequest(emailToVerifyDto).subscribe({
       next: res => {
+        if(res == true) alert('Send success!');
+        else alert('Email already used.');
       },
-      error: err => {
+      error: (err: HttpErrorResponse) => {
         if (err.status == 409) {
           this.message = 'Email đã được sử dụng!'
         }

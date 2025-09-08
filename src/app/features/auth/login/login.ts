@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import Swal from 'sweetalert2';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth.service';
+import { UserState } from '../services/user.state';
 
 
 @Component({
@@ -59,10 +60,16 @@ export class LoginComponent {
     this.Login(email, password)
   }
 
+  private readonly userState = inject(UserState);
+
   Login(email: string, password: string) {
     this.authService.login(email, password).subscribe({
-      next: res => {
-        localStorage.setItem("role", res.roles[0]);
+      next: (res) => {
+        if(res == null) {
+          alert('Login failed. Please check your username and password!');
+          return;
+        }
+        // localStorage.setItem("role", res.roles[0]);
         Swal.fire({
           title: 'Đăng nhập thành công!',
           text: 'Chào mừng bạn!',
@@ -71,10 +78,11 @@ export class LoginComponent {
           timer: 2000,       // tự đóng sau 2s (optional)
           timerProgressBar: true
         }).then(() => {
-          console.log(res)
-          this.authService.setRole(res.roles[0])
-          if (res.roles[0] === "Admin") {
-            console.log('ok')
+          // console.log(res)
+          // this.authService.setRole(res.roles[0])
+      
+          if (res.roles.includes("Admin")) {
+            // console.log('ok')
             this.router.navigate(['/admin']);
           } else {
             this.router.navigate(['/home-user']);
@@ -83,14 +91,16 @@ export class LoginComponent {
       },
       error: err => {
         console.log(err.status)
-        if (err.status == 400) {
-          this.message = 'Bạn nhập sai email hoặc mật khẩu!'
-          this.cdr.detectChanges();
-        }
+        // if (err.status == 401) {
+        //   this.message = 'Bạn nhập sai email hoặc mật khẩu!'
+        //   this.cdr.detectChanges();
+        // }
         if (err.status == 0) {
           this.message = 'Lỗi kết nối!'
           this.cdr.detectChanges();
         }
+        else this.message = "Lỗi không xác định.";
+        this.cdr.detectChanges();
       }
     });
   }

@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ResetPasswordDto, ResetPasswordService } from './reset-password-api';
 import { Router, RouterModule } from '@angular/router';
-import { SharedService } from '../share.service';
+import { SharedService } from '../services/share.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../services/auth.service';
+import { ResetPasswordDto } from '../../admin/models/auth.model';
 
 @Component({
   selector: 'reset-password',
@@ -22,7 +23,7 @@ export class ResetPasswordComponent {
 
   constructor(
     private fb: FormBuilder,
-    private resetService: ResetPasswordService,
+    private resetService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private sharedService: SharedService
@@ -79,7 +80,7 @@ export class ResetPasswordComponent {
       ConfirmNewPassword: this.resetForm.value.confirmPass
     };
 
-    this.resetService.create(dto).subscribe({
+    this.resetService.resetPassword(dto).subscribe({
       next: res => {
         Swal.fire({
           title: 'Đổi mật khẩu thành công!',

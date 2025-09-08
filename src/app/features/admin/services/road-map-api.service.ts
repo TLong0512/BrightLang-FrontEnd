@@ -14,13 +14,16 @@ export class RoadMapApiService {
   constructor(private http: HttpClient) { }
 
   getRoadmaps(): Observable<RoadMap[]> {
-    return this.http.get<RoadMap[]>(`${this.apiUrl}/Roadmaps`, {withCredentials: true});
+    return this.http.get<RoadMap[]>(`/Roadmaps`, {withCredentials: true});
   }
 
   getRoadMapElementsByRoadMapId(id: string): Observable<RoadMapElement[]> {
-    return this.http.get<RoadMapElement[]>(`${this.apiUrl}/RoadmapElementRanges/${id}`, {withCredentials: true});
+    return this.http.get<RoadMapElement[]>(`/RoadmapElementRanges/${id}`, {withCredentials: true});
   }
 
+  updateRoadMapElement(roadMapId: string, index: number, data: RoadMapElement) {
+    return this.http.post<void>(`/RoadmapElementRanges/${roadMapId}/${index}`, data, { withCredentials: true });
+  }
 //   getSkillLevelsByLevelId(id: string): Observable<SkillLevel[]> {
 //     return this.http.get<SkillLevel[]>(`${this.apiUrl}/SkillLevel/filter/level/${id}`);
 //   }

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Answer, Question, QuestionAdd } from '../../../models/question-bank.model';
-import { Component, Input, OnInit } from '@angular/core';
+import { Answer, ExamType, Level, Question, QuestionAdd, SkillLevel } from '../../../models/question-bank.model';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { QuestionBankApiService } from '../../../services/question-bank-api.service';
 import { Context } from 'vm';
 import { QuestionAddService } from '../services/question-add.service';
 import { EditorComponent } from '@tinymce/tinymce-angular';
+import { map, Observable } from 'rxjs';
 
 
 @Component({
@@ -87,6 +88,17 @@ import { EditorComponent } from '@tinymce/tinymce-angular';
 
 
 export class AddQuestionComponent {
+  // two way binding
+  selectedExamType: string = '';
+  selectedLevel: string = '';
+  selectedSkillLevel: string = '';
+  selectedRange: string = ''
+
+  // list
+  examTypes$!: Observable<ExamType[]>
+  levels$!: Observable<Level[]>
+  skillLevels!: SkillLevel[]
+  ranges$!: Observable<Range[]>;
   content: string = '';
   init = {
     height: 500,
@@ -134,8 +146,10 @@ export class AddQuestionComponent {
   audioUrl: string = '';
   nextQuestionId: number = 1;
   rangeId: string | null = ''
-  selectedRange: string | null = ''
-  constructor(private adminService: QuestionBankApiService, private sharedService: QuestionAddService) { }
+  constructor(private adminService: QuestionBankApiService,
+    private sharedService: QuestionAddService,
+    private cd: ChangeDetectorRef,
+  ) { }
 
   // ngOnInit(): void {
   //   this.sharedService.values$.subscribe((data) => {
@@ -211,7 +225,7 @@ export class AddQuestionComponent {
       return;
     }
 
-  
+
     const context: Context = {
       content: this.content,
       explain: this.passageExplanation,
@@ -235,7 +249,82 @@ export class AddQuestionComponent {
     })
   }
 
-  
+  getExamTypes() {
+    this.examTypes$ = this.adminService.getExamTypes();
+  }
 
-  
+  getLevels() {
+    if (this.selectedExamType) {
+      this.levels$ = this.adminService.getLevelsByExamTypeId(this.selectedExamType).pipe(
+        map((levels: Level[]) => levels.sort((a, b) => a.name.localeCompare(b.name))) // sort theo name
+      );
+    }
+  }
+
+  getSkillLevels() {
+    if (this.selectedLevel) {
+      this.adminService.getSkillLevelsByLevelId(this.selectedLevel).subscribe({
+        next: (data) => {
+          // FIX: Đảm bảo data clean và không có duplicate
+          this.skillLevels = data.filter((skill, index, self) =>
+            index === self.findIndex((s) => s.id === skill.id)
+          );
+          console.log('Loaded skillLevels:', this.skillLevels);
+          this.cd.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading skill levels:', error);
+          this.skillLevels = [];
+          this.cd.detectChanges();
+        }
+      });
+    }
+  }
+
+  // Xử lý khi thay đổi exam type
+  onExamTypeChange(): void {
+    this.getLevels();
+    // FIX: Reset tất cả các selection phía sau
+    this.selectedLevel = '';
+    this.selectedSkillLevel = '';
+
+    this.skillLevels = [];
+
+    // FIX: Force change detection
+    this.cd.detectChanges();
+  }
+
+  /**
+   * Xử lý khi thay đổi level
+   */
+  onLevelChange(): void {
+    this.getSkillLevels();
+    // FIX: Reset tất cả các selection phía sau
+    this.selectedSkillLevel = '';
+    this.selectedRange = '';
+
+    // FIX: Force change detection
+    this.cd.detectChanges();
+  }
+
+  /**
+   * Xử lý khi thay đổi skill level
+   */
+  onSkillLevelChange(): void {
+    // this.getRanges();
+    let skillLevel = this.skillLevels.find(s => s.id == this.selectedSkillLevel);
+    if (skillLevel) {
+      this.sharedService.setValues(this.selectedExamType, skillLevel!.skillId!);
+    }
+
+    // FIX: Reset range selection
+    this.selectedRange = '';
+
+    // FIX: Force change detection
+    this.cd.detectChanges();
+  }
+
+
+
+
 }
