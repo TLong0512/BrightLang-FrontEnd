@@ -1,4 +1,4 @@
-<!-- Nút thêm
+<!-- Nút thêm -->
 <div class="row mt-4">
     <div class="col-12 text-center">
         <button type="button" class="btn btn-primary btn-lg px-5">
@@ -42,12 +42,6 @@
                     </h1>
                     <p class="lead mt-3 mb-0 text-white">Quản lý và xem chi tiết các câu hỏi</p>
                 </div>
-                <div class="col-md-4 text-end">
-                    <div class="stats-card d-inline-block pulse-animation">
-                        <div class="stats-number">{{ questionsData.length }}</div>
-                        <div class="text-muted">Tổng câu hỏi</div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -78,9 +72,9 @@
     </div> -->
 
         <!-- Questions Container -->
-        <div class="row" *ngIf="questionsData.length > 0">
-            <div class="col-12 mb-4 fade-in" *ngFor="let question of questionsData; let i = index"
-                [style.animation-delay.s]="i * 0.1">
+        @for(question of questionsData?.items!; track question; let i = $index) {
+        <div class="row">
+            <div class="col-12 mb-4 fade-in" [style.animation-delay.s]="i * 0.1">
                 <div class="card question-card h-100 border-0">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between">
@@ -100,7 +94,7 @@
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-danger btn-sm ms-3" title="Xóa"
-                                    (click)="deleteQuestion(question.id!)" >
+                                    (click)="deleteQuestion(question.id!)">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -119,12 +113,12 @@
                 </div>
             </div>
         </div>
+        }
 
         <!-- No results message -->
-        <div class="text-center py-5" *ngIf="questionsData.length === 0">
+        <div class="text-center py-5" *ngIf="questionsData?.items!.length === 0">
             <i class="fas fa-search display-1 text-muted mb-3"></i>
             <h4 class="text-muted">Không tìm thấy câu hỏi nào</h4>
-            <p class="text-muted">Hãy thử tìm kiếm với từ khóa khác</p>
         </div>
     </div>
 </div>

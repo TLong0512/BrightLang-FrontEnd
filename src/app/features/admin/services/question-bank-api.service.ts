@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { ExamType, Level, SkillLevel, Range, Context, Question, Answer, QuestionAdd } from '../models/question-bank.model';
+import { ExamType, Level, SkillLevel, Range, Context, Question, Answer, QuestionAdd, QuestionPage, QuestionDto, QuestionUpdate } from '../models/question-bank.model';
 
 @Injectable({
   providedIn: 'root' // hoặc chỉ trong UserModule
@@ -65,21 +65,21 @@ export class QuestionBankApiService {
   }
 
   // Question
-  getAllQuestions(): Observable<Question[]> {
-    return this.http.get<Question[]>(`/Question`)
+  getAllQuestions(): Observable<QuestionPage> {
+    return this.http.get<QuestionPage>(`/Question/${1}/${10}`)
   }
   getQuestionsByContextId(id: string): Observable<Question[]> {
     return this.http.get<Question[]>(`/Question/filter/context/${id}`, { withCredentials: true });
   }
 
-  getQuestionById(id: string): Observable<Question> { 
-    return this.http.get<Question>(`/Question/${id}`, { withCredentials: true });
+  getQuestionById(id: string): Observable<QuestionDto> { 
+    return this.http.get<QuestionDto>(`/Question/${id}`, { withCredentials: true });
   }
 
   postQuestion(examTypeId: string, skillId: string, questions: QuestionAdd[]): Observable<void> {
     return this.http.post<void>(`/Question/quick-add/skill/${skillId}/exam-type/${examTypeId}`, questions, { withCredentials: true });
   }
-  updateQuestion(id: string, question: Question): Observable<void> {
+  updateQuestion(id: string, question: QuestionUpdate): Observable<void> {
     return this.http.put<void>(`/Question/${id}`, question, { withCredentials: true });
   }
 
@@ -101,7 +101,4 @@ export class QuestionBankApiService {
   updateAnswer(id: string, answer: Answer): Observable<void> {
     return this.http.put<void>(`/Answer/${id}`, answer, { withCredentials: true });
   }
-
-  // Road map
-  
 }

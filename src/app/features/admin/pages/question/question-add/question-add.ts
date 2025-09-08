@@ -1,19 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Answer, ExamType, Level, Question, QuestionAdd, SkillLevel } from '../../../models/question-bank.model';
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DOCUMENT, Inject, Input, OnInit } from '@angular/core';
 import { QuestionBankApiService } from '../../../services/question-bank-api.service';
 import { Context } from 'vm';
-import { QuestionAddService } from '../services/question-add.service';
 import { EditorComponent } from '@tinymce/tinymce-angular';
 import { map, Observable } from 'rxjs';
-
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-question',
   imports: [FormsModule, CommonModule, EditorComponent],
   standalone: true,
-  templateUrl: './add-question.html',
+  templateUrl: './question-add.html',
   styles: [`
     .bg-gradient-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -85,8 +84,6 @@ import { map, Observable } from 'rxjs';
   `]
 })
 
-
-
 export class AddQuestionComponent {
   // two way binding
   selectedExamType: string = '';
@@ -119,7 +116,7 @@ export class AddQuestionComponent {
     // Custom file picker (chọn file từ local)
     file_picker_callback: (callback: any, value: any, meta: any) => {
       if (meta.filetype === 'image' || meta.filetype === 'media') {
-        const input = document.createElement('input');
+        const input = this.document.createElement('input');
         input.setAttribute('type', 'file');
         input.setAttribute('accept', meta.filetype === 'image' ? 'image/*' : 'audio/*,video/*');
 
@@ -147,15 +144,17 @@ export class AddQuestionComponent {
   nextQuestionId: number = 1;
   rangeId: string | null = ''
   constructor(private adminService: QuestionBankApiService,
-    private sharedService: QuestionAddService,
     private cd: ChangeDetectorRef,
+    
+    @Inject(DOCUMENT) private document: Document
   ) { }
 
-  // ngOnInit(): void {
-  //   this.sharedService.values$.subscribe((data) => {
+  ngOnInit(): void {
+    // this.sharedService.values$.subscribe((data) => {
 
-  //   });
-  // }
+    // });
+    this.getExamTypes()
+  }
   addQuestion(): void {
     const newQuestion: QuestionAdd = {
       content: '',
@@ -189,41 +188,33 @@ export class AddQuestionComponent {
       question.answerList[answerIndex].isCorrect = true;
     }
   }
-  onImageUrlChange(question: Question): void {
-    // You can add image validation logic here
-    console.log('Image URL changed:', this.imageUrl);
-  }
+  
 
-  onImageError(question: Question): void {
-    console.error('Failed to load image:', this.imageUrl);
-    // You could show an error message or reset the URL
-  }
+  // isFormValid(): boolean {
+  //   if (!this.passage.trim()) {
+  //     return false;
+  //   }
 
-  isFormValid(): boolean {
-    if (!this.passage.trim()) {
-      return false;
-    }
+  //   if (this.questions.length === 0) {
+  //     return false;
+  //   }
 
-    if (this.questions.length === 0) {
-      return false;
-    }
+  //   return true
+  //   // Check if all questions have required fields
+  //   // return this.questions.every(question => {
+  //   //   const hasQuestionText = question.content.trim().length > 0;
+  //   //   const hasCorrectAnswer = question.answers.some(answer => answer.isCorrect);
+  //   //   const hasAnswerTexts = question.answers.every(answer => answer.text.trim().length > 0);
 
-    return true
-    // Check if all questions have required fields
-    // return this.questions.every(question => {
-    //   const hasQuestionText = question.content.trim().length > 0;
-    //   const hasCorrectAnswer = question.answers.some(answer => answer.isCorrect);
-    //   const hasAnswerTexts = question.answers.every(answer => answer.text.trim().length > 0);
-
-    //   return hasQuestionText && hasCorrectAnswer && hasAnswerTexts;
-    // });
-  }
+  //   //   return hasQuestionText && hasCorrectAnswer && hasAnswerTexts;
+  //   // });
+  // }
 
   saveQuestions(): void {
-    if (!this.isFormValid()) {
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-      return;
-    }
+    // if (!this.isFormValid()) {
+    //   alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+    //   return;
+    // }
 
 
     const context: Context = {
@@ -233,18 +224,21 @@ export class AddQuestionComponent {
       rangeId: this.rangeId
     }
     this.questions.forEach(q => q.context = context)
-    let examTypeId, skillId
-    this.sharedService.values$.subscribe(data => {
-      examTypeId = data.examTypeId,
-        skillId = data.skillId
-    })
 
-    this.adminService.postQuestion(examTypeId!, skillId!, this.questions).subscribe({
+    let skillLevel = this.skillLevels.find(s => s.id == this.selectedSkillLevel)
+
+    this.adminService.postQuestion(this.selectedExamType, skillLevel!.skillId || '', this.questions).subscribe({
       next: () => {
-        console.log('ok')
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Thêm câu hỏi thành công.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
       },
-      error: () => {
-        console.log('fail')
+      error: (error) => {
+        console.log(error)
       }
     })
   }
@@ -265,6 +259,7 @@ export class AddQuestionComponent {
     if (this.selectedLevel) {
       this.adminService.getSkillLevelsByLevelId(this.selectedLevel).subscribe({
         next: (data) => {
+
           // FIX: Đảm bảo data clean và không có duplicate
           this.skillLevels = data.filter((skill, index, self) =>
             index === self.findIndex((s) => s.id === skill.id)
@@ -311,11 +306,6 @@ export class AddQuestionComponent {
    * Xử lý khi thay đổi skill level
    */
   onSkillLevelChange(): void {
-    // this.getRanges();
-    let skillLevel = this.skillLevels.find(s => s.id == this.selectedSkillLevel);
-    if (skillLevel) {
-      this.sharedService.setValues(this.selectedExamType, skillLevel!.skillId!);
-    }
 
     // FIX: Reset range selection
     this.selectedRange = '';
