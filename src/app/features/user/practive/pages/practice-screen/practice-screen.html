@@ -73,13 +73,15 @@
             Đề bài
           </h4>
 
+          <!-- Text Context -->
+          <div *ngIf="getTextContent(currentQuestion?.contextInformation?.content) as textContent" class="text-context">
+            {{ textContent }}
+          </div>
+
           <!-- Audio Context -->
-          <div class="audio-container" *ngIf="getAudioUrl(currentQuestion?.contextInformation?.content) as audioUrl">
-            <div class="audio-player">
-              <audio controls [src]="audioUrl" preload="metadata">
-                <p>Trình duyệt không hỗ trợ audio.</p>
-              </audio>
-            </div>
+          <div class="audio-container"
+            *ngIf="getAudioHtml(currentQuestion?.contextInformation?.content) as safeAudioHtml">
+            <div class="audio-player" [innerHTML]="safeAudioHtml"></div>
           </div>
 
           <!-- Image Context -->
@@ -87,12 +89,6 @@
             <img [src]="imageUrl" alt="Context Image" class="context-image"
               (error)="$event.target.style.display='none'">
           </div>
-
-          <!-- Text Context -->
-          <div *ngIf="getTextContent(currentQuestion?.contextInformation?.content) as textContent" class="text-context">
-            {{ textContent }}
-          </div>
-
         </div>
 
         <!-- Question -->
@@ -120,10 +116,10 @@
                 <button class="answer-option" [class.selected]="selectedAnswerId === answer.id"
                   (click)="selectAnswer(answer.id)">
                   <div class="option-marker">
-                    <span class="option-number">{{ answer.value.charAt(0) }}</span>
+                    <span class="option-number">{{ (i+1) }}</span>
                   </div>
                   <div class="option-content">
-                    <span class="option-text">{{ answer.value.substring(2) }}</span>
+                    <span class="option-text" [innerHTML]="getSafeHtml(answer.value)"></span>
                   </div>
                   <div class="option-indicator" *ngIf="selectedAnswerId === answer.id">
                     <i class="bi bi-check-circle-fill"></i>
