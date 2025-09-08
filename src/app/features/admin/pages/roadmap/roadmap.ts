@@ -8,7 +8,9 @@ import { SharedService } from '../../services/shared.service';
   selector: 'roadmap',
   templateUrl: './roadmap.html',
   styleUrl: './roadmap.css',
-  imports: [RouterLink]
+  imports: [
+    // RouterLink
+  ]
 })
 export class RoadMapComponent implements OnInit {
   data: RoadMap[] = []

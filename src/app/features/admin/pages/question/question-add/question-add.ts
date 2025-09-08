@@ -161,7 +161,7 @@ export class AddQuestionComponent {
       explain: '',
       questionNumber: 0,
       answerList: [
-        { value: '', explain: '', isCorrect: false },
+        { value: '', explain: '', isCorrect: true },
         { value: '', explain: '', isCorrect: false },
         { value: '', explain: '', isCorrect: false },
         { value: '', explain: '', isCorrect: false }

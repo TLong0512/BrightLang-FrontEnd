@@ -62,7 +62,7 @@ export interface QuestionUpdate {
   questionNumber: number
   content: string
   explain: string
-  context: Context
+  contextUpdate: Context
   listAnswers: Answer[];
 }
 
