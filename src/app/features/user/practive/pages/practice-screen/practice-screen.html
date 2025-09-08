@@ -201,4 +201,76 @@
       </div>
     </div>
   </div>
+
+  <!-- Submit Confirmation Modal -->
+  <div class="modal-backdrop" *ngIf="showSubmitModal" (click)="cancelSubmit()">
+    <div class="confirmation-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon submit-icon">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <button class="close-btn" (click)="cancelSubmit()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <h3 class="modal-title">Nộp bài luyện tập</h3>
+        <p class="modal-message" *ngIf="answeredCount < questions.length">
+          Bạn còn {{ questions.length - answeredCount }} câu chưa trả lời.
+          Bạn có chắc chắn muốn nộp bài không?
+        </p>
+        <p class="modal-message" *ngIf="answeredCount === questions.length">
+          Bạn đã hoàn thành tất cả câu hỏi. Bạn có muốn nộp bài không?
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn cancel-btn" (click)="cancelSubmit()">
+          <i class="bi bi-x-circle"></i>
+          Tiếp tục làm
+        </button>
+        <button class="modal-btn confirm-btn submit" (click)="confirmSubmit()">
+          <i class="bi bi-check-circle"></i>
+          Nộp bài
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exit Confirmation Modal -->
+  <div class="modal-backdrop" *ngIf="showExitModal" (click)="cancelExit()">
+    <div class="confirmation-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon exit-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <button class="close-btn" (click)="cancelExit()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <h3 class="modal-title">Thoát luyện tập</h3>
+        <p class="modal-message" *ngIf="answeredCount > 0">
+          Bạn đã trả lời {{ answeredCount }}/{{ questions.length }} câu hỏi.
+          Nếu thoát, tiến trình sẽ không được lưu. Bạn có chắc chắn muốn thoát?
+        </p>
+        <p class="modal-message" *ngIf="answeredCount === 0">
+          Bạn có chắc chắn muốn thoát? Tiến trình sẽ không được lưu.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn cancel-btn" (click)="cancelExit()">
+          <i class="bi bi-x-circle"></i>
+          Ở lại
+        </button>
+        <button class="modal-btn confirm-btn exit" (click)="confirmExit()">
+          <i class="bi bi-exclamation-triangle"></i>
+          Thoát
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

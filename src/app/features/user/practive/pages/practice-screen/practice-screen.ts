@@ -24,7 +24,9 @@ export class PracticeComponent implements OnInit {
   userAnswers: UserAnswer[] = [];
   selectedAnswerId: string | null = null;
 
-  // States
+  showSubmitModal = false;
+  showExitModal = false;
+
   isLoading = signal(true);
   hasError = signal(false);
   errorMessage = '';
@@ -116,30 +118,45 @@ export class PracticeComponent implements OnInit {
   }
 
   submitPractice() {
-    if (confirm('Bạn có chắc chắn muốn nộp bài?')) {
-
-      const result: PracticeResult = {
-        totalQuestions: this.questions.length,
-        correctAnswers: this.userAnswers.filter(answer => answer.isCorrect).length,
-        wrongAnswers: this.userAnswers.filter(answer => answer.selectedAnswerId !== null && !answer.isCorrect).length,
-        unanswered: this.userAnswers.filter(answer => answer.selectedAnswerId === null).length,
-        score: 0,
-        userAnswers: this.userAnswers,
-        questions: this.questions
-      };
-
-      result.score = Math.round((result.correctAnswers / result.totalQuestions) * 100);
-
-      this.practiceResultService.setResult(result);
-
-      this.router.navigate(['/home-user/result-screen']);
-    }
+    this.showSubmitModal = true;
   }
 
   exitPractice() {
-    if (confirm('Bạn có chắc chắn muốn thoát? Tiến trình sẽ không được lưu.')) {
-      this.router.navigate(['/']);
-    }
+    this.showExitModal = true;
+  }
+
+  confirmSubmit() {
+    this.showSubmitModal = false;
+
+    // Logic nộp bài gốc
+    const result: PracticeResult = {
+      totalQuestions: this.questions.length,
+      correctAnswers: this.userAnswers.filter(answer => answer.isCorrect).length,
+      wrongAnswers: this.userAnswers.filter(answer => answer.selectedAnswerId !== null && !answer.isCorrect).length,
+      unanswered: this.userAnswers.filter(answer => answer.selectedAnswerId === null).length,
+      score: 0,
+      userAnswers: this.userAnswers,
+      questions: this.questions
+    };
+
+    result.score = Math.round((result.correctAnswers / result.totalQuestions) * 100);
+
+    // Gọi service hoặc navigate tùy theo cách bạn đang làm
+    this.practiceResultService.setResult(result);
+    this.router.navigate(['/home-user/result-screen']);
+  }
+
+  cancelSubmit() {
+    this.showSubmitModal = false;
+  }
+
+  confirmExit() {
+    this.showExitModal = false;
+    this.router.navigate(['/home-user']);
+  }
+
+  cancelExit() {
+    this.showExitModal = false;
   }
 
   retry() {

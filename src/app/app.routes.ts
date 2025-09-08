@@ -42,6 +42,11 @@ export const routes: Routes = [
     path: 'home-user',
     component: UserComponent,
     children: [
+
+      { path: 'book', component: BookComponent },
+      { path: 'vocab/:vocabId', component: VocabularyComponent },
+      { path: 'flashcard/:bookId', component: FlashcardComponent },
+
       { path: 'result-screen', component: ResultComponent },
       { path: 'practice-screen/:rangeId', component: PracticeComponent },
       { path: 'question-types/:skillId', component: QuestionTypesComponent },
