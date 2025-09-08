@@ -5,9 +5,10 @@ import { RouterLinkActive } from "@angular/router";
     selector: 'user-home',
     standalone: true,
     templateUrl: 'user-home.html',
-    styleUrl: 'user-home.css',
     imports: [RouterLinkActive]
 
 })
 
-export class UserHomeComponent{}
+export class UserHomeComponent {
+
+}

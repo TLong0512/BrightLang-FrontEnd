@@ -267,7 +267,7 @@ export class UpdateQuestionComponent implements OnInit {
             questionNumber: this.questionDto.questionInformation?.questionNumber || 0,
             content: this.questionDto.questionInformation?.content || '',
             explain: this.questionDto.questionInformation?.explain || '',
-            context: {
+            contextUpdate: {
                 content: this.questionDto.contextInformation?.content,
                 explain: this.questionDto.contextInformation?.explain,
                 isBelongTest: this.questionDto.contextInformation?.isBelongTest

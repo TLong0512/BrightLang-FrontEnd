@@ -59,10 +59,10 @@
         <div class="skill-indicator">
           <span class="skill-badge">
             <i class="bi bi-book"></i>
-            {{ currentQuestion?.skillName }} - {{ currentQuestion?.levelName }}
+            {{ currentQuestion.skillName }} - {{ currentQuestion.levelName }}
           </span>
           <span class="range-badge">
-            {{ currentQuestion?.rangeName }}
+            {{ currentQuestion.rangeName }}
           </span>
         </div>
 
@@ -100,12 +100,12 @@
           <div class="question-header">
             <h3 class="question-title">
               <i class="bi bi-question-circle"></i>
-              Câu hỏi {{ currentQuestion?.questionInformation?.questionNumber }}
+              Câu hỏi {{ currentQuestion.questionInformation.questionNumber }}
             </h3>
           </div>
 
           <div class="question-text">
-            {{ currentQuestion?.questionInformation?.content }}
+            {{ currentQuestion.questionInformation.content }}
           </div>
 
           <!-- Answer Options -->

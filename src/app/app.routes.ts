@@ -36,7 +36,7 @@ import { ResultComponent } from './features/user/practive/pages/result-screen/re
 // 👇 import guards
 
 
-
+// private router = inject(Router)
 
 export const routes: Routes = [
 
@@ -129,13 +129,13 @@ export const routes: Routes = [
     canActivate: [() => {
       const router = inject(Router);
       const userState = inject(UserState);
-      return userState.currentUser$.pipe(
-        map(user => {
-        if (user == null) {
-          return true; // cho phép đi tiếp
-        }
-        return router.parseUrl('/home-user'); // redirect an toàn
-      })
+        return userState.currentUser$.pipe(
+          map(user => {
+          if (user == null) {
+            return true; // cho phép đi tiếp
+          }
+          return router.navigate(['/home-user']); // redirect an toàn
+        })
       )
     }],
     component: AuthComponent,

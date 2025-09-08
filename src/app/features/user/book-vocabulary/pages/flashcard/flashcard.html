@@ -60,10 +60,10 @@
          [class.flipped]="showBack"
          (click)="flipCard()">
       <div class="front d-flex justify-content-center align-items-center">
-        <h3>{{ vocabularies[currentIndex]?.front }}</h3>
+        <h3>{{ vocabularies[currentIndex].front }}</h3>
       </div>
       <div class="back d-flex justify-content-center align-items-center">
-        <h3>{{ vocabularies[currentIndex]?.back }}</h3>
+        <h3>{{ vocabularies[currentIndex].back }}</h3>
       </div>
     </div>
   </div>
@@ -71,7 +71,7 @@
 
  <!-- Trả lời trực tiếp Mode -->
 <div *ngIf="mode === 'answer'" class="d-flex flex-column align-items-center">
-  <h3 class="fw-bold text-black mb-2">{{ vocabularies[answerIndex]?.back }}</h3>
+  <h3 class="fw-bold text-black mb-2">{{ vocabularies[answerIndex].back }}</h3>
   <!-- <h5 class="text-muted mb-3"> {{ vocabularies[answerIndex]?.back }}</h5> -->
 
   <input type="text" class="form-control w-50 mb-3" [(ngModel)]="userAnswer" placeholder="Nhập đáp án">
@@ -80,7 +80,7 @@
 
   <div *ngIf="answerResult !== null" class="mt-2">
     <p [ngClass]="{'text-success': answerResult, 'text-danger': !answerResult}">
-      {{ answerResult ? 'Đúng rồi!' : 'Sai, đáp án: ' + vocabularies[answerIndex]?.front }}
+      {{ answerResult ? 'Đúng rồi!' : 'Sai, đáp án: ' + vocabularies[answerIndex].front }}
     </p>
   </div>
 
