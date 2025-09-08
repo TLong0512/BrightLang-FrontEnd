@@ -1,0 +1,135 @@
+.review-container {
+      background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+    }
+
+    .review-header {
+      border-bottom: 1px solid #e9ecef;
+      z-index: 1020;
+    }
+
+    .stat-item {
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      margin-bottom: 10px;
+    }
+
+    .stat-item h3 {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .filter-buttons {
+      margin-bottom: 2rem;
+    }
+
+    .question-review-item {
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    .context-card {
+      border-left: 4px solid #17a2b8;
+    }
+
+    .question-card {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .answer-option {
+      border: 2px solid #e9ecef;
+      transition: all 0.2s ease;
+    }
+
+    .answer-option.user-selected {
+      border-color: #007bff;
+      background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .answer-option.correct-answer {
+      border-color: #28a745;
+      background-color: rgba(40, 167, 69, 0.05);
+    }
+
+    .answer-option.wrong-selected {
+      border-color: #dc3545;
+      background-color: rgba(220, 53, 69, 0.05);
+    }
+
+    .option-indicators {
+      min-width: 60px;
+    }
+
+    .badge-user {
+      font-size: 0.7rem;
+    }
+
+    .option-letter {
+      font-weight: 600;
+      color: #6c757d;
+      min-width: 25px;
+      display: inline-block;
+    }
+
+    .answer-text {
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .answer-explanation {
+      margin-left: 20px;
+    }
+
+    .question-explanation {
+      border-left: 4px solid;
+    }
+
+    .alert-success {
+      border-left-color: #28a745;
+    }
+
+    .alert-danger {
+      border-left-color: #dc3545;
+    }
+
+    .answer-summary {
+      font-size: 14px;
+    }
+
+    .context-content {
+      line-height: 1.6;
+      font-size: 15px;
+      text-align: justify;
+    }
+
+    .result-badge {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .stat-item h3 {
+        font-size: 1.5rem;
+      }
+      
+      .filter-buttons .btn-group {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .filter-buttons .btn {
+        border-radius: 0.375rem !important;
+        margin-bottom: 5px;
+      }
+    }

@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
+   standalone: true,
   selector: 'app-user-header',
   imports: [RouterModule],
   
@@ -12,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrl: './header.scss'
 })
 export class UserHeaderComponent {
+
   constructor(private authService: AuthService,
     private router: Router
   ) {}

@@ -437,11 +437,23 @@
     flex: 1;
     display: flex;
     align-items: center;
+    max-width: 250px;
 }
 
 .option-text {
     line-height: 1.6;
     word-wrap: break-word;
+    display: block;
+    overflow: hidden;
+}
+
+.option-text img {
+    max-width: 200px;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
 }
 
 .option-indicator {

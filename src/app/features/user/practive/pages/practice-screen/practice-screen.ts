@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { interval, Subscription } from 'rxjs';
 import { PracticeResult, Question, UserAnswer } from '../../../../../models/practice.model';
 import { TopikDataService } from '../../services/topik-data.service';
 import { CommonModule } from '@angular/common';
 import { PracticeService } from '../../services/practice.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-practice',
@@ -18,7 +18,8 @@ export class PracticeComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private dataPracticeService = inject(TopikDataService);
   private practiceResultService = inject(PracticeService);
-
+  private sanitizer = inject(DomSanitizer);
+  private cd = inject(ChangeDetectorRef)
   questions: Question[] = [];
   currentQuestionIndex = 0;
   userAnswers: UserAnswer[] = [];
@@ -32,10 +33,12 @@ export class PracticeComponent implements OnInit {
   errorMessage = '';
   rangeId: string | null = null;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.rangeId = this.route.snapshot.paramMap.get('rangeId') || '';
     if (this.rangeId) {
-      this.loadQuestions();
+      await this.loadQuestions();
+      this.getAudioHtml(this.questions[this.currentQuestionIndex]!.contextInformation!.content)
+
     } else {
       this.hasError.set(true);
       this.errorMessage = 'Range ID không hợp lệ';
@@ -43,15 +46,18 @@ export class PracticeComponent implements OnInit {
     }
   }
 
-  loadQuestions() {
+  async loadQuestions() {
     this.isLoading.set(true);
     this.hasError.set(false);
 
     this.dataPracticeService.getPracticeQuestions(this.rangeId!).subscribe({
       next: (questions) => {
+
         this.questions = questions;
+        this.cd.detectChanges()
         this.initializeUserAnswers();
         this.isLoading.set(false);
+
       },
       error: (error) => {
         console.error('Error loading questions:', error);
@@ -165,68 +171,60 @@ export class PracticeComponent implements OnInit {
 
   hasAudioContent(content: string): boolean {
     if (!content) return false;
-    return content.toLowerCase().includes('.mp3') ||
-      content.toLowerCase().includes('.wav') ||
-      content.toLowerCase().includes('.m4a') ||
-      content.toLowerCase().includes('audio');
+    return content.includes('<audio');
   }
 
   hasImageContent(content: string): boolean {
     if (!content) return false;
-    return content.toLowerCase().includes('.jpg') ||
-      content.toLowerCase().includes('.png') ||
-      content.toLowerCase().includes('.jpeg') ||
-      content.toLowerCase().includes('.gif') ||
-      content.toLowerCase().includes('image');
+    return content.includes('<img');
   }
 
-  getAudioUrl(content?: string): string | null {
+  getAudioHtml(content?: string): SafeHtml | null {
     if (!content) return null;
 
-    const audioExtensions = ['.mp3', '.wav', '.m4a'];
-    for (const ext of audioExtensions) {
-      const index = content.toLowerCase().indexOf(ext);
-      if (index !== -1) {
-        const start = content.lastIndexOf(' ', index) + 1;
-        const end = content.indexOf(' ', index + ext.length);
-        return content.substring(start, end === -1 ? undefined : end).trim();
-      }
+    // match src trong <audio ...>
+    const match = content.match(/<audio[^>]*src=["']([^"']+)["'][^>]*>/i);
+    if (match) {
+      const src = match[1];
+      // Tạo lại thẻ audio với source
+      const audioHtml = `
+      <audio controls preload="none">
+        <source src="${src}" type="audio/mpeg">
+        <p>Trình duyệt không hỗ trợ audio.</p>
+      </audio>
+    `;
+      return this.getSafeHtml(audioHtml);
     }
-    return null; // không tìm thấy file audio → trả về null
-  }
 
+    return null;
+  }
 
   getImageUrl(content?: string): string | null {
-    if (!content) return null;
+    if (!content || !this.hasImageContent(content)) return null;
 
-    const imageExtensions = ['.jpg', '.png', '.jpeg', '.gif'];
-    for (const ext of imageExtensions) {
-      const index = content.toLowerCase().indexOf(ext);
-      if (index !== -1) {
-        const start = content.lastIndexOf(' ', index) + 1;
-        const end = content.indexOf(' ', index + ext.length);
-        return content.substring(start, end === -1 ? undefined : end).trim();
-      }
-    }
-    return null; // không có ảnh → không render
+    // Tìm thẻ img và extract src
+    const imgMatch = content.match(/<img[^>]*src=["']([^"']+)["'][^>]*>/);
+    return imgMatch ? imgMatch[1] : null;
   }
 
   getTextContent(content?: string): string {
     if (!content) return '';
 
-    // Nếu có audio hoặc image, loại bỏ URL và chỉ lấy text
-    if (this.hasAudioContent(content) || this.hasImageContent(content)) {
-      const extensions = ['.mp3', '.wav', '.m4a', '.jpg', '.png', '.jpeg', '.gif'];
-      let textContent = content;
+    // Loại bỏ tất cả HTML tags và trả về text thuần
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    return tempDiv.textContent || tempDiv.innerText || '';
+  }
 
-      for (const ext of extensions) {
-        const regex = new RegExp(`\\S*${ext.replace('.', '\\.')}\\S*`, 'gi');
-        textContent = textContent.replace(regex, '').trim();
-      }
+  getAnswerText(value: string): string {
+    if (!value) return '';
 
-      return textContent;
-    }
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = value;
+    return tempDiv.textContent || tempDiv.innerText || '';
+  }
 
-    return content;
+  getSafeHtml(html: string) {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }
