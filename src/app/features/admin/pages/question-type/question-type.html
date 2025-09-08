@@ -1,5 +1,5 @@
 <!-- Modal Bootstrap -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
 
@@ -11,17 +11,35 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label">Tên dạng</label>
-                    <input type="text" class="form-control" [(ngModel)]="updateName">
-                </div> 
+                    <textarea name="" id="" type="text" class="form-control" [(ngModel)]="updateName"
+                    (focus)="onFocus('rangeUpdate')"></textarea>
+                    @if(rangeErrorMessageUpdate) {
+                    <span class="error-message">
+                        {{ rangeErrorMessageUpdate }}
+                    </span>
+                    }
+                </div>
 
                 <div class="mb-3">
                     <label class="form-label">Câu bắt đầu</label>
-                    <input type="number" class="form-control" [(ngModel)]="updateStartQuestionNumber">
+                    <input type="number" class="form-control" [(ngModel)]="updateStartQuestionNumber" min="1" onlyDigits
+                        [maxNumber]="50" (focus)="onFocus('startUpdate')">
+                    @if(startQuestionNumberErrorMessageUpdate) {
+                    <span class="error-message">
+                        {{ startQuestionNumberErrorMessageUpdate }}
+                    </span>
+                    }
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Câu kết thúc</label>
-                    <input type="number" class="form-control" [(ngModel)]="updateEndQuestionNumber">
+                    <input type="number" class="form-control" [(ngModel)]="updateEndQuestionNumber" min="1" onlyDigits
+                        [maxNumber]="50" (focus)="onFocus('endUpdate')">
+                        @if(endQuestionNumberErrorMessageUpdate) {
+                    <span class="error-message">
+                        {{ endQuestionNumberErrorMessageUpdate }}
+                    </span>
+                    }
                 </div>
             </div>
 
@@ -32,7 +50,7 @@
 
         </div>
     </div>
-</div>
+</div> -->
 
 
 <div class="container-fluid py-4">
@@ -120,13 +138,20 @@
                         <div>Thêm dạng câu hỏi</div>
                         <div class="row g-3">
                             <!-- Các trường input chỉ hiện khi đã chọn skill -->
-                            <div class="col-md-4">
+                            <div class="col-md-12">
                                 <label for="typeNameInput" class="form-label fw-semibold">
                                     <i class="fas fa-tag me-1"></i>
                                     Tên dạng bài
                                 </label>
-                                <input id="typeNameInput" type="text" class="form-control" [(ngModel)]="rangeName"
-                                    placeholder="Nhập tên dạng bài">
+
+                                <textarea name="" id="" id="typeNameInput" type="text" class="form-control"
+                                    [(ngModel)]="rangeName" placeholder="Nhập tên dạng bài"
+                                    (focus)="onFocus('range')"></textarea>
+                                @if(rangeErrorMessage) {
+                                <span class="error-message">
+                                    {{ rangeErrorMessage }}
+                                </span>
+                                }
                             </div>
 
                             <div class="col-md-4">
@@ -135,8 +160,18 @@
                                     Câu bắt đầu
                                 </label>
                                 <input id="startQuestionInput" type="number" class="form-control"
-                                    [(ngModel)]="startQuestionNumber" placeholder="Nhập số câu bắt đầu" min="1" onlyDigits
-                                    [maxNumber]="50">
+                                    [(ngModel)]="startQuestionNumber" placeholder="Nhập số câu bắt đầu" min="1"
+                                    onlyDigits [maxNumber]="50" (focus)="onFocus('start')">
+                                @if(startQuestionNumberErrorMessage) {
+                                <span class="error-message">
+                                    {{ startQuestionNumberErrorMessage }}
+                                </span>
+                                }
+                                @if(relativeErrorMessage) {
+                                <span class="error-message">
+                                    {{ relativeErrorMessage }}
+                                </span>
+                                }
                             </div>
 
                             <div class="col-md-4">
@@ -146,20 +181,23 @@
                                 </label>
                                 <input id="endQuestionInput" type="number" class="form-control"
                                     [(ngModel)]="endQuestionNumber" placeholder="Nhập số câu kết thúc"
-                                    [min]="startQuestionNumber || 1" onlyDigits>
+                                    [min]="startQuestionNumber || 1" onlyDigits (focus)="onFocus('end')">
+                                @if(endQuestionNumberErrorMessage) {
+                                <span class="error-message">
+                                    {{ endQuestionNumberErrorMessage }}
+                                </span>
+                                }
                             </div>
                         </div>
                         <!-- Nút thêm -->
                         <div class="row mt-4">
                             <div class="col-12 text-center">
-                                <button type="button" class="btn btn-primary btn-lg px-5"
-                                (click)="onAddRange()">
+                                <button type="button" class="btn btn-primary btn-lg px-5" (click)="onAddRange()">
                                     <i class="fas fa-plus me-2"></i>
                                     Thêm dạng bài
                                 </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -216,17 +254,11 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-warning btn-sm"
-                                            (click)="onUpdateRange(item.id!)" title="Sửa dạng bài"
-                                            data-bs-toggle="modal" data-bs-target="#editModal">
-                                            <i class="fas fa-edit me-1"></i>
-                                            Sửa
-                                        </button>
+                                        
 
                                         <button type="button" class="btn btn-danger btn-sm"
                                             (click)="onDeleteRange(item.id!)" title="Xóa dạng bài">
                                             <i class="fas fa-trash me-1"></i>
-                                            Xóa
                                         </button>
                                     </td>
                                 </tr>

@@ -27,6 +27,8 @@ import { TopikSelectionComponent } from './features/user/practive/pages/topik-se
 
 import { AdminComponent } from './shared/admin/admin';
 import { RoleGuard } from './guards/auth.guard';
+import { TestReviewComponent } from './features/user/level-test/pages/test-review/test-review';
+import { TestHistoryComponent } from './features/user/level-test/pages/test-history/test-history';
 import { UserState } from './features/auth/services/user.state';
 import { inject } from '@angular/core';
 import { map } from 'rxjs';
@@ -39,7 +41,7 @@ import { MyAccountUpdateAccountComponent } from './features/my-account/my-accoun
 // 👇 import guards
 
 
-
+// private router = inject(Router)
 
 export const routes: Routes = [
 
@@ -89,9 +91,16 @@ export const routes: Routes = [
 
     component: UserComponent,
     children: [
-
+      { path: 'level-test', component: LevelTestEntryComponent },
+      { path: 'test-ready', component: TestReadyComponent },
+      { path: 'test-question', component: TestQuestionsComponent },
+      { path: 'test-result', component: TestResultComponent },
+      { path: 'test-review/:testId', component: TestReviewComponent},
+      { path: 'test-history', component: TestHistoryComponent},
+      { path: '', component: UserHomeComponent },
+      { path: 'topik-detail', component: TopicsDetail },
       { path: 'book', component: BookComponent },
-      { path: 'vocab/:vocabId', component: VocabularyComponent },
+      { path: 'vocab/:id', component: VocabularyComponent },
       { path: 'flashcard/:bookId', component: FlashcardComponent },
 
       { path: 'result-screen', component: ResultComponent },
@@ -110,22 +119,7 @@ export const routes: Routes = [
         component: TopikSubLevelSelectionComponent
       },
 
-      {
-        path: 'level-test',
-        component: LevelTestEntryComponent
-      },
-      {
-        path: 'test-ready',
-        component: TestReadyComponent
-      },
-      {
-        path: 'test-question',
-        component: TestQuestionsComponent
-      },
-      {
-        path: 'test-result',
-        component: TestResultComponent
-      },
+      
       {
         path: '',
         component: UserHomeComponent
@@ -178,8 +172,8 @@ export const routes: Routes = [
 
   {
     path: 'admin',
-    // canActivate: [RoleGuard], 
-    // data: { roles: ['Admin'] },
+    canActivate: [RoleGuard], 
+    data: { roles: ['Admin'] },
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   }
 ];

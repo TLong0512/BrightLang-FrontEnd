@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { PracticeResult, Question, UserAnswer } from '../../../../../models/practice.model';
 import { CommonModule } from '@angular/common';
 import { PracticeService } from '../../services/practice.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-result',
@@ -17,6 +18,7 @@ export class ResultComponent implements OnInit {
     showExplanations = false;
     selectedQuestionIndex = 0;
     private practiceResultService = inject(PracticeService);
+    private sanitizer = inject(DomSanitizer);
 
     // Animation states
     animateScore = true;
@@ -134,63 +136,61 @@ export class ResultComponent implements OnInit {
 
     hasAudioContent(content: string): boolean {
         if (!content) return false;
-        return content.toLowerCase().includes('.mp3') ||
-            content.toLowerCase().includes('.wav') ||
-            content.toLowerCase().includes('.m4a') ||
-            content.toLowerCase().includes('audio');
+        return content.includes('<audio');
     }
 
     hasImageContent(content: string): boolean {
         if (!content) return false;
-        return content.toLowerCase().includes('.jpg') ||
-            content.toLowerCase().includes('.png') ||
-            content.toLowerCase().includes('.jpeg') ||
-            content.toLowerCase().includes('.gif') ||
-            content.toLowerCase().includes('image');
+        return content.includes('<img');
     }
 
-    getAudioUrl(content: string): string {
-        const audioExtensions = ['.mp3', '.wav', '.m4a'];
-        for (const ext of audioExtensions) {
-            const index = content.toLowerCase().indexOf(ext);
-            if (index !== -1) {
-                const start = content.lastIndexOf(' ', index) + 1;
-                const end = content.indexOf(' ', index + ext.length);
-                return content.substring(start, end === -1 ? undefined : end).trim();
-            }
+    getAudioHtml(content?: string): SafeHtml | null {
+        if (!content) return null;
+
+        // match src trong <audio ...>
+        const match = content.match(/<audio[^>]*src=["']([^"']+)["'][^>]*>/i);
+        if (match) {
+            const src = match[1];
+            // Tạo lại thẻ audio với source
+            const audioHtml = `
+          <audio controls preload="none">
+            <source src="${src}" type="audio/mpeg">
+            <p>Trình duyệt không hỗ trợ audio.</p>
+          </audio>
+        `;
+            return this.getSafeHtml(audioHtml);
         }
-        return content;
+
+        return null;
     }
 
-    getImageUrl(content: string): string {
-        const imageExtensions = ['.jpg', '.png', '.jpeg', '.gif'];
-        for (const ext of imageExtensions) {
-            const index = content.toLowerCase().indexOf(ext);
-            if (index !== -1) {
-                const start = content.lastIndexOf(' ', index) + 1;
-                const end = content.indexOf(' ', index + ext.length);
-                return content.substring(start, end === -1 ? undefined : end).trim();
-            }
-        }
-        return content;
+    getImageUrl(content?: string): string | null {
+        if (!content || !this.hasImageContent(content)) return null;
+
+        // Tìm thẻ img và extract src
+        const imgMatch = content.match(/<img[^>]*src=["']([^"']+)["'][^>]*>/);
+        return imgMatch ? imgMatch[1] : null;
     }
 
-    getTextContent(content: string): string {
+    getTextContent(content?: string): string {
         if (!content) return '';
 
-        if (this.hasAudioContent(content) || this.hasImageContent(content)) {
-            const extensions = ['.mp3', '.wav', '.m4a', '.jpg', '.png', '.jpeg', '.gif'];
-            let textContent = content;
+        // Loại bỏ tất cả HTML tags và trả về text thuần
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    }
 
-            for (const ext of extensions) {
-                const regex = new RegExp(`\\S*${ext.replace('.', '\\.')}\\S*`, 'gi');
-                textContent = textContent.replace(regex, '').trim();
-            }
+    getAnswerText(value: string): string {
+        if (!value) return '';
 
-            return textContent;
-        }
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = value;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    }
 
-        return content;
+    getSafeHtml(html: string) {
+        return this.sanitizer.bypassSecurityTrustHtml(html);
     }
 
     shareResult() {

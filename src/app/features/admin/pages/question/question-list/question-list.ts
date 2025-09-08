@@ -205,64 +205,33 @@ import { Router, RouterModule } from '@angular/router';
   `
 })
 export class QuestionListComponent implements OnInit {
+  currentPage: number = 1;
+  pageSize: number = 5;
+  pageSizes: number[] = [5, 10, 15, 20];
+
   constructor(private adminService: QuestionBankApiService,
     private router: Router,
     private cd: ChangeDetectorRef
   ) {}
   questionsData!: QuestionPage;
 
-  // filteredQuestions: Question[] = [];
-  // searchTerm: string = '';
-  // sortBy: string = 'number';
-
   ngOnInit(): void {
     // this.filterQuestions();
-    this.getAllQuestions()
+    this.getQuestionsByPage()
     console.log('2020',this.questionsData)
-
   }
 
-  getAllQuestions() {
-    this.adminService.getAllQuestions().subscribe({
+  getQuestionsByPage() {
+    this.adminService.getAllQuestions(this.currentPage, this.pageSize).subscribe({
       next: (data) => {
         this.questionsData = data
         this.cd.detectChanges()
-        console.log('230', data)
       }, error: (err) => {
         console.log(err)
       }
     })
     
   }
-
-
-  // filterQuestions(): void {
-  //   let filtered = this.questionsData.filter(q => 
-  //     q.content.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-  //     q.explain.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-  //     q.questionNumber.toString().includes(this.searchTerm)
-  //   );
-
-  //   // Sort data
-  //   filtered.sort((a, b) => {
-  //     if (this.sortBy === 'number') {
-  //       return a.questionNumber - b.questionNumber;
-  //     } else if (this.sortBy === 'content') {
-  //       return a.content.localeCompare(b.content);
-  //     }
-  //     return 0;
-  //   });
-
-  //   this.filteredQuestions = filtered;
-  // }
-
-  // onSearchChange(): void {
-  //   this.filterQuestions();
-  // }
-
-  // onSortChange(): void {
-  //   this.filterQuestions();
-  // }
 
   editQuestion(questionId: string): void {
     this.router.navigate(['/admin/question-update', questionId])
@@ -287,12 +256,24 @@ export class QuestionListComponent implements OnInit {
                   timer: 1500,
                   showConfirmButton: false
                 }).then(() => {
-                  this.getAllQuestions()
+                  this.getQuestionsByPage()
                 })
               }
             })
           }
         });
+  }
+  // Phân trang
+  
+
+  onPageSizeChange(event: any) {
+    this.pageSize = +event.target.value;
+    this.currentPage = 1; // reset về trang đầu khi thay đổi pageSize
+  }
+
+  changePage(page: number) {
+    if (page < 1 || page > this.questionsData.totalPages) return;
+    this.currentPage = page;
   }
 }
 

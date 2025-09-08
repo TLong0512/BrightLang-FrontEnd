@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OnlyDigitsDirective } from '../../directive/only-number';
 import { MaxNumberDirective } from '../../directive/max-number';
@@ -74,9 +74,13 @@ import { map, Observable } from 'rxjs';
         font-size: 0.9rem;
       }
     }
+      .error-message {
+    color: red;
+}
   `]
 })
 export class ExamQuestionTypeComponent implements OnInit {
+
   ranges: Range[] = [];
 
   // two way binding
@@ -99,6 +103,17 @@ export class ExamQuestionTypeComponent implements OnInit {
   updateStartQuestionNumber: number = 0
   updateEndQuestionNumber: number = 0
   updateRangeId: string = ''
+
+  // error message add
+  rangeErrorMessage: string = ''
+  startQuestionNumberErrorMessage: string = ''
+  endQuestionNumberErrorMessage: string = ''
+  relativeErrorMessage: string = ''
+
+  // error message update
+  rangeErrorMessageUpdate: string = ''
+  startQuestionNumberErrorMessageUpdate: string = ''
+  endQuestionNumberErrorMessageUpdate: string = ''
 
 
   constructor(private cd: ChangeDetectorRef, public adminService: QuestionBankApiService) { }
@@ -167,20 +182,123 @@ export class ExamQuestionTypeComponent implements OnInit {
   /**
    * Kiểm tra có thể thêm dạng bài không
    */
-  // canAddQuestionType(): boolean {
-  //   return !!(this.selectedLevel &&
-  //     this.selectedSkill &&
-  //     this.typeName &&
-  //     this.startQuestion &&
-  //     this.endQuestion &&
-  //     this.startQuestion <= this.endQuestion);
+
+  checkValid(): boolean {
+    let hasError = false
+    if (this.rangeName.trim() == '') {
+      this.rangeErrorMessage = 'Vui lòng nhập dạng câu hỏi.'
+      hasError = true
+    }
+
+    if (!this.startQuestionNumber) {
+      this.startQuestionNumberErrorMessage = 'Vui lòng nhập câu bắt đầu.'
+      hasError = true
+    } else if (this.startQuestionNumber == 0) {
+      this.startQuestionNumberErrorMessage = 'Câu hỏi phải lớn hơn 0'
+      hasError = true
+    }
+
+    if (!this.endQuestionNumber) {
+      this.endQuestionNumberErrorMessage = 'Vui lòng nhập câu kết thúc.'
+      hasError = true
+    } else if (this.endQuestionNumber == 0) {
+      this.startQuestionNumberErrorMessage = 'Câu hỏi phải lớn hơn 0'
+      hasError = true
+    }
+
+    if (this.startQuestionNumber && this.endQuestionNumber) {
+      if (this.startQuestionNumber >= this.endQuestionNumber) {
+        this.relativeErrorMessage = 'Câu bắt đầu phải nhỏ hơn câu kết thúc.'
+        this.startQuestionNumberErrorMessage = ''
+        this.endQuestionNumberErrorMessage = ''
+        hasError = true
+        this.cd.detectChanges()
+      }
+    }
+
+    // check name, range is exist
+    const nameExists = this.ranges.some(r => r.name === this.rangeName);
+    if (nameExists) {
+      this.rangeErrorMessage = `Tên đã tồn tại.`;
+      hasError = true
+    }
+
+    // 2. Check overlap start-end
+    const overlap = this.ranges.some(r =>
+      // nếu new.start <= r.end && new.end >= r.start => overlap
+      this.startQuestionNumber <= r.endQuestionNumber && this.endQuestionNumber >= r.startQuestionNumber
+    );
+
+    console.log(232)
+    if (overlap && this.relativeErrorMessage == '') {
+      console.log(234, overlap, this.relativeErrorMessage)
+      this.relativeErrorMessage = `Khoảng (${this.startQuestionNumber}, ${this.endQuestionNumber}) bị trùng với dữ liệu có sẵn.`;
+      this.startQuestionNumberErrorMessage = ''
+      hasError = true
+    }
+    return hasError
+  }
+
+  // checkValidUpdate(): boolean {
+  //   let hasError = false
+  //   if (this.updateName.trim() == '') {
+  //     this.rangeErrorMessageUpdate = 'Vui lòng nhập dạng câu hỏi.'
+  //     hasError = true
+  //   }
+
+  //   if (!this.updateStartQuestionNumber) {
+  //     this.startQuestionNumberErrorMessageUpdate = 'Vui lòng nhập câu bắt đầu.'
+  //     hasError = true
+  //   } else if (this.updateStartQuestionNumber == 0) {
+  //     this.startQuestionNumberErrorMessageUpdate = 'Câu hỏi phải lớn hơn 0'
+  //     hasError = true
+  //   }
+
+  //   if (!this.updateEndQuestionNumber) {
+  //     this.endQuestionNumberErrorMessageUpdate = 'Vui lòng nhập câu kết thúc.'
+  //     hasError = true
+  //   } else if (this.updateEndQuestionNumber == 0) {
+  //     this.startQuestionNumberErrorMessageUpdate = 'Câu hỏi phải lớn hơn 0'
+  //     hasError = true
+  //   }
+
+  //   if (this.updateStartQuestionNumber && this.updateEndQuestionNumber) {
+  //     if (this.updateStartQuestionNumber >= this.updateEndQuestionNumber) {
+  //       this.startQuestionNumberErrorMessageUpdate = 'Câu bắt đầu phải nhỏ hơn câu kết thúc.'
+  //       this.endQuestionNumberErrorMessageUpdate = ''
+  //       hasError = true
+  //     }
+  //   }
+
+  //   // check name, range is exist
+  //   const others =  this.ranges.filter(r => r.id !== this.updateRangeId) 
+
+  //   const nameExists = others.some(r => r.name === this.updateName);
+  //   if (nameExists) {
+  //     this.rangeErrorMessageUpdate = `Tên đã tồn tại.`;
+  //     hasError = true
+  //   }
+
+  //   // 2. Check overlap start-end
+  //   const overlap = others.some(r =>
+  //     // nếu new.start <= r.end && new.end >= r.start => overlap
+  //     this.updateStartQuestionNumber <= r.endQuestionNumber && this.updateEndQuestionNumber >= r.startQuestionNumber
+  //   );
+  //   console.log(280, nameExists)
+  //   if (overlap) {
+  //     if (!this.startQuestionNumberErrorMessageUpdate) {
+  //       this.startQuestionNumberErrorMessageUpdate = `Khoảng (${this.updateStartQuestionNumber}, ${this.updateEndQuestionNumber}) bị trùng với dữ liệu có sẵn.`;
+  //       hasError = true
+  //     }
+  //   }
+  //   return hasError
   // }
 
   /**
    * Thêm dạng bài mới
    */
   onAddRange(): void {
-
+    if (this.checkValid()) return;
     const range: Range = {
       skillLevelId: this.selectedSkillLevel,
       name: this.rangeName,
@@ -188,6 +306,7 @@ export class ExamQuestionTypeComponent implements OnInit {
       endQuestionNumber: this.endQuestionNumber
     }
     // this.ranges.push(questionType);
+    console.log(range)
     this.adminService.postRange(range).subscribe({
       next: (res) => {
         Swal.fire({
@@ -225,28 +344,30 @@ export class ExamQuestionTypeComponent implements OnInit {
     })
   }
 
-  onUpdateRangeModal(): void {
-    console.log(1)
-    const rangeUpdate: Range = {
-      name: this.updateName,
-      startQuestionNumber: this.updateStartQuestionNumber,
-      endQuestionNumber: this.updateEndQuestionNumber,
-      skillLevelId: this.selectedSkillLevel
-    }
-    this.adminService.updateRange(this.updateRangeId, rangeUpdate).subscribe({
-      next: () => {
-        Swal.fire({
-          title: 'Thành câu!',
-          text: 'Sửa thành công.',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false
-        }).then(() => {
-          this.getRanges()
-        })
-      }
-    })
-  }
+  // onUpdateRangeModal(): void {
+  //   if(this.checkValidUpdate()) {
+  //     return;
+  //   }
+  //   const rangeUpdate: Range = {
+  //     name: this.updateName,
+  //     startQuestionNumber: this.updateStartQuestionNumber,
+  //     endQuestionNumber: this.updateEndQuestionNumber,
+  //     skillLevelId: this.selectedSkillLevel
+  //   }
+  //   this.adminService.updateRange(this.updateRangeId, rangeUpdate).subscribe({
+  //     next: () => {
+  //       Swal.fire({
+  //         title: 'Thành câu!',
+  //         text: 'Sửa thành công.',
+  //         icon: 'success',
+  //         timer: 1500,
+  //         showConfirmButton: false
+  //       }).then(() => {
+  //         this.getRanges()
+  //       })
+  //     }
+  //   })
+  // }
   /**
      * Xóa dạng bài theo ID
      */
@@ -302,5 +423,23 @@ export class ExamQuestionTypeComponent implements OnInit {
   }
 
 
+  onFocus(inputName: string) {
+    if (inputName == 'range') {
+      this.rangeErrorMessage = ''
+    } else if (inputName == 'start') {
+      this.startQuestionNumberErrorMessage = ''
+      this.relativeErrorMessage = ''
+    } else if (inputName == 'end') {
+      this.endQuestionNumberErrorMessage = ''
+      this.relativeErrorMessage = ''
+    } else if (inputName == 'rangeUpdate') {
+      this.rangeErrorMessageUpdate = ''
+    } else if (inputName == 'startUpdate') {
+      this.startQuestionNumberErrorMessageUpdate = ''
+    } else if (inputName == 'endUpdate') {
+      this.endQuestionNumberErrorMessageUpdate = ''
+    }
+
+  }
 
 }
