@@ -43,7 +43,7 @@ export class BookComponent implements OnInit {
   loadBooks(): void {
     this.service.getBooks().subscribe({
       next: (data: any) => {
-        this.books = data.items;
+        this.books = data;
         this.cd.detectChanges();
       },
       error: (err) => console.error(err)
@@ -78,11 +78,9 @@ export class BookComponent implements OnInit {
       };
 
       this.service.updateBook(updated).subscribe({
-        next: (res) => {
-          this.books = this.books.map(b => b.id === res.id ? res : b);
+        next: () => {
+          this.loadBooks(); // gọi lại API lấy danh sách mới
           this.closeUpdateModal();
-          this.cd.detectChanges();
-          window.location.reload();
         },
         error: (err) => console.error("Lỗi khi sửa book:", err)
       });
@@ -110,6 +108,7 @@ export class BookComponent implements OnInit {
       error: (err) => console.error("Lỗi khi xóa book:", err)
     });
   }
+
   addBook(event?: Event) {
     event?.preventDefault();
     if (this.addBookForm.invalid) return;
@@ -120,13 +119,15 @@ export class BookComponent implements OnInit {
     };
 
     this.service.addBook(newBook).subscribe({
-      next: (res) => {
-        this.books = [...this.books, res];
+      next: () => {
+        this.loadBooks(); // gọi lại API lấy danh sách chuẩn từ backend
         this.addBookForm.reset();
-        this.cd.detectChanges();
-        window.location.reload();
+        this.addBookForm.markAsPristine();
+        this.addBookForm.markAsUntouched();
       },
       error: (err) => console.error("Lỗi khi thêm book:", err)
     });
   }
+
+
 }

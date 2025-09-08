@@ -69,13 +69,13 @@ export class VocabularyComponent implements OnInit {
 
   saveNewVocab(vocab: Vocabulary) {
     this.vocabService.addVocabulary(vocab).subscribe({
-      next: (res: Vocabulary) => {
-        vocab.id = res.id;
-        this.cd.detectChanges();
+      next: () => {
+        this.loadVocabularies(); // 👈 load lại để có id thật
       },
       error: err => console.error(err)
     });
   }
+
 
   editVocab(vocab: Vocabulary) {
     console.log("Sửa vocab:", vocab);
@@ -100,6 +100,7 @@ export class VocabularyComponent implements OnInit {
     this.selectedVocab = null;
     this.isDeleteModalOpen = false;
   }
+
   confirmDeleteVocab() {
     if (this.selectedVocab) {
       this.vocabService.deleteVocabulary(this.selectedVocab.id).subscribe({
@@ -113,23 +114,13 @@ export class VocabularyComponent implements OnInit {
     }
   }
 
-  // deleteVocab(id: string) {
-  //   if(confirm("Bạn có chắc chắn muốn xoá từ này?")) {
-  //     this.vocabService.deleteVocabulary(id).subscribe({
-  //       next: () => {
-  //           this.vocabularies = this.vocabularies.filter(v => v.id !== id);
-  //         },
-  //         error: err => console.error(err)   
-  //       });
-  //   }
-  // }
   startLearning() {
     if (this.vocabularies.length > 0) {
       this.router.navigate(['/home-user/flashcard', this.bookId]);
-      // , {
-      //   state: { vocabs: this.vocabularies }
-      // });;
     }
   }
 
+  goBackToBooks() {
+    this.router.navigate(['/home-user/book']);
+  }
 }
