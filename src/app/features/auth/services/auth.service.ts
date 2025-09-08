@@ -6,6 +6,8 @@ import { ResetPasswordDto } from '../../admin/models/auth.model';
 import { EmailToVerifyDto } from '../../../models/email.model';
 import { RegisterDto } from '../../../models/register.model';
 import { MyAccountDto, UserState } from './user.state';
+import { ChangePasswordDto } from '../../../models/change-password.model';
+import { UpdateAccountDto } from '../../../models/update-account.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -150,5 +152,39 @@ export class AuthService {
         return throwError(() => err);
       })
     );
+  }
+
+  myAccountMe(): Observable<MyAccountDto | null> {
+    return this.http.get<MyAccountDto>(`/my-account/me`).pipe(
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) return of(null);
+        if (err.status === 404) return of(null);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  myAccountChangePassword(dto: ChangePasswordDto): Observable<boolean> {
+    return this.http.put<void>(`/my-account/change-password`, dto).pipe(
+      map(() => true),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) return of(false);
+        if (err.status === 404) return of(false);
+        if (err.status === 400) return of(false);
+        return throwError(() => err);
+      })
+    )
+  }
+  
+  myAccountUpdateAccount(dto: UpdateAccountDto): Observable<boolean> {
+    return this.http.put<void>(`/my-account/update-account`, dto).pipe(
+      map(() => true),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) return of(false);
+        if (err.status === 404) return of(false);
+        if (err.status === 400) return of(false);
+        return throwError(() => err);
+      })
+    )
   }
 }

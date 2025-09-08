@@ -34,6 +34,9 @@ import { inject } from '@angular/core';
 import { map } from 'rxjs';
 import { TopikSubLevelSelectionComponent } from './features/user/practive/pages/topik-SubLevel/topik-sub-level';
 import { ResultComponent } from './features/user/practive/pages/result-screen/result-screen';
+import { MyAccountComponent } from './features/my-account/my-account.component';
+import { MyAccountChangePasswordComponent } from './features/my-account/my-account-change-password.component';
+import { MyAccountUpdateAccountComponent } from './features/my-account/my-account-update-account.component';
 
 // 👇 import guards
 
@@ -60,6 +63,16 @@ export const routes: Routes = [
       { path: 'topik-detail', component: TopicsDetail }
       // { path: '', component: TopicsDetail }
     ]
+  },
+
+  {
+    path: 'my-account', component: UserComponent,
+    children: [
+      { path: '', pathMatch: 'full', component: MyAccountComponent },
+      { path: 'change-password', component: MyAccountChangePasswordComponent },
+      { path: 'update-account', component: MyAccountUpdateAccountComponent },
+
+    ],
   },
 
   {
@@ -123,12 +136,12 @@ export const routes: Routes = [
     canActivate: [() => {
       const router = inject(Router);
       const userState = inject(UserState);
-        return userState.currentUser$.pipe(
-          map(user => {
+      return userState.currentUser$.pipe(
+        map(user => {
           if (user == null) {
             return true; // cho phép đi tiếp
           }
-          return router.navigate(['/home-user']); // redirect an toàn
+          return router.parseUrl('/home-user'); // redirect an toàn
         })
       )
     }],
