@@ -7,11 +7,12 @@ import Swal from 'sweetalert2';
 import { QuestionBankApiService } from '../../services/question-bank-api.service';
 import { ExamType, Level, SkillLevel, Range } from '../../models/question-bank.model';
 import { map, Observable } from 'rxjs';
+import { MinNumberDirective } from '../../directive/min-number';
 
 @Component({
   selector: 'app-exam-question-types',
   standalone: true,
-  imports: [CommonModule, FormsModule, OnlyDigitsDirective, MaxNumberDirective],
+  imports: [CommonModule, FormsModule, OnlyDigitsDirective, MaxNumberDirective, MinNumberDirective],
   templateUrl: './question-type.html',
   styleUrl: './question-type.css'
 })
@@ -33,18 +34,18 @@ export class ExamQuestionTypeComponent implements OnInit {
   levels$!: Observable<Level[]>
   skillLevels$!: Observable<SkillLevel[]>
 
-  // two way binding update
-  updateName: string = ''
-  updateStartQuestionNumber: number = 0
-  updateEndQuestionNumber: number = 0
-  updateRangeId: string = ''
-
+  // error message
+  rangeMessage: string = ''
+  startMessage: string = ''
+  endMessage: string = ''
+  compareMessage: string = ''
 
   constructor(private cd: ChangeDetectorRef, public adminService: QuestionBankApiService) { }
 
   ngOnInit(): void {
     this.getExamTypes()
   }
+
   // api: load exam type 
   getExamTypes() {
     this.examTypes$ = this.adminService.getExamTypes();
@@ -71,27 +72,20 @@ export class ExamQuestionTypeComponent implements OnInit {
     this.selectedLevel = ''
   }
 
-  /**
-   * Xử lý khi thay đổi level
-   */
+  /** Xử lý khi thay đổi level */
   onLevelChange(): void {
     this.getSkillLevels()
     this.selectedSkillLevel = ''
   }
 
-  /**
-   * Xử lý khi thay đổi skill
-   */
+  /** Xử lý khi thay đổi skill */
   onSkillLevelChange(): void {
     this.resetInputFields();
     this.getRanges()
   }
 
-  /**
-   * Lấy danh sách range the 
-   */
+  /** Lấy danh sách range the */
   getRanges(): void {
-
     if (this.selectedSkillLevel) {
       this.adminService.getRangesBySkillLevelId(this.selectedSkillLevel)
         .subscribe(data => {
@@ -103,23 +97,11 @@ export class ExamQuestionTypeComponent implements OnInit {
     console.log(this.ranges)
   }
 
-  /**
-   * Kiểm tra có thể thêm dạng bài không
-   */
-  // canAddQuestionType(): boolean {
-  //   return !!(this.selectedLevel &&
-  //     this.selectedSkill &&
-  //     this.typeName &&
-  //     this.startQuestion &&
-  //     this.endQuestion &&
-  //     this.startQuestion <= this.endQuestion);
-  // }
-
-  /**
-   * Thêm dạng bài mới
-   */
-  onAddRange(): void {
-
+  /** Thêm dạng bài mới */
+  onAddRange(): void { 
+    if(!this.isValid()) {
+      return;
+    }
     const range: Range = {
       skillLevelId: this.selectedSkillLevel,
       name: this.rangeName,
@@ -147,48 +129,7 @@ export class ExamQuestionTypeComponent implements OnInit {
     })
   }
 
-  /**
-   * Sửa dạng bài theo ID
-   */
-  onUpdateRange(id: string): void {
-
-    this.adminService.getRangeById(id).subscribe({
-      next: (res) => {
-        console.log(res)
-        this.updateName = res.name
-        this.updateStartQuestionNumber = res.startQuestionNumber
-        this.updateEndQuestionNumber = res.endQuestionNumber
-        this.updateRangeId = id
-        this.cd.detectChanges()
-      }
-    })
-  }
-
-  onUpdateRangeModal(): void {
-    console.log(1)
-    const rangeUpdate: Range = {
-      name: this.updateName,
-      startQuestionNumber: this.updateStartQuestionNumber,
-      endQuestionNumber: this.updateEndQuestionNumber,
-      skillLevelId: this.selectedSkillLevel
-    }
-    this.adminService.updateRange(this.updateRangeId, rangeUpdate).subscribe({
-      next: () => {
-        Swal.fire({
-          title: 'Thành câu!',
-          text: 'Sửa thành công.',
-          icon: 'success',
-          timer: 1500,
-          showConfirmButton: false
-        }).then(() => {
-          this.getRanges()
-        })
-      }
-    })
-  }
-  /**
-     * Xóa dạng bài theo ID
-     */
+  /** Xóa dạng bài theo ID */
   onDeleteRange(id: string): void {
     Swal.fire({
       title: 'Bạn có chắc muốn xoá?',
@@ -216,30 +157,70 @@ export class ExamQuestionTypeComponent implements OnInit {
     });
   }
 
-  /**
-   * Reset form về trạng thái ban đầu
-   */
+  /** Reset form về trạng thái ban đầu */
   private resetForm(): void {
-
     this.resetInputFields();
   }
 
-  /**
-   * Reset các trường input
-   */
+  /** Reset các trường input */
   private resetInputFields(): void {
     this.rangeName = '';
     this.startQuestionNumber = 1;
     this.endQuestionNumber = 1;
+    this.rangeMessage = ''
+    this.startMessage = ''
+    this.endMessage = ''
+    this.compareMessage = ''
   }
 
-  /**
-   * Chuyển đổi chuỗi sang Title Case
-   */
-  toTitleCase(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  // Xử lý error
+  isValid(): boolean {
+    let isValid = true
+    if(this.rangeName.trim() == '') {
+      this.rangeMessage = 'Vui lòng nhập tên dạng bài'
+      isValid = false
+    }
+    if(this.startQuestionNumber.toString() == '') {
+      this.startMessage = 'Vui lòng nhập câu bắt đầu'
+      isValid = false
+    }
+    if(this.endQuestionNumber.toString() == '') {
+      this.startMessage = 'Vui lòng nhập câu kết thúc'
+      isValid = false
+    }
+    if(this.rangeMessage == '') {
+      let range = this.ranges.find(r => r.name == this.rangeName)
+      if(range) {
+        this.rangeMessage = 'Tên dạng bài đã tồn tại'
+      }
+    }
+
+    if(this.startQuestionNumber && this.endQuestionNumber) {
+      if(this.startQuestionNumber >= this.endQuestionNumber) {
+        this.compareMessage = 'Câu bắt đầu phải nhỏ hơn câu kết thúc'
+      } else {
+        this.ranges.forEach(r => {
+          if((this.startQuestionNumber >= r.startQuestionNumber && this.startQuestionNumber <= r.endQuestionNumber) || 
+              this.endQuestionNumber >= r.startQuestionNumber && this.endQuestionNumber <= r.endQuestionNumber) {
+                this.compareMessage = 'Khoảng câu hỏi đã tồn tại'
+                isValid = false
+                return;
+              }
+        })
+      }
+    }
+    return isValid
   }
 
-
-
+  onFocus(input: string) {
+    if(input == 'range') {
+      this.rangeMessage = ''
+    } else if(input == 'start') {
+      this.startMessage = ''
+      this.compareMessage = ''
+    } else if(input == 'end') {
+      this.endMessage = ''
+      this.compareMessage = ''
+    }
+  }
 }

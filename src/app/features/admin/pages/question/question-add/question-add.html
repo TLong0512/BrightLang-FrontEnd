@@ -170,13 +170,7 @@
                                     <div class="mb-5" [@slideIn]="i"
                                     style="animation: slideIn 0.5s ease-out;">
                                     <div class="card border-start border-primary border-4 shadow-sm">
-                                        <div
-                                            class="card-header bg-light d-flex justify-content-between align-items-center">
-                                            <h5 class="mb-0 text-primary">
-                                                <i class="fas fa-hashtag me-2"></i>
-                                                Câu hỏi {{ i + 1 }}
-                                                <span class="badge bg-primary ms-2">Mới</span>
-                                            </h5>
+                                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                             <button type="button" class="btn btn-outline-danger btn-sm"
                                                 (click)="removeQuestion(i)">
                                                 <i class="fas fa-trash me-1"></i>
@@ -194,7 +188,8 @@
                                                     </label>
                                                     <input type="number" class="form-control form-control-lg"
                                                         [(ngModel)]="question.questionNumber"
-                                                        [name]="'questionText' + i" placeholder="">
+                                                        [name]="'questionText' + i" placeholder="" 
+                                                        [maxNumber]="50" [minNumber]="1">
                                                 </div>
                                             </div>
                                             <!-- Question Text -->

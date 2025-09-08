@@ -7,10 +7,13 @@ import { Context } from 'vm';
 import { EditorComponent } from '@tinymce/tinymce-angular';
 import { map, Observable } from 'rxjs';
 import Swal from 'sweetalert2';
+import { OnlyDigitsDirective } from '../../../directive/only-number';
+import { MaxNumberDirective } from '../../../directive/max-number';
+import { MinNumberDirective } from '../../../directive/min-number';
 
 @Component({
   selector: 'app-add-question',
-  imports: [FormsModule, CommonModule, EditorComponent],
+  imports: [FormsModule, CommonModule, EditorComponent, OnlyDigitsDirective, MaxNumberDirective, MinNumberDirective],
   standalone: true,
   templateUrl: './question-add.html',
   styles: [`
@@ -169,6 +172,7 @@ export class AddQuestionComponent {
     };
 
     this.questions.push(newQuestion);
+    this.cd.detectChanges()
   }
 
   removeQuestion(index: number): void {
@@ -235,6 +239,13 @@ export class AddQuestionComponent {
           icon: 'success',
           timer: 2000,
           showConfirmButton: false
+        }).then(() => {
+          this.isForExam = false
+          this.passage = ''
+          this.passageExplanation = ''
+          this.questions = []
+          this.cd.detectChanges()
+          this.addQuestion()
         });
       },
       error: (error) => {
