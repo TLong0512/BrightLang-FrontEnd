@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrlAuth: 'https://localhost:7030/api',
-  apiUrlQuestionBank: 'https://localhost:7141/api'  
+  apiUrlAuth: 'http://localhost:5001/api',
+  apiUrlQuestionBank: 'http://localhost:5003/api'  
 };

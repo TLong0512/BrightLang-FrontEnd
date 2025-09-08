@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Route, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../features/auth/auth.service';
 
 @Component({
@@ -11,13 +11,13 @@ import { AuthService } from '../../../features/auth/auth.service';
   styleUrl: './header.scss'
 })
 export class UserHeaderComponent {
-  constructor(private authService: AuthService, private router: Router){
 
-  }
-  logout(){
-    this.authService.logout();
-    this.router.navigate(['/home-user']);
-  }
-  
+  constructor(private authService: AuthService,
+    private router: Router
+  ) {}
 
+  onLogout() {
+    this.authService.logout()
+    this.router.navigate(['/home-user'])
+  }
 }

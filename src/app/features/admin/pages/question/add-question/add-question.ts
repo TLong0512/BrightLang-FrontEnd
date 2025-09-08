@@ -134,6 +134,7 @@ export class AddQuestionComponent {
   audioUrl: string = '';
   nextQuestionId: number = 1;
   rangeId: string | null = ''
+  selectedRange: string | null = ''
   constructor(private adminService: AdminService, private sharedService: QuestionAddService) { }
 
   // ngOnInit(): void {

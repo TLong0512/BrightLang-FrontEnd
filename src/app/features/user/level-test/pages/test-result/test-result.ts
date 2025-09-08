@@ -2,6 +2,7 @@ import { Component, OnInit, output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExamStateService, ExamResult } from '../../services/exam-state.service';
 import { TestService, SubmitTestRequestDto } from '../../services/exam.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-test-result',
@@ -24,6 +25,8 @@ export class TestResultComponent implements OnInit {
   isProcessing = signal<boolean>(false);
   showRoadmapConfirm = signal<boolean>(false);
   submitError = signal<string | null>(null);
+
+  router = inject(Router);
 
   ngOnInit(): void {
     this.submitExamAndCalculateResult();
@@ -265,6 +268,14 @@ export class TestResultComponent implements OnInit {
   }
 
   onViewDetailedResults(): void {
+    
+    const testId = this.examStateService.examData()?.testId;
+    console.log('id: ',testId );
+    if (testId) {
+      this.router.navigate(['/home-user/test-review', testId]);
+    } else {
+      console.error('No test ID found');
+    }
     this.viewResults.emit();
   }
 

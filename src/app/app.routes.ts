@@ -28,6 +28,8 @@ import { SkillSelectionComponent } from './features/user/practive/pages/skill-se
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
 import { AdminComponent } from './shared/admin/admin';
 import { RoleGuard } from './guards/auth.guard';
+import { TestReviewComponent } from './features/user/level-test/pages/test-review/test-review';
+import { TestHistoryComponent } from './features/user/level-test/pages/test-history/test-history';
 
 // 👇 import guards
 
@@ -55,11 +57,14 @@ export const routes: Routes = [
       { path: 'test-ready', component: TestReadyComponent },
       { path: 'test-question', component: TestQuestionsComponent },
       { path: 'test-result', component: TestResultComponent },
+      { path: 'test-review/:testId', component: TestReviewComponent},
+      { path: 'test-history', component: TestHistoryComponent},
       { path: '', component: UserHomeComponent },
       { path: 'topik-detail', component: TopicsDetail },
       { path: 'book', component: BookComponent },
       { path: 'vocab/:id', component: VocabularyComponent },
-      { path: 'flashcard/:bookId', component: FlashcardComponent }
+      { path: 'flashcard/:bookId', component: FlashcardComponent },
+      
     ]
   },
 
