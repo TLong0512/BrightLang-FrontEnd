@@ -9,7 +9,7 @@ import { QuestionListComponent } from "./pages/question/question-list/question-l
 import { AddQuestionComponent } from "./pages/question/question-add/question-add";
 import { UpdateQuestionComponent } from "./pages/question/question-update/question-update";
 import { RoleGuard } from "../../guards/auth.guard";
-import { RoadMapElementComponent } from "./pages/question/road-map-element/road-map-element";
+import { RoadMapElementComponent } from "./pages/road-map-element/road-map-element";
 
 export const adminRoutes: Routes = [
     {

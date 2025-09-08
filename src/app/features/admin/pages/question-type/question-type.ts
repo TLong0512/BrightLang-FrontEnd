@@ -13,68 +13,7 @@ import { map, Observable } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule, OnlyDigitsDirective, MaxNumberDirective],
   templateUrl: './question-type.html',
-  styles: [`
-    /* Custom styles để bổ sung cho Bootstrap */
-    .card {
-      border: none;
-      border-radius: 12px;
-    }
-
-    .card-header {
-      border-radius: 12px 12px 0 0 !important;
-      border-bottom: none;
-    }
-
-    .form-select:focus,
-    .form-control:focus {
-      border-color: #0d6efd;
-      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-
-    .btn {
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .badge {
-      font-size: 0.75rem;
-    }
-
-    .table th {
-      border-bottom: 2px solid #dee2e6;
-      font-weight: 600;
-    }
-
-    .table-hover tbody tr:hover {
-      background-color: rgba(0, 0, 0, 0.025);
-    }
-
-    .shadow-sm {
-      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .container-fluid {
-        padding-left: 15px;
-        padding-right: 15px;
-      }
-      
-      .btn-lg {
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
-      }
-      
-      .table-responsive {
-        font-size: 0.9rem;
-      }
-    }
-  `]
+  styleUrl: './question-type.css'
 })
 export class ExamQuestionTypeComponent implements OnInit {
   ranges: Range[] = [];

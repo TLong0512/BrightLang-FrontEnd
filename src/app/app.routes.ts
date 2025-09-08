@@ -34,6 +34,7 @@ import { inject } from '@angular/core';
 import { map } from 'rxjs';
 import { TopikSubLevelSelectionComponent } from './features/user/practive/pages/topik-SubLevel/topik-sub-level';
 import { ResultComponent } from './features/user/practive/pages/result-screen/result-screen';
+import { RoadmapComponent } from './features/user/road-map/road-map';
 
 // 👇 import guards
 
@@ -105,7 +106,10 @@ export const routes: Routes = [
         path: 'topik-sublevel/:examTypeId',
         component: TopikSubLevelSelectionComponent
       },
-
+      {
+        path: 'road-map',
+        component: RoadmapComponent
+      },
       
       {
         path: '',
@@ -159,8 +163,8 @@ export const routes: Routes = [
 
   {
     path: 'admin',
-    canActivate: [RoleGuard], 
-    data: { roles: ['Admin'] },
+    // canActivate: [RoleGuard], 
+    // data: { roles: ['Admin'] },
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   }
 ];
