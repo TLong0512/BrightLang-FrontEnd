@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { OnlyDigitsDirective } from '../../directive/only-number';
 import { MaxNumberDirective } from '../../directive/max-number';
 import Swal from 'sweetalert2';
-import { AdminService } from '../../services/admin.service';
+import { QuestionBankApiService } from '../../services/question-bank-api.service';
 import { ExamType, Level, SkillLevel, Range } from '../../models/question-bank.model';
 import { map, Observable } from 'rxjs';
 import { RouterModule } from '@angular/router';
@@ -163,7 +163,7 @@ export class QuestionComponent implements OnInit {
 
   constructor(
     private cd: ChangeDetectorRef, 
-    public adminService: AdminService,
+    public adminService: QuestionBankApiService,
     private sharedService: QuestionAddService,
     private questionListService: QuestionListService
   ) { }

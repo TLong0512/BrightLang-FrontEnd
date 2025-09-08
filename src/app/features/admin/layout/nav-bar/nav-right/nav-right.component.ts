@@ -1,7 +1,8 @@
 // Angular import
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../../../../../shared/shared.module';
+import { AuthService } from '../../../../auth/services/auth.service';
 
 // third party import
 
@@ -11,4 +12,10 @@ import { SharedModule } from '../../../../../shared/shared.module';
   templateUrl: './nav-right.component.html',
   styleUrls: ['./nav-right.component.scss']
 })
-export class NavRightComponent {}
+export class NavRightComponent {
+
+  private authService = inject(AuthService)
+  onLogout() {
+    this.authService.logout()
+  }
+}

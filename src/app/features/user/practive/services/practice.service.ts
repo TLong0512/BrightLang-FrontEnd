@@ -1,137 +1,271 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { PracticeSession, UserAnswer, PracticeResult } from '../../../../models/topik.model';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { TopikLevel, SubLevel, Skill, PracticeSession, Question, PracticeResult } from '../../../../models/practice.model';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class PracticeService {
-  private currentSessionSubject = new BehaviorSubject<PracticeSession | null>(null);
-  private userAnswersSignal = signal<UserAnswer[]>([]);
-  private currentQuestionIndexSignal = signal<number>(0);
-  private startTimeSignal = signal<number>(0);
+    private readonly STORAGE_KEY_LEVEL = 'selectedLevel';
+    private readonly STORAGE_KEY_SUBLEVEL = 'selectedSubLevel';
+    private readonly STORAGE_KEY_SKILL = 'selectedSkill';
+    private result: PracticeResult | null = null;
 
-  readonly currentSession$ = this.currentSessionSubject.asObservable();
-  readonly userAnswers = this.userAnswersSignal.asReadonly();
-  readonly currentQuestionIndex = this.currentQuestionIndexSignal.asReadonly();
+    setResult(res: PracticeResult) {
+        this.result = res;
+    }
 
-  readonly progress = computed(() => {
-    const session = this.currentSessionSubject.value;
-    const currentIndex = this.currentQuestionIndexSignal();
-    
-    if (!session) return 0;
-    return ((currentIndex + 1) / session.totalQuestions) * 100;
-  });
+    getResult(): PracticeResult | null {
+        return this.result;
+    }
 
-  readonly currentQuestion = computed(() => {
-    const session = this.currentSessionSubject.value;
-    const currentIndex = this.currentQuestionIndexSignal();
-    
-    if (!session || currentIndex >= session.questions.length) return null;
-    return session.questions[currentIndex];
-  });
+    clearResult() {
+        this.result = null;
+    }
 
-  readonly currentContext = computed(() => {
-    const question = this.currentQuestion();
-    const session = this.currentSessionSubject.value;
-    
-    if (!question || !session) return null;
-    return session.contexts.find(c => c.id === question.contextId) || null;
-  });
-
-  startSession(session: PracticeSession): void {
-    this.currentSessionSubject.next(session);
-    this.userAnswersSignal.set(
-      session.questions.map(q => ({
-        questionId: q.id,
-        selectedAnswer: null
-      }))
+    // ===== TopikLevel =====
+    private selectedLevelSource = new BehaviorSubject<TopikLevel | null>(
+        this.getSessionItem<TopikLevel>(this.STORAGE_KEY_LEVEL)
     );
-    this.currentQuestionIndexSignal.set(0);
-    this.startTimeSignal.set(Date.now());
-  }
+    selectedLevel$ = this.selectedLevelSource.asObservable();
 
-  selectAnswer(questionId: string, answerIndex: number): void {
-    this.userAnswersSignal.update(answers => 
-      answers.map(answer => 
-        answer.questionId === questionId
-          ? { ...answer, selectedAnswer: answerIndex }
-          : answer
-      )
+    // ===== SubLevel =====
+    private selectedSubLevelSource = new BehaviorSubject<SubLevel | null>(
+        this.getSessionItem<SubLevel>(this.STORAGE_KEY_SUBLEVEL)
     );
-  }
+    selectedSubLevel$ = this.selectedSubLevelSource.asObservable();
 
-  nextQuestion(): void {
-    const session = this.currentSessionSubject.value;
-    const currentIndex = this.currentQuestionIndexSignal();
-    
-    if (session && currentIndex < session.questions.length - 1) {
-      this.currentQuestionIndexSignal.set(currentIndex + 1);
+    // ===== Skill =====
+    private selectedSkillSource = new BehaviorSubject<Skill | null>(
+        this.getSessionItem<Skill>(this.STORAGE_KEY_SKILL)
+    );
+    selectedSkill$ = this.selectedSkillSource.asObservable();
+
+    // ===== practice session =====
+    private currentSession = new BehaviorSubject<PracticeSession | null>(null);
+    public currentSession$ = this.currentSession.asObservable();
+
+
+
+
+    // ===== TopikLevel =====
+    getLevel(): TopikLevel | null {
+        return this.selectedLevelSource.value;
     }
-  }
-
-  previousQuestion(): void {
-    const currentIndex = this.currentQuestionIndexSignal();
-    
-    if (currentIndex > 0) {
-      this.currentQuestionIndexSignal.set(currentIndex - 1);
+    setLevel(level: TopikLevel): void {
+        this.selectedLevelSource.next(level);
+        this.setSessionItem(this.STORAGE_KEY_LEVEL, level);
     }
-  }
-
-  goToQuestion(index: number): void {
-    const session = this.currentSessionSubject.value;
-    
-    if (session && index >= 0 && index < session.questions.length) {
-      this.currentQuestionIndexSignal.set(index);
-    }
-  }
-
-  submitPractice(): Observable<PracticeResult> {
-    const session = this.currentSessionSubject.value;
-    const answers = this.userAnswersSignal();
-    const startTime = this.startTimeSignal();
-
-    if (!session) {
-      throw new Error('No active session');
+    clearLevel(): void {
+        this.selectedLevelSource.next(null);
+        this.removeSessionItem(this.STORAGE_KEY_LEVEL);
     }
 
-    // Calculate results
-    const answersWithCorrectness = answers.map(answer => {
-      const question = session.questions.find(q => q.id === answer.questionId);
-      return {
-        ...answer,
-        isCorrect: question ? answer.selectedAnswer === question.correctAnswer : false
-      };
-    });
+    // ===== SubLevel =====
+    getSubLevel(): SubLevel | null {
+        return this.selectedSubLevelSource.value;
+    }
+    setSubLevel(subLevel: SubLevel): void {
+        this.selectedSubLevelSource.next(subLevel);
+        this.setSessionItem(this.STORAGE_KEY_SUBLEVEL, subLevel);
+    }
+    clearSubLevel(): void {
+        this.selectedSubLevelSource.next(null);
+        this.removeSessionItem(this.STORAGE_KEY_SUBLEVEL);
+    }
 
-    const correctAnswers = answersWithCorrectness.filter(a => a.isCorrect).length;
-    const wrongAnswers = session.totalQuestions - correctAnswers;
-    const accuracy = Math.round((correctAnswers / session.totalQuestions) * 100);
-    const timeElapsed = Date.now() - startTime;
+    // ===== Skill =====
+    getSkill(): Skill | null {
+        return this.selectedSkillSource.value;
+    }
+    setSkill(skill: Skill): void {
+        this.selectedSkillSource.next(skill);
+        this.setSessionItem(this.STORAGE_KEY_SKILL, skill);
+    }
+    clearSkill(): void {
+        this.selectedSkillSource.next(null);
+        this.removeSessionItem(this.STORAGE_KEY_SKILL);
+    }
 
-    const result: PracticeResult = {
-      sessionId: session.id,
-      userAnswers: answersWithCorrectness,
-      score: correctAnswers,
-      totalQuestions: session.totalQuestions,
-      correctAnswers,
-      wrongAnswers,
-      accuracy,
-      timeElapsed
-    };
+    // ===== Helpers cho sessionStorage =====
+    private getSessionItem<T>(key: string): T | null {
+        if (typeof window === 'undefined') return null;
+        const saved = sessionStorage.getItem(key);
+        return saved ? (JSON.parse(saved) as T) : null;
+    }
 
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next(result);
-        observer.complete();
-      }, 500);
-    });
-  }
+    private setSessionItem<T>(key: string, value: T): void {
+        if (typeof window === 'undefined') return;
+        sessionStorage.setItem(key, JSON.stringify(value));
+    }
 
-  resetSession(): void {
-    this.currentSessionSubject.next(null);
-    this.userAnswersSignal.set([]);
-    this.currentQuestionIndexSignal.set(0);
-    this.startTimeSignal.set(0);
-  }
+    private removeSessionItem(key: string): void {
+        if (typeof window === 'undefined') return;
+        sessionStorage.removeItem(key);
+    }
+
+    /**
+       * Create a new practice session
+    */
+    createPracticeSession(rangeId: string, questions: Question[]): PracticeSession {
+        const session: PracticeSession = {
+            id: this.generateSessionId(),
+            rangeId: rangeId,
+            questions: questions,
+            userAnswers: questions.map(q => ({
+                questionId: q.questionInformation.id,
+                selectedAnswerId: null,
+                isCorrect: false
+            })),
+            status: 'active'
+        };
+
+        this.currentSession.next(session);
+        this.saveSessionToStorage(session);
+        return session;
+    }
+
+    /**
+     * Update current practice session
+     */
+    updatePracticeSession(session: PracticeSession): void {
+        this.currentSession.next(session);
+        this.saveSessionToStorage(session);
+    }
+
+    /**
+     * Complete practice session and return result
+     */
+    completePracticeSession(session: PracticeSession): PracticeResult {
+        session.status = 'completed';
+
+        const correctAnswers = session.userAnswers.filter(answer => answer.isCorrect).length;
+        const wrongAnswers = session.userAnswers.filter(answer =>
+            answer.selectedAnswerId !== null && !answer.isCorrect
+        ).length;
+        const unanswered = session.userAnswers.filter(answer =>
+            answer.selectedAnswerId === null
+        ).length;
+
+        const result: PracticeResult = {
+            totalQuestions: session.questions.length,
+            correctAnswers,
+            wrongAnswers,
+            unanswered,
+            score: Math.round((correctAnswers / session.questions.length) * 100),
+            userAnswers: session.userAnswers,
+            questions: session.questions
+        };
+
+        this.updatePracticeSession(session);
+        this.saveResultToHistory(result);
+
+        return result;
+    }
+
+    /**
+     * Get current practice session from storage
+     */
+    getCurrentSession(): PracticeSession | null {
+        try {
+            const stored = localStorage.getItem('currentPracticeSession');
+            if (stored) {
+                const session = JSON.parse(stored);
+                session.startTime = new Date(session.startTime);
+                if (session.endTime) {
+                    session.endTime = new Date(session.endTime);
+                }
+                return session;
+            }
+        } catch (error) {
+            console.error('Error loading session from storage:', error);
+        }
+        return null;
+    }
+
+    /**
+     * Clear current practice session
+     */
+    clearCurrentSession(): void {
+        this.currentSession.next(null);
+        localStorage.removeItem('currentPracticeSession');
+    }
+
+    /**
+     * Get practice history
+     */
+    getPracticeHistory(): PracticeResult[] {
+        try {
+            const stored = localStorage.getItem('practiceHistory');
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error loading practice history:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Clear practice history
+     */
+    clearPracticeHistory(): void {
+        localStorage.removeItem('practiceHistory');
+    }
+
+    /**
+     * Export practice result to JSON
+     */
+    exportResult(result: PracticeResult): string {
+        const exportData = {
+            date: new Date().toISOString(),
+            ...result,
+            questions: result.questions.map((q, index) => ({
+                questionNumber: q.questionInformation.questionNumber,
+                skill: q.skillName,
+                level: q.levelName,
+                range: q.rangeName,
+                question: q.questionInformation.content,
+                context: q.contextInformation.content,
+                options: q.answerDetails.map(a => ({
+                    option: a.value,
+                    isCorrect: a.isCorrect,
+                    explanation: a.explain
+                })),
+                userAnswer: result.userAnswers[index].selectedAnswerId ?
+                    q.answerDetails.find(a => a.id === result.userAnswers[index].selectedAnswerId)?.value : 'Không trả lời',
+                correctAnswer: q.answerDetails.find(a => a.isCorrect)?.value,
+                isCorrect: result.userAnswers[index].isCorrect,
+                questionExplanation: q.questionInformation.explain
+            }))
+        };
+
+        return JSON.stringify(exportData, null, 2);
+    }
+
+    private generateSessionId(): string {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+    }
+
+    private saveSessionToStorage(session: PracticeSession): void {
+        try {
+            localStorage.setItem('currentPracticeSession', JSON.stringify(session));
+        } catch (error) {
+            console.error('Error saving session to storage:', error);
+        }
+    }
+
+    private saveResultToHistory(result: PracticeResult): void {
+        try {
+            const history = this.getPracticeHistory();
+            history.unshift(result); // Add to beginning of array
+
+            // Keep only last 50 results
+            if (history.length > 50) {
+                history.splice(50);
+            }
+
+            localStorage.setItem('practiceHistory', JSON.stringify(history));
+        } catch (error) {
+            console.error('Error saving result to history:', error);
+        }
+    }
 }

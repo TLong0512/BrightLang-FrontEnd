@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="navigation">
+        <button class="back-btn" (click)="goBack()">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </button>
+    </div>
+
+    <div class="header">
+        <h1 *ngIf="topikLevel && subTopikLevel && skill">
+            {{ topikLevel.name }} {{ subTopikLevel.name }} {{skill.skillName}}
+        </h1>
+        <p>Chọn dạng câu hỏi để luyện tập</p>
+
+        @if (loading()) {
+        <app-loading-spinner message="Đang tải dạng câu hỏi..."></app-loading-spinner>
+        } @else {
+        <div class="options-grid">
+            @for (questionType of questionTypes(); track questionType.id) {
+            <button class="option-card" (click)="selectQuestionType(questionType.id)">
+                <h3>[{{ questionType.startQuestionNumber }} - {{ questionType.endQuestionNumber}}]</h3>
+            </button>
+            }
+        </div>
+        }
+    </div>
+</div>

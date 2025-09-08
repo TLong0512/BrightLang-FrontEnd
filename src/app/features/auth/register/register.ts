@@ -4,8 +4,8 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EmailToVerifyDto } from '../../../models/email.model';
-import { RegisterService } from './register-api';
-import { SharedService } from '../share.service';
+import { SharedService } from '../services/share.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'register',
@@ -23,7 +23,7 @@ export class RegisterComponent {
 
   constructor(private fb: FormBuilder,
     private router: Router,
-    private registerService: RegisterService,
+    private registerService: AuthService,
     private cdr: ChangeDetectorRef,
     private sharedService: SharedService) {
     this.registerForm = this.fb.group({
@@ -94,7 +94,7 @@ export class RegisterComponent {
   get confirmPassword() { return this.registerForm.get('confirmPassword'); }
 
   SendEmail(emailToVerifyDto: EmailToVerifyDto) {
-    this.registerService.create(emailToVerifyDto).subscribe({
+    this.registerService.registerEmailRequest(emailToVerifyDto).subscribe({
       next: res => {
         this.router.navigate(['/auth/verify']);
       },

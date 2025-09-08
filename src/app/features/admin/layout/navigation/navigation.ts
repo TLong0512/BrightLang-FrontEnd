@@ -45,7 +45,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Câu hỏi',
         type: 'item',
         classes: 'nav-item',
-        url: '/admin/question',
+        url: '/admin/question-list',
         icon: 'ti ti-brush'
       },
       {
@@ -55,8 +55,6 @@ export const NavigationItems: NavigationItem[] = [
         classes: 'nav-item',
         url: '/admin/roadmap',
         icon: 'ti ti-plant-2',
-        target: true,
-        external: true
       }
     ]
   }

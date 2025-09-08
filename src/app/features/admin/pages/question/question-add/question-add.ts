@@ -1,18 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Answer, Question, QuestionAdd } from '../../../models/question-bank.model';
-import { Component, Input, OnInit } from '@angular/core';
-import { AdminService } from '../../../services/admin.service';
+import { Answer, ExamType, Level, Question, QuestionAdd, SkillLevel } from '../../../models/question-bank.model';
+import { ChangeDetectorRef, Component, DOCUMENT, Inject, Input, OnInit } from '@angular/core';
+import { QuestionBankApiService } from '../../../services/question-bank-api.service';
 import { Context } from 'vm';
-import { QuestionAddService } from '../services/question-add.service';
 import { EditorComponent } from '@tinymce/tinymce-angular';
-
+import { map, Observable } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-question',
   imports: [FormsModule, CommonModule, EditorComponent],
   standalone: true,
-  templateUrl: './add-question.html',
+  templateUrl: './question-add.html',
   styles: [`
     .bg-gradient-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -84,9 +84,18 @@ import { EditorComponent } from '@tinymce/tinymce-angular';
   `]
 })
 
-
-
 export class AddQuestionComponent {
+  // two way binding
+  selectedExamType: string = '';
+  selectedLevel: string = '';
+  selectedSkillLevel: string = '';
+  selectedRange: string = ''
+
+  // list
+  examTypes$!: Observable<ExamType[]>
+  levels$!: Observable<Level[]>
+  skillLevels!: SkillLevel[]
+  ranges$!: Observable<Range[]>;
   content: string = '';
   init = {
     height: 500,
@@ -107,7 +116,7 @@ export class AddQuestionComponent {
     // Custom file picker (chọn file từ local)
     file_picker_callback: (callback: any, value: any, meta: any) => {
       if (meta.filetype === 'image' || meta.filetype === 'media') {
-        const input = document.createElement('input');
+        const input = this.document.createElement('input');
         input.setAttribute('type', 'file');
         input.setAttribute('accept', meta.filetype === 'image' ? 'image/*' : 'audio/*,video/*');
 
@@ -134,14 +143,18 @@ export class AddQuestionComponent {
   audioUrl: string = '';
   nextQuestionId: number = 1;
   rangeId: string | null = ''
-  selectedRange: string | null = ''
-  constructor(private adminService: AdminService, private sharedService: QuestionAddService) { }
+  constructor(private adminService: QuestionBankApiService,
+    private cd: ChangeDetectorRef,
+    
+    @Inject(DOCUMENT) private document: Document
+  ) { }
 
-  // ngOnInit(): void {
-  //   this.sharedService.values$.subscribe((data) => {
+  ngOnInit(): void {
+    // this.sharedService.values$.subscribe((data) => {
 
-  //   });
-  // }
+    // });
+    this.getExamTypes()
+  }
   addQuestion(): void {
     const newQuestion: QuestionAdd = {
       content: '',
@@ -175,43 +188,35 @@ export class AddQuestionComponent {
       question.answerList[answerIndex].isCorrect = true;
     }
   }
-  onImageUrlChange(question: Question): void {
-    // You can add image validation logic here
-    console.log('Image URL changed:', this.imageUrl);
-  }
+  
 
-  onImageError(question: Question): void {
-    console.error('Failed to load image:', this.imageUrl);
-    // You could show an error message or reset the URL
-  }
+  // isFormValid(): boolean {
+  //   if (!this.passage.trim()) {
+  //     return false;
+  //   }
 
-  isFormValid(): boolean {
-    if (!this.passage.trim()) {
-      return false;
-    }
+  //   if (this.questions.length === 0) {
+  //     return false;
+  //   }
 
-    if (this.questions.length === 0) {
-      return false;
-    }
+  //   return true
+  //   // Check if all questions have required fields
+  //   // return this.questions.every(question => {
+  //   //   const hasQuestionText = question.content.trim().length > 0;
+  //   //   const hasCorrectAnswer = question.answers.some(answer => answer.isCorrect);
+  //   //   const hasAnswerTexts = question.answers.every(answer => answer.text.trim().length > 0);
 
-    return true
-    // Check if all questions have required fields
-    // return this.questions.every(question => {
-    //   const hasQuestionText = question.content.trim().length > 0;
-    //   const hasCorrectAnswer = question.answers.some(answer => answer.isCorrect);
-    //   const hasAnswerTexts = question.answers.every(answer => answer.text.trim().length > 0);
-
-    //   return hasQuestionText && hasCorrectAnswer && hasAnswerTexts;
-    // });
-  }
+  //   //   return hasQuestionText && hasCorrectAnswer && hasAnswerTexts;
+  //   // });
+  // }
 
   saveQuestions(): void {
-    if (!this.isFormValid()) {
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-      return;
-    }
+    // if (!this.isFormValid()) {
+    //   alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+    //   return;
+    // }
 
-  
+
     const context: Context = {
       content: this.content,
       explain: this.passageExplanation,
@@ -219,23 +224,97 @@ export class AddQuestionComponent {
       rangeId: this.rangeId
     }
     this.questions.forEach(q => q.context = context)
-    let examTypeId, skillId
-    this.sharedService.values$.subscribe(data => {
-      examTypeId = data.examTypeId,
-        skillId = data.skillId
-    })
 
-    this.adminService.postQuestion(examTypeId!, skillId!, this.questions).subscribe({
+    let skillLevel = this.skillLevels.find(s => s.id == this.selectedSkillLevel)
+
+    this.adminService.postQuestion(this.selectedExamType, skillLevel!.skillId || '', this.questions).subscribe({
       next: () => {
-        console.log('ok')
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Thêm câu hỏi thành công.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
       },
-      error: () => {
-        console.log('fail')
+      error: (error) => {
+        console.log(error)
       }
     })
   }
 
-  
+  getExamTypes() {
+    this.examTypes$ = this.adminService.getExamTypes();
+  }
 
-  
+  getLevels() {
+    if (this.selectedExamType) {
+      this.levels$ = this.adminService.getLevelsByExamTypeId(this.selectedExamType).pipe(
+        map((levels: Level[]) => levels.sort((a, b) => a.name.localeCompare(b.name))) // sort theo name
+      );
+    }
+  }
+
+  getSkillLevels() {
+    if (this.selectedLevel) {
+      this.adminService.getSkillLevelsByLevelId(this.selectedLevel).subscribe({
+        next: (data) => {
+
+          // FIX: Đảm bảo data clean và không có duplicate
+          this.skillLevels = data.filter((skill, index, self) =>
+            index === self.findIndex((s) => s.id === skill.id)
+          );
+          console.log('Loaded skillLevels:', this.skillLevels);
+          this.cd.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading skill levels:', error);
+          this.skillLevels = [];
+          this.cd.detectChanges();
+        }
+      });
+    }
+  }
+
+  // Xử lý khi thay đổi exam type
+  onExamTypeChange(): void {
+    this.getLevels();
+    // FIX: Reset tất cả các selection phía sau
+    this.selectedLevel = '';
+    this.selectedSkillLevel = '';
+
+    this.skillLevels = [];
+
+    // FIX: Force change detection
+    this.cd.detectChanges();
+  }
+
+  /**
+   * Xử lý khi thay đổi level
+   */
+  onLevelChange(): void {
+    this.getSkillLevels();
+    // FIX: Reset tất cả các selection phía sau
+    this.selectedSkillLevel = '';
+    this.selectedRange = '';
+
+    // FIX: Force change detection
+    this.cd.detectChanges();
+  }
+
+  /**
+   * Xử lý khi thay đổi skill level
+   */
+  onSkillLevelChange(): void {
+
+    // FIX: Reset range selection
+    this.selectedRange = '';
+
+    // FIX: Force change detection
+    this.cd.detectChanges();
+  }
+
+
+
+
 }

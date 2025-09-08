@@ -1,0 +1,23 @@
+<div class="container">
+    <div class="navigation">
+        <button class="back-btn" (click)="goBack()">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </button>
+    </div>
+
+    <div class="header">
+        <h1 *ngIf="level">{{ level.name }}</h1>
+    </div>
+
+    @if (loading()) {
+    <app-loading-spinner message="Đang tải dữ liệu..."></app-loading-spinner>
+    } @else {
+    <div class="options-grid">
+        @for (subLevel of subLevels(); track subLevel.id) {
+        <button class="option-card" (click)="selectSubLevel(subLevel)" [attr.data-level]="subLevel.id">
+            <h3>{{ subLevel.name }}</h3>
+        </button>
+        }
+    </div>
+    }
+</div>

@@ -1,9 +1,9 @@
 // question-list.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AdminService } from '../../../services/admin.service';
-import { Question } from '../../../models/question-bank.model';
+import { QuestionBankApiService } from '../../../services/question-bank-api.service';
+import { Question, QuestionPage } from '../../../models/question-bank.model';
 import Swal from 'sweetalert2';
 import { Router, RouterModule } from '@angular/router';
 
@@ -205,10 +205,11 @@ import { Router, RouterModule } from '@angular/router';
   `
 })
 export class QuestionListComponent implements OnInit {
-  constructor(private adminService: AdminService,
-    private router: Router
+  constructor(private adminService: QuestionBankApiService,
+    private router: Router,
+    private cd: ChangeDetectorRef
   ) {}
-  questionsData: Question[] = [];
+  questionsData!: QuestionPage;
 
   // filteredQuestions: Question[] = [];
   // searchTerm: string = '';
@@ -217,6 +218,7 @@ export class QuestionListComponent implements OnInit {
   ngOnInit(): void {
     // this.filterQuestions();
     this.getAllQuestions()
+    console.log('2020',this.questionsData)
 
   }
 
@@ -224,8 +226,13 @@ export class QuestionListComponent implements OnInit {
     this.adminService.getAllQuestions().subscribe({
       next: (data) => {
         this.questionsData = data
+        this.cd.detectChanges()
+        console.log('230', data)
+      }, error: (err) => {
+        console.log(err)
       }
     })
+    
   }
 
 
@@ -258,7 +265,7 @@ export class QuestionListComponent implements OnInit {
   // }
 
   editQuestion(questionId: string): void {
-    this.router.navigate(['/admin/update-question', questionId])
+    this.router.navigate(['/admin/question-update', questionId])
   }
 
   deleteQuestion(questionId: string): void {
@@ -287,10 +294,6 @@ export class QuestionListComponent implements OnInit {
           }
         });
   }
-
-  // getShortId(id: string): string {
-  //   return id.substring(0, 8) + '...';
-  // }
 }
 
 

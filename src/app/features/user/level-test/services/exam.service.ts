@@ -78,7 +78,7 @@ export class TestService extends BaseService<any> {
     http: HttpClient,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
-    super(http, platformId, 'http://localhost:5005/api/Test');
+    super(http, platformId, '/Test');
   }
 
   /**

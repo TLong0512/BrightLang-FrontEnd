@@ -1,86 +1,106 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import Sortable from 'sortablejs';
-
-interface Lesson {
-    id: number;
-    type: string;
-    name: string;
-    days: number;
-    sentences: number;
-}
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { RoadMap, RoadMapElement } from "../../models/road-map.model";
+import { CommonModule } from "@angular/common";
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { RoadMapApiService } from "../../services/road-map-api.service";
+import Swal from "sweetalert2";
 
 @Component({
-    selector: 'roadmap-detail',
-    templateUrl: './roadmap-detail.html',
-    styleUrls: ['./roadmap-detail.css'],
-    imports: [ReactiveFormsModule, CommonModule],
-    standalone: true,
+  selector: 'roadmap-detail',
+  templateUrl: './roadmap-detail.html',
+  styleUrls: ['./roadmap-detail.css'],
+  imports: [ReactiveFormsModule, CommonModule],
+  standalone: true,
 })
-export class RoadMapDetailComponent implements OnInit, AfterViewInit {
-    lessons: Lesson[] = [
-        { id: 1, type: 'Practice', name: 'Dạng câu 9-10: Tìm nghĩa phần phù hợp', days: 50, sentences: 30 },
-        { id: 2, type: 'Theory', name: 'Ngữ pháp cơ bản', days: 50, sentences: 30 },
-        { id: 3, type: 'Test', name: 'Bài kiểm tra số 1', days: 50, sentences: 30 },
-    ];
+export class RoadMapDetailComponent implements OnInit {
 
-    formGroups: { [key: number]: FormGroup } = {};
+  roadMapElements!: RoadMapElement[];
+  roadMapId!: string
+  formGroups: { [key: string]: FormGroup } = {};
 
-    constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private apiService: RoadMapApiService,
+    private cd: ChangeDetectorRef
+  ) { }
 
-    ngOnInit(): void {
-        // Tạo form group cho từng lesson
-        this.lessons.forEach(lesson => {
-            this.formGroups[lesson.id] = this.fb.group({
-                days: [lesson.days],
-                sentences: [lesson.sentences]
-            });
+  ngOnInit(): void {
+    this.roadMapId = this.route.snapshot.paramMap.get('id') || '';
+    this.apiService.getRoadMapElementsByRoadMapId(this.roadMapId).subscribe({
+      next: (res) => {
+        this.roadMapElements = res;
+
+
+        // Tạo form group cho từng range duy nhất
+        this.roadMapElements.forEach(r => {
+          this.formGroups[r.range!.id!] = this.fb.group({
+            days: [r.repeatDays ?? 50],
+            sentences: [r.questionPerDay ?? 30]
+          });
         });
-    }
 
-    ngAfterViewInit(): void {
-        // Simple check for browser environment
-        if (typeof document !== 'undefined') {
-            this.initializeSortable();
-        }
-    }
+        this.cd.detectChanges();
+      }
+    });
+  }
 
-    private initializeSortable(): void {
-        const el = document.getElementById('lessonAccordion');
-        if (!el) return;
-
-        new Sortable(el, {
-            animation: 200,
-            ghostClass: 'dragging',
-            draggable: '.accordion-item',
-            handle: '.lesson-btn', // optional, chỉ kéo khi bấm header
-            onEnd: (evt) => {
-                // Optional: cập nhật thứ tự lessons array sau khi kéo
-                const oldIndex = evt.oldIndex!;
-                const newIndex = evt.newIndex!;
-                const moved = this.lessons.splice(oldIndex, 1)[0];
-                this.lessons.splice(newIndex, 0, moved);
-                console.log('Mảng lessons sau khi kéo:', this.lessons);
-            }
-        });
-    }
-
-    getData() {
-        const data = this.lessons.map(lesson => {
-            const fg = this.formGroups[lesson.id];
+  saveData() {
+    Swal.fire({
+      title: 'Bạn có chắc muốn lưu thay đổi?',
+      text: ``,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Có, lưu lại',
+      cancelButtonText: 'Hủy'
+    }).then(result => {
+      if (result.isConfirmed) {
+        const changed = this.roadMapElements
+          .map((el, index) => {
+            const fg = this.formGroups[el.range!.id!];
             return {
-                id: lesson.id,
-                type: lesson.type,
-                name: lesson.name,
-                days: fg.get('days')?.value,
-                sentences: fg.get('sentences')?.value
+              index, // thêm vị trí dòng
+              repeatDays: fg.get('days')?.value,
+              questionPerDay: fg.get('sentences')?.value,
+              dirty: fg.dirty
             };
-        });
-        console.log('Dữ liệu theo thứ tự giao diện:', data);
-    }
+          })
+          .filter(x => x.dirty); // chỉ lấy những formGroup có thay đổi
 
-    getControl(lessonId: number, controlName: 'days' | 'sentences'): FormControl {
-        return this.formGroups[lessonId].get(controlName) as FormControl;
-    }
+
+        if (changed.length > 0) {
+          changed.forEach((r) => {
+            this.apiService.updateRoadMapElement(this.roadMapId, r.index, {
+              repeatDays: r.repeatDays,
+              questionPerDay: r.questionPerDay
+            })
+          })
+          Swal.fire({
+            title: 'Thành công!',
+            text: 'Cập nhật dữ liệu thành công.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire({
+            title: 'Không có thay đổi',
+            text: 'Bạn chưa chỉnh sửa gì.',
+            icon: 'info',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+
+      }
+    });
+  }
+  getControl(rangeId: string, controlName: 'days' | 'sentences'): FormControl {
+    return this.formGroups[rangeId].get(controlName) as FormControl;
+  }
 }
+
+
+
+
