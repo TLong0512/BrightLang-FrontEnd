@@ -90,7 +90,15 @@
           { "glob": "**/*", "input": "node_modules/tinymce", "output": "/tinymce/" }],
             "styles": [
               "src/styles.scss"
-            ]
+            ],
+            "scripts": [
+      
+      "src/assets/js/jquery.min.js",
+      "src/assets/js/bootstrap.bundle.min.js",
+      "src/assets/js/jquery.sticky.js",
+      "src/assets/js/click-scroll.js",
+      "src/assets/js/custom.js"
+    ]
           }
         }
       }
