@@ -55,9 +55,14 @@ export class FlashcardComponent implements OnInit {
 
     this.vocabService.getVocabulariesByBook(this.bookId).subscribe({
       next: (res: any) => {
-        this.vocabularies = res.items;
-        this.answerVocabularies = res.items.map((v: Vocabulary) => ({ ...v }));
-        // Shuffle answer vocabularies for variety
+        this.vocabularies = res.items.map((v: Vocabulary) => ({
+          ...v,
+          front: v.front?.trim().normalize('NFC'),
+          back: v.back?.trim().normalize('NFC'),
+        }));
+
+        this.answerVocabularies = this.vocabularies.map(v => ({ ...v }));
+
         this.shuffleArray(this.answerVocabularies);
         this.currentIndex = 0;
         this.cdr.detectChanges();
@@ -170,31 +175,25 @@ export class FlashcardComponent implements OnInit {
     if (!this.currentAnswerCard) return;
 
     const normalize = (str: string) =>
-      str.trim()
+      str
+        .trim()
         .toLowerCase()
         .normalize('NFC')
-        .replace(/\s+/g, ' ');
+        .replace(/\s+/g, ' ')
+        .replace(/[^\p{L}\p{N}\s]/gu, '');
 
     const userAnswerNormalized = normalize(this.userAnswer);
     const correctAnswer = normalize(this.currentAnswerCard.front);
-
-    console.log('Raw user:', this.userAnswer);
-    console.log('Raw correct:', this.currentAnswerCard.front);
-    console.log('User normalized:', `"${userAnswerNormalized}"`);
-    console.log('Correct normalized:', `"${correctAnswer}"`);
 
     this.answerResult = userAnswerNormalized === correctAnswer;
   }
 
   handleEnterKey() {
     if (this.answerResult === null) {
-      // First enter - check answer
       this.checkAnswer();
     } else if (this.answerResult === true || (this.answerResult === false && this.showCorrectAnswer)) {
-      // Enter when answer is correct or correct answer is shown - go to next
       this.nextAnswer();
     }
-    // If answer is wrong but correct answer not shown yet, do nothing (user needs to retry or show answer)
   }
 
   retryAnswer() {
@@ -223,14 +222,13 @@ export class FlashcardComponent implements OnInit {
     if (this.answerIndex < this.answerVocabularies.length - 1) {
       this.answerIndex++;
       this.resetAnswerState();
-      // Focus back on input
-      setTimeout(() => {
-        if (this.answerInput) {
-          this.answerInput.nativeElement.focus();
-        }
-      }, 100);
+
+      // ép Angular clear state input
+      this.cdr.detectChanges();
+
+      // focus input mới
+      setTimeout(() => this.answerInput?.nativeElement.focus(), 50);
     } else {
-      // Finished all answers - show completion modal
       this.showCompletionModal = true;
     }
   }
