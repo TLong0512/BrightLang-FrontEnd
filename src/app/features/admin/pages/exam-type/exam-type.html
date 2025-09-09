@@ -1,0 +1,80 @@
+<div class="exam-type-container">
+    <div class="header">
+        <h2>Quản lý loại kỳ thi</h2>
+        <button class="btn btn-primary" (click)="openAddModal()">
+            <i class="fas fa-plus"></i> Thêm mới
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table class="exam-type-table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên loại kỳ thi</th>
+                    <th>Mô tả</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(examType of examTypes; track examType; let i = $index) {
+                <tr>
+
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ examType.name }}</td>
+                    <td>{{ examType.description }}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" (click)="openEditModal(examType)">
+                            <i class="fas fa-edit"></i> Sửa
+                        </button>
+                        <button class="btn btn-danger btn-sm" (click)="deleteExamType(examType.id!)">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </td>
+
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+     @if(showModal) {
+        <div class="modal-overlay" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>{{ isEditMode ? 'Sửa loại kỳ thi' : 'Thêm loại kỳ thi mới' }}</h3>
+                <button class="close-btn" (click)="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="name">Tên loại kỳ thi:</label>
+                        <input type="text" id="name" class="form-control" [(ngModel)]="currentExamType.name" name="name"
+                            placeholder="Nhập tên loại kỳ thi" (focus)="onFocus()">
+                        @if(contentMessage) {
+                            <div class="text-danger">{{ contentMessage }}</div>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Mô tả:</label>
+                        <textarea id="description" class="form-control" [(ngModel)]="currentExamType.description"
+                            name="description" rows="4" placeholder="Nhập mô tả cho loại kỳ thi">
+            </textarea>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+                <button class="btn btn-primary" (click)="saveExamType()">
+                    {{ isEditMode ? 'Cập nhật' : 'Thêm mới' }}
+                </button>
+            </div>
+        </div>
+    </div>
+     }
+    
+</div>

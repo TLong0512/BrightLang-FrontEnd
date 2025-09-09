@@ -137,10 +137,12 @@ export class AddQuestionComponent {
     }
   };
 
-
+  // context infor
   isForExam: boolean = false;
   passage: string = '';
   passageExplanation: string = '';
+  contextMessage = ''
+
   questions: QuestionAdd[] = [];
   imageUrl: string = '';
   audioUrl: string = '';
@@ -148,7 +150,7 @@ export class AddQuestionComponent {
   rangeId: string | null = ''
   constructor(private adminService: QuestionBankApiService,
     private cd: ChangeDetectorRef,
-    
+
     @Inject(DOCUMENT) private document: Document
   ) { }
 
@@ -157,17 +159,20 @@ export class AddQuestionComponent {
 
     // });
     this.getExamTypes()
+    this.addQuestion()
   }
+
   addQuestion(): void {
     const newQuestion: QuestionAdd = {
       content: '',
+      questionNumberMessage: '',
       explain: '',
       questionNumber: 0,
       answerList: [
-        { value: '', explain: '', isCorrect: false },
-        { value: '', explain: '', isCorrect: false },
-        { value: '', explain: '', isCorrect: false },
-        { value: '', explain: '', isCorrect: false }
+        { value: '', explain: '', isCorrect: true, answerMessage: '' },
+        { value: '', explain: '', isCorrect: false, answerMessage: '' },
+        { value: '', explain: '', isCorrect: false, answerMessage: '' },
+        { value: '', explain: '', isCorrect: false, answerMessage: '' }
       ]
     };
 
@@ -176,49 +181,65 @@ export class AddQuestionComponent {
   }
 
   removeQuestion(index: number): void {
-    if (confirm('Bạn có chắc muốn xóa câu hỏi này?')) {
-      this.questions.splice(index, 1);
-    }
+    Swal.fire({
+      title: 'Bạn có chắc muốn xoá?',
+      text: 'Dữ liệu sẽ không thể khôi phục!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Xoá',
+      cancelButtonText: 'Huỷ'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.questions.splice(index, 1);
+        this.cd.detectChanges()
+      }
+    });
+
   }
 
-  setCorrectAnswer(question: Question, answerIndex: number): void {
-    if (!question.answerList) return;
-
-    // Reset tất cả đáp án về false
-    question.answerList.forEach(answer => answer.isCorrect = false);
-
-    // Đặt đáp án được chọn là đúng
-    if (question.answerList[answerIndex]) {
-      question.answerList[answerIndex].isCorrect = true;
+  isValid(): boolean {
+    let isValid = true
+    let skillLevel = this.skillLevels.find(s => s.id = this.selectedSkillLevel)
+    if (skillLevel?.skillName == 'Nghe') {
+      if (!this.passage.includes('audio')) {
+        this.contextMessage = 'Vui lòng nhập audio'
+        isValid = false
+      }
     }
+    this.questions.forEach(q => {
+      console.log(210, q)
+      if (q.questionNumber?.toString() == '' || q.questionNumber == 0) {
+        q.questionNumberMessage = 'Vui lòng nhập số'
+        isValid = false
+      }
+      q.answerList?.forEach(a => {
+        if (a.value?.trim() == '') {
+          a.answerMessage = 'Vui lòng nhập câu trả lời'
+          isValid = false
+        }
+      })
+      // 2. Kiểm tra trùng nhau (chỉ khi không rỗng)
+      const normalizedValues = q.answerList
+        ?.map(a => a.value?.trim().toLowerCase())
+        .filter(v => v); // bỏ null/empty
+
+      if (normalizedValues) {
+        q.answerList?.forEach((a, idx) => {
+          const val = a.value?.trim().toLowerCase();
+          if (val && normalizedValues.filter(v => v === val).length > 1) {
+            a.answerMessage = 'Câu trả lời này bị trùng';
+            isValid = false;
+          }
+        });
+      }
+    })
+    return isValid
   }
-  
-
-  // isFormValid(): boolean {
-  //   if (!this.passage.trim()) {
-  //     return false;
-  //   }
-
-  //   if (this.questions.length === 0) {
-  //     return false;
-  //   }
-
-  //   return true
-  //   // Check if all questions have required fields
-  //   // return this.questions.every(question => {
-  //   //   const hasQuestionText = question.content.trim().length > 0;
-  //   //   const hasCorrectAnswer = question.answers.some(answer => answer.isCorrect);
-  //   //   const hasAnswerTexts = question.answers.every(answer => answer.text.trim().length > 0);
-
-  //   //   return hasQuestionText && hasCorrectAnswer && hasAnswerTexts;
-  //   // });
-  // }
 
   saveQuestions(): void {
-    // if (!this.isFormValid()) {
-    //   alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-    //   return;
-    // }
+    if (!this.isValid()) {
+      return;
+    }
 
 
     const context: Context = {
@@ -300,9 +321,7 @@ export class AddQuestionComponent {
     this.cd.detectChanges();
   }
 
-  /**
-   * Xử lý khi thay đổi level
-   */
+  /** Xử lý khi thay đổi level */
   onLevelChange(): void {
     this.getSkillLevels();
     // FIX: Reset tất cả các selection phía sau
@@ -313,9 +332,7 @@ export class AddQuestionComponent {
     this.cd.detectChanges();
   }
 
-  /**
-   * Xử lý khi thay đổi skill level
-   */
+  /** Xử lý khi thay đổi skill level */
   onSkillLevelChange(): void {
 
     // FIX: Reset range selection
@@ -325,7 +342,27 @@ export class AddQuestionComponent {
     this.cd.detectChanges();
   }
 
+  setCorrectAnswer(question: Question, answerIndex: number): void {
+    if (!question.answerList) return;
 
+    // Reset tất cả đáp án về false
+    question.answerList.forEach(answer => answer.isCorrect = false);
 
+    // Đặt đáp án được chọn là đúng
+    if (question.answerList[answerIndex]) {
+      question.answerList[answerIndex].isCorrect = true;
+    }
+  }
 
+  onFocus(input: string, questionIndex?: number, answerIndex?: number) {
+    console.log(input)
+    if (input == 'passage') {
+      this.contextMessage = ''
+    } else if (input == 'questionNumber') {
+      this.questions![questionIndex!].questionNumberMessage = ''
+    } else if (input == 'answer') {
+      console.log(questionIndex, answerIndex)
+      this.questions![questionIndex!]!.answerList![answerIndex!].answerMessage = ''
+    }
+  }
 }
