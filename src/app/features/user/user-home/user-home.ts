@@ -10,4 +10,8 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
 
 })
 
-export class UserHomeComponent {}
+export class UserHomeComponent{
+    scrollTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+}

@@ -20,6 +20,11 @@ export class UserHeaderComponent {
   ) { }
 
   private destroyRef = inject(DestroyRef);
+
+  scrollTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
   onLogout() {
     this.authService.logout()
       .pipe(takeUntilDestroyed(this.destroyRef))
