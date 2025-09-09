@@ -144,7 +144,7 @@ import { map, Observable } from 'rxjs';
                        placeholder="1"
                        (focus)="onFocus('start')"
                        onlyDigits [maxNumber]="50" [minNumber]="1"
-                       [class.error]="startMessage || compareMessage">
+                       [class.error]="startMessage || compareMessage" (wheel)="onWheel($event)">
                 <div class="input-icon">🔢</div>
               </div>
               <div class="error-message" *ngIf="startMessage">{{ startMessage }}</div>
@@ -162,7 +162,8 @@ import { map, Observable } from 'rxjs';
                        placeholder="10"
                        (focus)="onFocus('end')"
                        onlyDigits [maxNumber]="50" [minNumber]="1"
-                       [class.error]="endMessage || compareMessage">
+                       [class.error]="endMessage || compareMessage"
+                       (wheel)="onWheel($event)">
                 <div class="input-icon">🔢</div>
               </div>
               <div class="error-message" *ngIf="endMessage">{{ endMessage }}</div>
@@ -992,5 +993,10 @@ export class ExamQuestionTypeComponent implements OnInit {
   // Track by range (dùng cho ranges)
   trackByRange(index: number, item: any): any {
     return index; // chỉ cần index là đủ vì ranges thường là mảng số hoặc object nhỏ
+  }
+
+  onWheel(event: WheelEvent) {
+    (event.target as HTMLElement).blur(); // bỏ focus khỏi input
+    event.preventDefault(); // chặn thay đổi giá trị khi scroll
   }
 }

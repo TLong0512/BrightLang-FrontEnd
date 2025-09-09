@@ -208,8 +208,8 @@ export class AddQuestionComponent {
       }
     }
     this.questions.forEach(q => {
-      console.log(210, q)
-      if (q.questionNumber?.toString() == '' || q.questionNumber == 0) {
+      console.log(211, q)
+      if (q.questionNumber?.toString().trim() == '' || q.questionNumber == 0) {
         q.questionNumberMessage = 'Vui lòng nhập số'
         isValid = false
       }
@@ -239,6 +239,12 @@ export class AddQuestionComponent {
 
   saveQuestions(): void {
     if (!this.isValid()) {
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Có lỗi xảy ra vui lòng kiểm tra lại!',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
       return;
     }
 
@@ -266,8 +272,11 @@ export class AddQuestionComponent {
           this.passage = ''
           this.passageExplanation = ''
           this.questions = []
-          this.cd.detectChanges()
+          this.contextMessage = ''
           this.addQuestion()
+
+          this.cd.detectChanges()
+
         });
       },
       error: (error) => {
@@ -366,4 +375,10 @@ export class AddQuestionComponent {
       this.questions![questionIndex!]!.answerList![answerIndex!].answerMessage = ''
     }
   }
+
+  onWheel(event: WheelEvent) {
+    (event.target as HTMLElement).blur(); // bỏ focus khỏi input
+    event.preventDefault(); // chặn thay đổi giá trị khi scroll
+  }
+
 }

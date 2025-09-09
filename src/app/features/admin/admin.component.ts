@@ -18,9 +18,6 @@ import { BerryConfig } from '../../../app-config';
 })
 export class AdminComponent implements AfterViewInit {
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-
-
-
   }
   private location = inject(Location);
   private locationStrategy = inject(LocationStrategy);
