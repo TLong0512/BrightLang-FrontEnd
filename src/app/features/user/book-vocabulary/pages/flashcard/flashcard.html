@@ -79,7 +79,7 @@
 
       <div class="answer-input-container w-100" style="max-width: 500px;">
         <input #answerInput type="text" class="form-control form-control-lg text-center" [(ngModel)]="userAnswer"
-          (keyup.enter)="handleEnterKey()" placeholder="Nhập nghĩa tiếng Hàn..."
+          (keydown.enter)="handleEnterKey()" placeholder="Nhập nghĩa tiếng Hàn..."
           [class.is-valid]="answerResult === true" [class.is-invalid]="answerResult === false && showCorrectAnswer"
           [disabled]="answerResult === true">
 
@@ -109,7 +109,7 @@
             <strong>Đáp án đúng:</strong> <strong>{{ currentAnswerCard?.front }}</strong>
           </div>
 
-          <button #nextButton class="btn btn-primary btn-lg px-5" (click)="nextAnswer()" (keyup.enter)="nextAnswer()">
+          <button #nextButton class="btn btn-primary btn-lg px-5" (click)="nextAnswer()" (keydown.enter)="nextAnswer()">
             {{ isLastAnswer() ? 'Hoàn thành 🏆' : 'Tiếp theo →' }}
           </button>
         </div>
