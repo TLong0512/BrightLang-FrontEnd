@@ -294,6 +294,6 @@ export class UpdateQuestionComponent implements OnInit {
             error: err => {
                 console.log(err)
             }
-        })   
+        })
     }
 }
