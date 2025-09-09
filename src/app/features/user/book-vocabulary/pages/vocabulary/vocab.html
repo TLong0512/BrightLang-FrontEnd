@@ -58,18 +58,27 @@
                   <span *ngIf="editingVocabId !== vocab.id && vocab.id !== ''">{{ vocab.back }}</span>
                 </td>
                 <td class="text-center">
+                  <!-- Nếu là dòng đang thêm mới -->
                   <button *ngIf="vocab.id === ''" class="btn btn-sm btn-success me-2" (click)="saveNewVocab(vocab)">
                     <i class="bi bi-check"></i>
                   </button>
+                  <button *ngIf="vocab.id === ''" class="btn btn-sm btn-outline-danger" (click)="cancelNewVocab(vocab)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+
+                  <!-- Nếu đang chỉnh sửa -->
                   <button *ngIf="editingVocabId === vocab.id" class="btn btn-sm btn-success me-2"
                     (click)="saveEditVocab(vocab)">
                     <i class="bi bi-check"></i>
                   </button>
+
+                  <!-- Nếu là vocab bình thường -->
                   <button *ngIf="vocab.id !== '' && editingVocabId !== vocab.id"
                     class="btn btn-sm btn-outline-primary me-2" (click)="editVocab(vocab)">
                     <i class="bi bi-pencil"></i>
                   </button>
-                  <button class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(vocab)">
+                  <button *ngIf="vocab.id !== ''" class="btn btn-sm btn-outline-danger"
+                    (click)="openDeleteModal(vocab)">
                     <i class="bi bi-trash"></i>
                   </button>
                 </td>

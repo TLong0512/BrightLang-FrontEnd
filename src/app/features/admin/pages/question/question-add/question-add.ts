@@ -199,7 +199,7 @@ export class AddQuestionComponent {
 
   isValid(): boolean {
     let isValid = true
-    let skillLevel = this.skillLevels.find(s => s.id = this.selectedSkillLevel)
+    let skillLevel = this.skillLevels.find(s => s.id == this.selectedSkillLevel)
     if (skillLevel?.skillName == 'Nghe') {
       if (!this.passage.includes('audio')) {
         this.contextMessage = 'Vui lòng nhập audio'

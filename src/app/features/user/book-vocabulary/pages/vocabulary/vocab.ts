@@ -68,6 +68,11 @@ export class VocabularyComponent implements OnInit {
     this.isAddingNew = true;
   }
 
+  cancelNewVocab(vocab: Vocabulary) {
+  this.vocabularies = this.vocabularies.filter(v => v !== vocab);
+  this.isAddingNew = false;
+}
+
   saveNewVocab(vocab: Vocabulary) {
     this.vocabService.addVocabulary(vocab).subscribe({
       next: () => {
