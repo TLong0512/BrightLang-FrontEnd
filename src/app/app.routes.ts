@@ -76,12 +76,12 @@ export const routes: Routes = [
       { path: 'test-ready', component: TestReadyComponent },
       { path: 'test-question', component: TestQuestionsComponent },
       { path: 'test-result', component: TestResultComponent },
-      { path: 'test-review/:testId', component: TestReviewComponent},
-      { path: 'test-history', component: TestHistoryComponent},
+      { path: 'test-review/:testId', component: TestReviewComponent },
+      { path: 'test-history', component: TestHistoryComponent },
       { path: '', component: UserHomeComponent },
       { path: 'topik-detail', component: TopicsDetail },
       { path: 'book', component: BookComponent },
-      { path: 'vocab/:id', component: VocabularyComponent },
+      { path: 'vocab/:bookId', component: VocabularyComponent },
       { path: 'flashcard/:bookId', component: FlashcardComponent },
 
       { path: 'result-screen', component: ResultComponent },
@@ -117,11 +117,11 @@ export const routes: Routes = [
       const userState = inject(UserState);
       return userState.currentUser$.pipe(
         map(user => {
-        if (user == null) {
-          return true; // cho phép đi tiếp
-        }
-        return router.parseUrl('/home-user'); // redirect an toàn
-      })
+          if (user == null) {
+            return true; // cho phép đi tiếp
+          }
+          return router.parseUrl('/home-user'); // redirect an toàn
+        })
       )
     }],
     component: AuthComponent,
