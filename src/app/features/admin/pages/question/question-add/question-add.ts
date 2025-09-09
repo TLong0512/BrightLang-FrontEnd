@@ -201,7 +201,8 @@ export class AddQuestionComponent {
     let isValid = true
     let skillLevel = this.skillLevels.find(s => s.id == this.selectedSkillLevel)
     if (skillLevel?.skillName == 'Nghe') {
-      if (!this.passage.includes('audio')) {
+      console.log(204, this.passage)
+      if (!this.passage.includes('</audio>')) {
         this.contextMessage = 'Vui lòng nhập audio'
         isValid = false
       }

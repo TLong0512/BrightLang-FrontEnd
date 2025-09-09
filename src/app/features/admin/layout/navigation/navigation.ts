@@ -38,7 +38,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Dạng bài thi',
         type: 'item',
         classes: 'nav-item',
-        url: '/admin/question-type',
+        url: '/admin/exam-type',
         icon: 'ti ti-typography'
       },
       {
