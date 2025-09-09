@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 
 export interface RoadmapGeneralDto {
   id: string;
@@ -43,7 +44,7 @@ export interface UserRoadmapDetailDto {
   providedIn: 'root'
 })
 export class RoadmapService {
-  private baseUrl = 'your-api-base-url'; // Thay thế bằng URL API thực tế
+  private baseUrl = `${environment.apiUrlRoadMap}`
 
   constructor(private http: HttpClient) {}
 
@@ -53,6 +54,6 @@ export class RoadmapService {
   }
 
   createUserRoadmap(userRoadmapDto: UserRoadmapPostDto): Observable<UserRoadmapDetailDto> {
-    return this.http.post<UserRoadmapDetailDto>(`${this.baseUrl}/user-roadmaps`, userRoadmapDto);
+    return this.http.post<UserRoadmapDetailDto>(`${this.baseUrl}/userroadmaps`, userRoadmapDto);
   }
 }

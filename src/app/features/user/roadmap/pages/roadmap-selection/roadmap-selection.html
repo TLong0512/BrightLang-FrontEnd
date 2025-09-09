@@ -1,0 +1,69 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-12 text-center mb-5">
+      <h2 class="display-6 fw-bold text-dark">Chọn Lộ Trình Học Tập</h2>
+      <p class="lead text-muted">Lựa chọn gói học phù hợp với khả năng và mục tiêu của bạn</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    @for(plan of pricingPlans; track plan.id) {
+      <div class="col-md-4 mb-4">
+        <div class="card pricing-card h-100" [class.popular]="plan.isPopular">
+          <div class="card-body d-flex flex-column">
+            <!-- Header -->
+            <div class="text-center mb-4">
+              <h5 class="card-title plan-title">{{ plan.title }}</h5>
+              <div class="price-section">
+                <span class="price">{{ plan.price }}</span>
+                <span class="price-currency">{{ plan.period }}</span>
+              </div>
+            </div>
+            
+            <!-- Features List -->
+            <ul class="features-list flex-grow-1">
+              @for(feature of plan.features; track $index) {
+                <li class="feature-item">
+                  <i class="bi bi-check-circle-fill text-success me-2"></i>
+                  {{ feature }}
+                </li>
+              }
+            </ul>
+            
+            <!-- Button -->
+            <div class="mt-auto">
+              <button 
+                type="button" 
+                class="btn btn-select w-100" 
+                [class.btn-popular]="plan.isPopular"
+                [disabled]="isLoading"
+                (click)="onSelectPlan(plan.id)">
+                @if (isLoading) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Đang tạo...
+                } @else {
+                  {{ plan.buttonText }}
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (pricingPlans.length === 0) {
+    <div class="row justify-content-center">
+      <div class="col-md-6 text-center">
+        <div class="alert alert-warning" role="alert">
+          <h4 class="alert-heading">Không tìm thấy lộ trình!</h4>
+          <p>Hiện tại chưa có lộ trình phù hợp với level bạn đã chọn.</p>
+          <hr>
+          <button class="btn btn-primary" (click)="router.navigate(['/level-test-entry'])">
+            Quay lại chọn level
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
