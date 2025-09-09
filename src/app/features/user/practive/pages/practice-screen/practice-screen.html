@@ -85,8 +85,7 @@
           </div>
 
           <!-- Image Context -->
-          <div class="image-container" *ngIf="getImageUrl(currentQuestion?.contextInformation?.content) as imageUrl"
-            style="width: 100px; height: 100px;">
+          <div class="image-container" *ngIf="getImageUrl(currentQuestion?.contextInformation?.content) as imageUrl">
             <img [src]="imageUrl" alt="Context Image" class="context-image"
               (error)="$event.target.style.display='none'">
           </div>
@@ -120,8 +119,7 @@
                     <span class="option-number">{{ (i+1) }}</span>
                   </div>
                   <div class="option-content">
-                    <div class="option-text image-container" [innerHTML]="getSafeHtml(answer.value)"
-                      style="width: 500px; height: 500px; border: 2px solid black;"></div>
+                    <span class="option-text" [innerHTML]="getSafeHtml(answer.value)"></span>
                   </div>
                   <div class="option-indicator" *ngIf="selectedAnswerId === answer.id">
                     <i class="bi bi-check-circle-fill"></i>
@@ -214,7 +212,7 @@
 
       <div class="modal-body">
         <h3 class="modal-title">Nộp bài luyện tập</h3>
-        <p class="modal-message" *ngIf="answeredCount < questions.length">
+        <p class="modal-message" *ngIf="answeredCount questions.length">
           Bạn còn {{ questions.length - answeredCount }} câu chưa trả lời.
           Bạn có chắc chắn muốn nộp bài không?
         </p>
