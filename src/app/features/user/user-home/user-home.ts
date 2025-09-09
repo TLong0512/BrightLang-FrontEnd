@@ -3,11 +3,13 @@ import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { HttpClient } from "@angular/common/http";
 
 @Component({
+
   selector: 'user-home',
   standalone: true,
   templateUrl: 'user-home.html',
   styleUrl: 'user-home.css',
   imports: [RouterLinkActive, RouterLink]
+
 })
 export class UserHomeComponent {
   constructor(private router: Router, private http: HttpClient) {}
