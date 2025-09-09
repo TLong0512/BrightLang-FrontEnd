@@ -35,9 +35,8 @@ export class VocabularyComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-
     this.route.paramMap.subscribe(params => {
-      const id = params.get('vocabId');
+      const id = params.get('bookId');
       if (id) {
         this.bookId = id;
         this.loadVocabularies();
@@ -49,7 +48,6 @@ export class VocabularyComponent implements OnInit {
       next: (data: any) => {
         this.vocabularies = data.items;
         this.cd.detectChanges();
-        console.log('konnichiwa', this.vocabularies)
       },
       error: (err) => {
         console.error('Lỗi khi load vocab:', err);
@@ -70,7 +68,7 @@ export class VocabularyComponent implements OnInit {
   saveNewVocab(vocab: Vocabulary) {
     this.vocabService.addVocabulary(vocab).subscribe({
       next: () => {
-        this.loadVocabularies(); // 👈 load lại để có id thật
+        this.loadVocabularies();
       },
       error: err => console.error(err)
     });

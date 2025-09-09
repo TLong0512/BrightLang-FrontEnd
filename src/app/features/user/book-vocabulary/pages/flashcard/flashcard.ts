@@ -138,6 +138,7 @@ export class FlashcardComponent implements OnInit {
       }, 100);
     }
     this.isTransitioning = false;
+    this.cdr.detectChanges();
   }
 
   prevCard() {

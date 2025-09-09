@@ -128,6 +128,4 @@ export class BookComponent implements OnInit {
       error: (err) => console.error("Lỗi khi thêm book:", err)
     });
   }
-
-
 }
