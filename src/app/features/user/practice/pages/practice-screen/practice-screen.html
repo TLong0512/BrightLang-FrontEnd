@@ -212,7 +212,7 @@
 
       <div class="modal-body">
         <h3 class="modal-title">Nộp bài luyện tập</h3>
-        <p class="modal-message" *ngIf="answeredCount questions.length">
+        <p class="modal-message" *ngIf="answeredCount < questions.length">
           Bạn còn {{ questions.length - answeredCount }} câu chưa trả lời.
           Bạn có chắc chắn muốn nộp bài không?
         </p>
