@@ -38,11 +38,11 @@
           <!-- Action Buttons -->
           <div class="position-absolute top-0 end-0 m-3 opacity-75">
             <div class="btn-group" role="group">
-              <button class="btn btn-sm btn-outline-primary rounded-pill me-1" (click)="editBook(book, $event)"
+              <button class="btn btn-sm btn-outline-primary rounded-pill me-1 book-edit" (click)="editBook(book, $event)"
                 style="width: 35px; height: 35px;">
                 <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-sm btn-outline-danger rounded-pill" (click)="deleteBook(book.id, $event)"
+              <button class="btn btn-sm btn-outline-danger rounded-pill book-edit" (click)="deleteBook(book.id, $event)"
                 style="width: 35px; height: 35px;">
                 <i class="bi bi-trash"></i>
               </button>
