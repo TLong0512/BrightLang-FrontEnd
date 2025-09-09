@@ -133,7 +133,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
           timer: 2000,
           timerProgressBar: true
         }).then(() => {
-          this.router.navigate(['/auth']);
+          this.router.navigate(['/admin']);
         });
       },
       error: err => {
