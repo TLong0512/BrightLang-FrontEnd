@@ -265,9 +265,9 @@ export class UpdateQuestionComponent implements OnInit {
     updateQuestion(): void {
         let questionUpdate: QuestionUpdate = {
             questionNumber: this.questionDto.questionInformation?.questionNumber || 0,
-            content: this.questionDto.questionInformation?.content || '',
-            explain: this.questionDto.questionInformation?.explain || '',
-            context: {
+            content: this.questionDto.questionInformation!.content || '',
+            explain: this.questionDto.questionInformation!.explain || '',
+            contextUpdate: {
                 content: this.questionDto.contextInformation?.content,
                 explain: this.questionDto.contextInformation?.explain,
                 isBelongTest: this.questionDto.contextInformation?.isBelongTest
@@ -294,6 +294,6 @@ export class UpdateQuestionComponent implements OnInit {
             error: err => {
                 console.log(err)
             }
-        })   
+        })
     }
 }
