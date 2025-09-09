@@ -1,24 +1,46 @@
-<div class="container mt-4">
-  <h2 class="mb-3">Chọn Level để bắt đầu</h2>
-
-  <div class="mb-3">
-    <label for="levelSelect" class="form-label">Chọn level</label>
-    <select
-      id="levelSelect"
-      class="form-select"
-      [(ngModel)]="selectedLevel"
-    >
-      <option value="" disabled selected>-- Chọn level --</option>
-      <option value="beginner">Beginner</option>
-      <option value="intermediate">Intermediate</option>
-      <option value="advanced">Advanced</option>
-    </select>
-  </div>
-
-  <button
-    class="btn btn-primary"
-    (click)="startTest()"
-  >
-    Start Test
-  </button>
-</div>
+<div class="container-fluid d-flex justify-content-center align-items-center min-vh-100">
+      <div class="card shadow-lg entry-card">
+        <div class="card-body text-center p-5">
+          <h4 class="mb-4 title">BÀI TEST TRÌNH ĐỘ TOPIK</h4>
+          
+          <div class="mb-4">
+            <label class="form-label fw-bold">TÔI BIẾT TRÌNH ĐỘ CỦA MÌNH:</label>
+            <select 
+              class="form-select level-select" 
+              [(ngModel)]="selectedLevel" 
+              (change)="onLevelChange()">
+              <option value="">Chọn cấp độ TOPIK</option>
+              @for (level of topikLevels; track level.value) {
+                <option [value]="level.value">{{ level.label }}</option>
+              }
+            </select>
+            @if (selectedLevel()) {
+              <small class="text-muted mt-2 d-block">
+                {{ getLevelDescription(selectedLevel()) }}
+              </small>
+            }
+          </div>
+          
+          <div class="d-grid gap-3">
+            <button 
+              class="btn btn-primary btn-lg roadmap-button" 
+              (click)="goToRoadmap()" 
+              [disabled]="!selectedLevel()">
+              <i class="fas fa-route me-2"></i>
+              XÂY DỰNG LỘ TRÌNH HỌC TẬP
+            </button>
+            
+            <div class="divider my-3">
+              <span class="divider-text">HOẶC</span>
+            </div>
+            
+            <button 
+              class="btn btn-outline-secondary btn-lg test-button" 
+              (click)="startTest()">
+              <i class="fas fa-clipboard-list me-2"></i>
+              KIỂM TRA TRÌNH ĐỘ (TEST)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
