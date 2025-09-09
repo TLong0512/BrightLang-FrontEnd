@@ -25,8 +25,6 @@ import { PracticeComponent } from './features/user/practive/pages/practice-scree
 import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
 
-import { AdminComponent } from './shared/admin/admin';
-import { RoleGuard } from './guards/auth.guard';
 import { TestReviewComponent } from './features/user/level-test/pages/test-review/test-review';
 import { TestHistoryComponent } from './features/user/level-test/pages/test-history/test-history';
 import { UserState } from './features/auth/services/user.state';
@@ -37,10 +35,6 @@ import { ResultComponent } from './features/user/practive/pages/result-screen/re
 import { RoadmapComponent } from './features/user/roadmap/pages/roadmap/roadmap';
 
 // 👇 import guards
-
-
-
-
 export const routes: Routes = [
 
   {
@@ -83,12 +77,12 @@ export const routes: Routes = [
       { path: 'test-ready', component: TestReadyComponent },
       { path: 'test-question', component: TestQuestionsComponent },
       { path: 'test-result', component: TestResultComponent },
-      { path: 'test-review/:testId', component: TestReviewComponent},
-      { path: 'test-history', component: TestHistoryComponent},
+      { path: 'test-review/:testId', component: TestReviewComponent },
+      { path: 'test-history', component: TestHistoryComponent },
       { path: '', component: UserHomeComponent },
       { path: 'topik-detail', component: TopicsDetail },
       { path: 'book', component: BookComponent },
-      { path: 'vocab/:id', component: VocabularyComponent },
+      { path: 'vocab/:bookId', component: VocabularyComponent },
       { path: 'flashcard/:bookId', component: FlashcardComponent },
 
       { path: 'result-screen', component: ResultComponent },
@@ -106,8 +100,6 @@ export const routes: Routes = [
         path: 'topik-sublevel/:examTypeId',
         component: TopikSubLevelSelectionComponent
       },
-
-      
       {
         path: '',
         component: UserHomeComponent
@@ -128,11 +120,11 @@ export const routes: Routes = [
       const userState = inject(UserState);
       return userState.currentUser$.pipe(
         map(user => {
-        if (user == null) {
-          return true; // cho phép đi tiếp
-        }
-        return router.parseUrl('/home-user'); // redirect an toàn
-      })
+          if (user == null) {
+            return true; // cho phép đi tiếp
+          }
+          return router.parseUrl('/home-user'); // redirect an toàn
+        })
       )
     }],
     component: AuthComponent,
@@ -162,8 +154,8 @@ export const routes: Routes = [
 
   {
     path: 'admin',
-    canActivate: [RoleGuard], 
-    data: { roles: ['Admin'] },
+    // canActivate: [RoleGuard], 
+    // data: { roles: ['Admin'] },
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   }
 ];

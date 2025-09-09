@@ -4,7 +4,7 @@
         <div class="header-content">
             <h1 class="result-title">
                 <i class="bi bi-clipboard-check"></i>
-                Kết Quả Luyện Tập
+                Kết quả luyện tập
             </h1>
             <p class="result-subtitle">{{ performanceMessage }}</p>
         </div>
@@ -89,11 +89,6 @@
             <button class="action-btn outline" (click)="startNewPractice()">
                 <i class="bi bi-plus-circle"></i>
                 Bài mới
-            </button>
-
-            <button class="action-btn info" (click)="shareResult()">
-                <i class="bi bi-share"></i>
-                Chia sẻ
             </button>
 
             <button class="action-btn success" (click)="goHome()">
@@ -301,12 +296,5 @@
             </div>
         </div>
 
-        <!-- Additional Actions -->
-        <div class="additional-actions" *ngIf="showExplanations">
-            <button class="utility-btn" (click)="downloadResult()">
-                <i class="bi bi-download"></i>
-                Tải kết quả
-            </button>
-        </div>
     </div>
 </div>

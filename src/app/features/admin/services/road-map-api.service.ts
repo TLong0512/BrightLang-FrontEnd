@@ -22,7 +22,7 @@ export class RoadMapApiService {
   }
 
   updateRoadMapElement(roadMapId: string, index: number, data: RoadMapElement) {
-    return this.http.post<void>(`/RoadmapElementRanges/${roadMapId}/${index}`, data, { withCredentials: true });
+    return this.http.put<void>(`/RoadmapElementRanges/${roadMapId}/${index}`, data, { withCredentials: true });
   }
 //   getSkillLevelsByLevelId(id: string): Observable<SkillLevel[]> {
 //     return this.http.get<SkillLevel[]>(`${this.apiUrl}/SkillLevel/filter/level/${id}`);

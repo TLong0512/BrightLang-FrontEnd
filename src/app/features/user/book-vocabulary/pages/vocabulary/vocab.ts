@@ -26,6 +26,7 @@ export class VocabularyComponent implements OnInit {
   editingVocabId: string | null = null;
   isDeleteModalOpen = false;
   selectedVocab: Vocabulary | null = null;
+   isAddingNew = false;
 
   constructor(
     private vocabService: VocabService,
@@ -35,9 +36,8 @@ export class VocabularyComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-
     this.route.paramMap.subscribe(params => {
-      const id = params.get('vocabId');
+      const id = params.get('bookId');
       if (id) {
         this.bookId = id;
         this.loadVocabularies();
@@ -49,7 +49,6 @@ export class VocabularyComponent implements OnInit {
       next: (data: any) => {
         this.vocabularies = data.items;
         this.cd.detectChanges();
-        console.log('konnichiwa', this.vocabularies)
       },
       error: (err) => {
         console.error('Lỗi khi load vocab:', err);
@@ -65,17 +64,28 @@ export class VocabularyComponent implements OnInit {
     };
 
     this.vocabularies.unshift(newVocab);
+
+    this.isAddingNew = true;
   }
+
+  cancelNewVocab(vocab: Vocabulary) {
+  this.vocabularies = this.vocabularies.filter(v => v !== vocab);
+  this.isAddingNew = false;
+}
 
   saveNewVocab(vocab: Vocabulary) {
     this.vocabService.addVocabulary(vocab).subscribe({
-      next: (res: Vocabulary) => {
-        vocab.id = res.id;
-        this.cd.detectChanges();
+      next: () => {
+        this.loadVocabularies();
+        this.isAddingNew = false;
       },
-      error: err => console.error(err)
+      error: err => {
+        console.error(err);
+        this.isAddingNew = false;
+      }
     });
   }
+
 
   editVocab(vocab: Vocabulary) {
     console.log("Sửa vocab:", vocab);
@@ -100,6 +110,7 @@ export class VocabularyComponent implements OnInit {
     this.selectedVocab = null;
     this.isDeleteModalOpen = false;
   }
+
   confirmDeleteVocab() {
     if (this.selectedVocab) {
       this.vocabService.deleteVocabulary(this.selectedVocab.id).subscribe({
@@ -113,23 +124,13 @@ export class VocabularyComponent implements OnInit {
     }
   }
 
-  // deleteVocab(id: string) {
-  //   if(confirm("Bạn có chắc chắn muốn xoá từ này?")) {
-  //     this.vocabService.deleteVocabulary(id).subscribe({
-  //       next: () => {
-  //           this.vocabularies = this.vocabularies.filter(v => v.id !== id);
-  //         },
-  //         error: err => console.error(err)   
-  //       });
-  //   }
-  // }
   startLearning() {
     if (this.vocabularies.length > 0) {
       this.router.navigate(['/home-user/flashcard', this.bookId]);
-      // , {
-      //   state: { vocabs: this.vocabularies }
-      // });;
     }
   }
 
+  goBackToBooks() {
+    this.router.navigate(['/home-user/book']);
+  }
 }
