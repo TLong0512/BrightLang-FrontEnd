@@ -37,15 +37,15 @@
 
             </ul>
             <div class="d-none d-lg-block dropdown">
-                <a href="#" class="navbar-icon bi-person" id="userDropdown" data-bs-toggle="dropdown"
-                    aria-expanded="false"></a>
+                <a href="#" class="navbar-icon bi-person" id="userDropdown" (click)="$event.preventDefault()">
+                </a>
 
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                     <li><a class="dropdown-item" href="#">Profile</a></li>
-
                     <li><a class="dropdown-item" (click)="onLogout()">Đăng xuất</a></li>
                 </ul>
             </div>
+
         </div>
     </div>
 </nav>
