@@ -6,3 +6,8 @@
 .navbar.sticky-header {
     background-color: #80d0c7 !important;
 }
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+  margin-top: 0;
+}
