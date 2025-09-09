@@ -264,7 +264,7 @@ export class UpdateQuestionComponent implements OnInit {
 
     updateQuestion(): void {
         let questionUpdate: QuestionUpdate = {
-            questionNumber: this.questionDto.questionInformation?.questionNumber || 0,
+            questionNumber: this.questionDto.questionInformation!.questionNumber || 0,
             content: this.questionDto.questionInformation!.content || '',
             explain: this.questionDto.questionInformation!.explain || '',
             contextUpdate: {

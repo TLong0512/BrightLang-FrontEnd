@@ -1,4 +1,3 @@
-// question-list.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -9,294 +8,197 @@ import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-question-list',
-  templateUrl: './question-list.html',
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
-  styles: `
-  /* question-list.component.css */
-.question-list-container {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+  template: `
+    <div class="question-list-wrapper">
+      <!-- Header Section -->
+      <div class="header-section">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h1 class="page-title">
+                <i class="fas fa-question-circle me-3"></i>
+                Danh sách câu hỏi
+              </h1>
+              <p class="page-subtitle">Quản lý tất cả câu hỏi trong ngân hàng đề</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <div class="stats-card">
+                <div class="stats-number"></div>
+                <div class="stats-label">Tổng câu hỏi</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-.header-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 3rem 0;
-  margin-bottom: 2rem;
-  border-radius: 0 0 30px 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
+      <!-- Main Content -->
+      <div class="container">
+        <!-- Add Button Section -->
+        <div class="add-question-section">
+          <button 
+            type="button" 
+            class="btn-add-question"
+            routerLink="/admin/question-add">
+            <i class="fas fa-plus me-2"></i>
+            Thêm câu hỏi mới
+          </button>
+        </div>
 
-.question-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-  margin-bottom: 2rem;
-}
+        <!-- Questions Content -->
+        @if(!questionsData?.items) {
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-clipboard-question"></i>
+            </div>
+            <h3 class="empty-title">Chưa có câu hỏi nào</h3>
+            <p class="empty-description">Hãy tạo câu hỏi đầu tiên để bắt đầu xây dựng ngân hàng đề</p>
+            <button 
+              type="button" 
+              class="btn-primary-custom"
+              routerLink="/admin/question-add">
+              <i class="fas fa-plus me-2"></i>
+              Tạo câu hỏi đầu tiên
+            </button>
+          </div>
+        } @else {
+          <div class="questions-grid">
+            @for(question of questionsData?.items!; track question; let i = $index) {
+              <div class="question-card" [style.animation-delay.s]="i * 0.1">
+                <div class="card-header">
+                  <div class="question-number">
+                    <span>{{ question.questionNumber }}</span>
+                  </div>
+                  <div class="card-actions">
+                    <button 
+                      type="button" 
+                      class="action-btn edit-btn" 
+                      title="Chỉnh sửa"
+                      (click)="editQuestion(question.id!)">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button 
+                      type="button" 
+                      class="action-btn delete-btn" 
+                      title="Xóa"
+                      (click)="deleteQuestion(question.id!)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
 
-.question-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
+                <div class="card-body">
+                  <div class="question-content">
+                    {{ question.content || 'Nội dung câu hỏi' }}
+                  </div>
 
-.question-number {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
+                  <div class="explanation-section">
+                    <div class="explanation-header">
+                      <i class="fas fa-lightbulb"></i>
+                      <span>Giải thích</span>
+                    </div>
+                    <div class="explanation-content" [class.no-explanation]="!question.explain">
+                      {{ question.explain || 'Chưa có giải thích cho câu hỏi này' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
 
-.question-content {
-  font-size: 1.2rem;
-  color: #2d3748;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  line-height: 1.6;
-}
-
-.explanation-section {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 15px;
-  padding: 1.5rem;
-  margin-top: 1rem;
-  border-left: 4px solid #667eea;
-}
-
-.explanation-text {
-  color: #6c757d;
-  font-style: italic;
-}
-
-.explanation-text.no-explanation {
-  color: #adb5bd;
-}
-
-.stats-card {
-  background: white;
-  border-radius: 15px;
-  padding: 1.5rem;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-}
-
-.stats-card:hover {
-  transform: scale(1.05);
-}
-
-.stats-number {
-  font-size: 2.5rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.pulse-animation {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { 
-    transform: scale(1); 
-  }
-  50% { 
-    transform: scale(1.05); 
-  }
-  100% { 
-    transform: scale(1); 
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.8s ease-in forwards;
-}
-
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(30px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
-.search-box {
-  border-radius: 25px;
-  border: 2px solid #e9ecef;
-  padding: 0.75rem 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.search-box:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
-  outline: none;
-}
-
-.btn {
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.badge {
-  font-size: 0.85rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .header-section {
-    padding: 2rem 0;
-    text-align: center;
-  }
-  
-  .stats-card {
-    margin-top: 1rem;
-  }
-  
-  .question-number {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
-  }
-  
-  .question-content {
-    font-size: 1.1rem;
-  }
-  
-  .explanation-section {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .question-card {
-    margin-bottom: 1rem;
-  }
-  
-  .card-body {
-    padding: 1rem !important;
-  }
-  
-  .explanation-section {
-    padding: 0.75rem;
-  }
-  
-  .btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.7rem;
-  }
-}
-  `
+            @if(questionsData?.items!.length === 0) {
+              <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h4>Không tìm thấy câu hỏi nào</h4>
+                <p>Thử điều chỉnh bộ lọc hoặc tạo câu hỏi mới</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  `,
+  styleUrl: './question-list.css'
 })
 export class QuestionListComponent implements OnInit {
-  constructor(private adminService: QuestionBankApiService,
-    private router: Router,
-    private cd: ChangeDetectorRef
-  ) {}
   questionsData!: QuestionPage;
 
-  // filteredQuestions: Question[] = [];
-  // searchTerm: string = '';
-  // sortBy: string = 'number';
+  constructor(
+    private adminService: QuestionBankApiService,
+    private router: Router,
+    private cd: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
-    // this.filterQuestions();
-    this.getAllQuestions()
-    console.log('2020',this.questionsData)
-
+    this.getAllQuestions();
   }
 
   getAllQuestions() {
     this.adminService.getAllQuestions().subscribe({
       next: (data) => {
-        this.questionsData = data
-        this.cd.detectChanges()
-        console.log('230', data)
-      }, error: (err) => {
-        console.log(err)
+        this.questionsData = data;
+        this.cd.detectChanges();
+        console.log('Questions data:', data);
+      },
+      error: (err) => {
+        console.error('Error loading questions:', err);
+        Swal.fire({
+          title: 'Lỗi!',
+          text: 'Không thể tải danh sách câu hỏi',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       }
-    })
-    
+    });
   }
 
-
-  // filterQuestions(): void {
-  //   let filtered = this.questionsData.filter(q => 
-  //     q.content.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-  //     q.explain.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-  //     q.questionNumber.toString().includes(this.searchTerm)
-  //   );
-
-  //   // Sort data
-  //   filtered.sort((a, b) => {
-  //     if (this.sortBy === 'number') {
-  //       return a.questionNumber - b.questionNumber;
-  //     } else if (this.sortBy === 'content') {
-  //       return a.content.localeCompare(b.content);
-  //     }
-  //     return 0;
-  //   });
-
-  //   this.filteredQuestions = filtered;
-  // }
-
-  // onSearchChange(): void {
-  //   this.filterQuestions();
-  // }
-
-  // onSortChange(): void {
-  //   this.filterQuestions();
-  // }
-
   editQuestion(questionId: string): void {
-    this.router.navigate(['/admin/question-update', questionId])
+    this.router.navigate(['/admin/question-update', questionId]);
   }
 
   deleteQuestion(questionId: string): void {
     Swal.fire({
-          title: 'Bạn có chắc muốn xoá?',
-          text: 'Dữ liệu sẽ không thể khôi phục!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Xoá',
-          cancelButtonText: 'Huỷ'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.adminService.deleteQuestion(questionId).subscribe({
-              next: () => {
-                Swal.fire({
-                  title: 'Đã xoá!',
-                  text: 'Câu hỏi đã được xoá.',
-                  icon: 'success',
-                  timer: 1500,
-                  showConfirmButton: false
-                }).then(() => {
-                  this.getAllQuestions()
-                })
+      title: 'Bạn có chắc muốn xóa?',
+      text: 'Dữ liệu sẽ không thể khôi phục!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#80D0C7',
+      cancelButtonColor: '#f56565',
+      confirmButtonText: 'Xóa',
+      cancelButtonText: 'Hủy',
+      customClass: {
+        popup: 'swal-custom-popup',
+        confirmButton: 'swal-confirm-btn',
+        cancelButton: 'swal-cancel-btn'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.adminService.deleteQuestion(questionId).subscribe({
+          next: () => {
+            Swal.fire({
+              title: 'Đã xóa!',
+              text: 'Câu hỏi đã được xóa thành công.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false,
+              customClass: {
+                popup: 'swal-success-popup'
               }
-            })
+            }).then(() => {
+              this.getAllQuestions();
+            });
+          },
+          error: (err) => {
+            console.error('Error deleting question:', err);
+            Swal.fire({
+              title: 'Lỗi!',
+              text: 'Không thể xóa câu hỏi',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
           }
         });
+      }
+    });
   }
 }
-
-
-
-
-
