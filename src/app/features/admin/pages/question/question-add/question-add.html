@@ -195,7 +195,9 @@
                                                         [(ngModel)]="question.questionNumber"
                                                         [name]="'questionText' + i" placeholder="" [maxNumber]="50"
                                                         [minNumber]="1" onlyDigits
-                                                        (focus)="onFocus('questionNumber', i)">
+                                                        (focus)="onFocus('questionNumber', i)"
+                                                        (wheel)="onWheel($event)"
+                                                        >
                                                     @if(question.questionNumberMessage) {
                                                     <div class="text-danger">{{ question.questionNumberMessage}}</div>
                                                     }
