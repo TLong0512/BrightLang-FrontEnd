@@ -74,3 +74,25 @@
 .custom-backdrop.show {
   opacity: 1;
 }
+
+.book-edit {
+  transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  will-change: transform, background-color, color;
+}
+
+/* Primary variant: khi hover/focus/active */
+.book-edit.btn-outline-primary:hover,
+.book-edit.btn-outline-primary:focus,
+.book-edit.btn-outline-primary:active {
+  background-color: var(--bs-primary) !important;   /* màu primary chính xác từ Bootstrap */
+  border-color: var(--bs-primary) !important;
+
+}
+
+/* Danger variant */
+.book-edit.btn-outline-danger:hover,
+.book-edit.btn-outline-danger:focus,
+.book-edit.btn-outline-danger:active {
+  background-color: var(--bs-danger) !important;
+  border-color: var(--bs-danger) !important;
+}
