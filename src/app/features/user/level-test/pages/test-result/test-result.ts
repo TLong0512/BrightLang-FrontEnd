@@ -280,7 +280,7 @@ export class TestResultComponent implements OnInit {
   }
 
   onRetakeExam(): void {
-    this.retakeExam.emit();
+    this.router.navigate(['/home-user/level-test']);
   }
 
   onSaveResult(): void {
