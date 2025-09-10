@@ -9,7 +9,7 @@ import { UserFooterComponent } from '../../shared/user/footer/footer';
   imports: [ RouterModule, UserFooterComponent, UserHeaderComponent
     ],
   templateUrl: './user.html',
-  
+  styleUrls: ['./user.css']
 })
 export class UserComponent {
 

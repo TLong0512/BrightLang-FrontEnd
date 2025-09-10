@@ -1,13 +1,38 @@
 import { Component } from "@angular/core";
-import { RouterLink, RouterLinkActive } from "@angular/router";
+import { Router, RouterLink, RouterLinkActive } from "@angular/router";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
-    selector: 'user-home',
-    standalone: true,
-    templateUrl: 'user-home.html',
-    styleUrl: 'user-home.css',
-    imports: [RouterLinkActive, RouterLink]
+
+  selector: 'user-home',
+  standalone: true,
+  templateUrl: 'user-home.html',
+  styleUrl: 'user-home.css',
+  imports: [RouterLinkActive, RouterLink]
 
 })
+export class UserHomeComponent {
+  constructor(private router: Router, private http: HttpClient) {}
 
-export class UserHomeComponent{}
+  scrollTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  continueRoadmap() {
+    this.http.get<any>(`/UserRoadmaps?page=1&pageSize=1`,  { withCredentials: true  })
+      .subscribe({
+        next: (res) => {
+          console.log('dddddddddddd', res.totalItem);
+          if (res && res.totalItem > 0) {
+            this.router.navigate(['/home-user/roadmap']); // Có lộ trình
+          } else {
+            this.router.navigate(['/home-user/level-test']); // Chưa có
+          }
+        },
+        error: (err) => {
+          console.error("API GetMyRoadmaps error", err);
+          this.router.navigate(['/home-user/level-test']); // fallback
+        }
+      });
+  }
+}

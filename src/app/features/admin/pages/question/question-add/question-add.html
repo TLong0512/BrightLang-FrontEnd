@@ -107,7 +107,7 @@
                                         Đoạn văn, hình ảnh, âm thanh:
                                     </label>
                                     <editor apiKey="amy8k0ro3nc5wj01vdvtdgcu8wltaqzfnkw3da2arhsfz3tb" [init]="init"
-                                        [(ngModel)]="content" [ngModelOptions]="{standalone: true}"
+                                        [(ngModel)]="passage" [ngModelOptions]="{standalone: true}"
                                         (onFocus)="onFocus('passage')" />
                                     @if(contextMessage) {
                                     <div class="text-danger">{{ contextMessage}}</div>
@@ -173,7 +173,9 @@
                                                         [(ngModel)]="question.questionNumber"
                                                         [name]="'questionText' + i" placeholder="" [maxNumber]="50"
                                                         [minNumber]="1" onlyDigits
-                                                        (focus)="onFocus('questionNumber', i)">
+                                                        (focus)="onFocus('questionNumber', i)"
+                                                        (wheel)="onWheel($event)"
+                                                        >
                                                     @if(question.questionNumberMessage) {
                                                     <div class="text-danger">{{ question.questionNumberMessage}}</div>
                                                     }

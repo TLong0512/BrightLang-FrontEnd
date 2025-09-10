@@ -26,6 +26,7 @@ export class VocabularyComponent implements OnInit {
   editingVocabId: string | null = null;
   isDeleteModalOpen = false;
   selectedVocab: Vocabulary | null = null;
+   isAddingNew = false;
 
   constructor(
     private vocabService: VocabService,
@@ -63,14 +64,25 @@ export class VocabularyComponent implements OnInit {
     };
 
     this.vocabularies.unshift(newVocab);
+
+    this.isAddingNew = true;
   }
+
+  cancelNewVocab(vocab: Vocabulary) {
+  this.vocabularies = this.vocabularies.filter(v => v !== vocab);
+  this.isAddingNew = false;
+}
 
   saveNewVocab(vocab: Vocabulary) {
     this.vocabService.addVocabulary(vocab).subscribe({
       next: () => {
         this.loadVocabularies();
+        this.isAddingNew = false;
       },
-      error: err => console.error(err)
+      error: err => {
+        console.error(err);
+        this.isAddingNew = false;
+      }
     });
   }
 

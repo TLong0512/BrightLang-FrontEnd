@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OnlyDigitsDirective } from '../../directive/only-number';
 import { MaxNumberDirective } from '../../directive/max-number';
@@ -144,7 +144,7 @@ import { map, Observable } from 'rxjs';
                        placeholder="1"
                        (focus)="onFocus('start')"
                        onlyDigits [maxNumber]="50" [minNumber]="1"
-                       [class.error]="startMessage || compareMessage">
+                       [class.error]="startMessage || compareMessage" (wheel)="onWheel($event)">
                 <div class="input-icon">🔢</div>
               </div>
               <div class="error-message" *ngIf="startMessage">{{ startMessage }}</div>
@@ -162,7 +162,8 @@ import { map, Observable } from 'rxjs';
                        placeholder="10"
                        (focus)="onFocus('end')"
                        onlyDigits [maxNumber]="50" [minNumber]="1"
-                       [class.error]="endMessage || compareMessage">
+                       [class.error]="endMessage || compareMessage"
+                       (wheel)="onWheel($event)">
                 <div class="input-icon">🔢</div>
               </div>
               <div class="error-message" *ngIf="endMessage">{{ endMessage }}</div>
@@ -774,9 +775,13 @@ import { map, Observable } from 'rxjs';
         padding: 1.5rem;
       }
     }
+      .error-message {
+    color: red;
+}
   `]
 })
 export class ExamQuestionTypeComponent implements OnInit {
+
   ranges: Range[] = [];
 
   // two way binding
@@ -869,6 +874,7 @@ export class ExamQuestionTypeComponent implements OnInit {
       endQuestionNumber: this.endQuestionNumber
     }
     // this.ranges.push(questionType);
+    console.log(range)
     this.adminService.postRange(range).subscribe({
       next: (res) => {
         Swal.fire({
@@ -992,5 +998,10 @@ export class ExamQuestionTypeComponent implements OnInit {
   // Track by range (dùng cho ranges)
   trackByRange(index: number, item: any): any {
     return index; // chỉ cần index là đủ vì ranges thường là mảng số hoặc object nhỏ
+  }
+
+  onWheel(event: WheelEvent) {
+    (event.target as HTMLElement).blur(); // bỏ focus khỏi input
+    event.preventDefault(); // chặn thay đổi giá trị khi scroll
   }
 }

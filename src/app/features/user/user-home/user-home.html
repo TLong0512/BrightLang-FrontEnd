@@ -10,9 +10,10 @@
                         <h6 class="text-center">Đạt mục tiêu TOPIK dễ dàng với BrightLang</h6>
 
                         <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5 text-center" role="search">
-                            <button type="submit" class="btn custom-btn">
-                               Kiểm tra 
-                            </button>
+                            
+                            <a routerLink="/home-user/test-question" class="btn custom-btn">
+                                Kiểm tra 
+                            </a>
                         </form>
 
                     </div>
@@ -54,7 +55,9 @@
 
                                         <p class="text-white">Tạo mới lộ hoặc tiếp tục lộ trình bạn đang theo</p>
 
-                                        <a routerLink="/home-user/level-test" class="btn custom-btn mt-2 mt-lg-3">Tiếp tục lộ trình</a>
+                                        <button (click)="continueRoadmap()" class="btn custom-btn mt-2 mt-lg-3">
+                                            Tiếp tục lộ trình
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="section-overlay"></div>
@@ -198,9 +201,9 @@
                                 <h2>Chế độ luyện tập</h2>
                                 <h5>Làm các bài tập theo dạng với kho nội dung phong phú</h5>
                                 <form method="get" class="custom-practice mt-4 pt-2 mb-lg-0 mb-5 text-center" role="search">
-                                    <button type="submit" class="btn custom-btn">
+                                    <a class="btn custom-btn" (click)="scrollTop()" routerLink="/home-user/topik-selection">
                                         Luyện tập ngay
-                                    </button>
+                                    </a>
                                 </form>
                             </div>
                         </div>
@@ -332,5 +335,3 @@
             </div>
         </section>
 </main>
-
-

@@ -1,20 +1,12 @@
 import { Router, Routes } from '@angular/router';
-import { LoginComponent } from './features/auth/login/login';
-import { RegisterComponent } from './features/auth/register/register';
-import { VerifyComponent } from './features/auth/verify/verify';
-import { ForgetPassword } from './features/auth/forget-password/forget-password';
-import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
+
 import { TopicsDetail } from './features/home/topics-detail/topics-detail';
 import { HomeComponent } from './features/home/home';
 import { HomePageComponent } from './features/home/home-page/home-page';
 import { UserHomeComponent } from './features/user/user-home/user-home';
-
-import { AuthComponent } from './shared/auth/auth';
-
 import { BookComponent } from './features/user/book-vocabulary/pages/book/book';
 import { VocabularyComponent } from './features/user/book-vocabulary/pages/vocabulary/vocab';
 import { FlashcardComponent } from './features/user/book-vocabulary/pages/flashcard/flashcard';
-
 import { UserComponent } from './features/user/user';
 import { LevelTestEntryComponent } from './features/user/level-test/pages/level-test-entry/level-test-entry';
 import { TestReadyComponent } from './features/user/level-test/pages/test-ready/test-ready';
@@ -30,8 +22,14 @@ import { TestHistoryComponent } from './features/user/level-test/pages/test-hist
 import { UserState } from './features/auth/services/user.state';
 import { inject } from '@angular/core';
 import { map } from 'rxjs';
-import { TopikSubLevelSelectionComponent } from './features/user/practice/pages/topik-SubLevel/topik-sub-level';
+import { RoadmapComponent } from './features/user/roadmap/pages/roadmap/roadmap';
+import { RoadmapSelectionComponent } from './features/user/roadmap/pages/roadmap-selection/roadmap-selection';
+import { AdminGuard, AuthGuard } from './guards/guard';
+import { MyAccountComponent } from './features/my-account/my-account.component';
+import { MyAccountChangePasswordComponent } from './features/my-account/my-account-change-password.component';
+import { MyAccountUpdateAccountComponent } from './features/my-account/my-account-update-account.component';
 import { ResultComponent } from './features/user/practice/pages/result-screen/result-screen';
+import { TopikSubLevelSelectionComponent } from './features/user/practice/pages/topik-SubLevel/topik-sub-level';
 
 // 👇 import guards
 export const routes: Routes = [
@@ -54,6 +52,16 @@ export const routes: Routes = [
       { path: 'topik-detail', component: TopicsDetail }
       // { path: '', component: TopicsDetail }
     ]
+  },
+
+  {
+    path: 'my-account', component: UserComponent,
+    children: [
+      { path: '', pathMatch: 'full', component: MyAccountComponent },
+      { path: 'change-password', component: MyAccountChangePasswordComponent },
+      { path: 'update-account', component: MyAccountUpdateAccountComponent },
+
+    ],
   },
 
   {
@@ -106,53 +114,24 @@ export const routes: Routes = [
       {
         path: 'topik-detail',
         component: TopicsDetail
+      },
+      { path: 'roadmap', component: RoadmapComponent },
+      {
+        path: 'roadmap-selection',
+        component: RoadmapSelectionComponent
       }
+
     ]
   },
 
   {
     path: 'auth',
-    canActivate: [() => {
-      const router = inject(Router);
-      const userState = inject(UserState);
-      return userState.currentUser$.pipe(
-        map(user => {
-          if (user == null) {
-            return true; // cho phép đi tiếp
-          }
-          return router.parseUrl('/home-user'); // redirect an toàn
-        })
-      )
-    }],
-    component: AuthComponent,
-    children: [
-      {
-        path: '',
-        component: LoginComponent
-      },
-      {
-        path: 'register',
-        component: RegisterComponent
-      },
-      {
-        path: 'verify',
-        component: VerifyComponent
-      },
-      {
-        path: 'forget-password',
-        component: ForgetPassword
-      },
-      {
-        path: 'reset-password',
-        component: ResetPasswordComponent
-      }
-    ]
+    loadChildren: () => import('./features/auth/auth.routes').then(m => m.authRoutes)
   },
 
   {
     path: 'admin',
-    // canActivate: [RoleGuard], 
-    // data: { roles: ['Admin'] },
+    canActivate: [AdminGuard],
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   }
 ];
