@@ -17,6 +17,7 @@ export interface NavigationItem {
 }
 
 export const NavigationItems: NavigationItem[] = [
+  
   {
     id: 'default',
     title: 'Tổng quan',
@@ -32,6 +33,22 @@ export const NavigationItems: NavigationItem[] = [
     type: 'group',
     icon: 'icon-navigation',
     children: [
+      {
+        id: 'typography1',
+        title: 'Dạng bài thi',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/admin/exam-type',
+        icon: 'ti ti-typography'
+      },
+      {
+        id: 'typography2',
+        title: 'Cấp độ',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/admin/question-type',
+        icon: 'ti ti-typography'
+      },
       {
         id: 'typography',
         title: 'Dạng câu hỏi',

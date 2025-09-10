@@ -69,20 +69,33 @@ export class RoadMapDetailComponent implements OnInit {
           .filter(x => x.dirty); // chỉ lấy những formGroup có thay đổi
 
 
+        let isSuccess = true
         if (changed.length > 0) {
-          changed.forEach((r) => {
-            this.apiService.updateRoadMapElement(this.roadMapId, r.index, {
+          changed.forEach((r, index) => {
+            this.apiService.updateRoadMapElement(this.roadMapId, index, {
               repeatDays: r.repeatDays,
               questionPerDay: r.questionPerDay
+            }).subscribe({
+              next: () => { },
+              error: (err) => {
+                console.log(err)
+                isSuccess = false
+                console.log(isSuccess)
+                console.log(index)
+              }
+
             })
           })
-          Swal.fire({
-            title: 'Thành công!',
-            text: 'Cập nhật dữ liệu thành công.',
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
-          });
+          if (isSuccess) {
+            Swal.fire({
+              title: 'Thành công!',
+              text: 'Cập nhật dữ liệu thành công.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          }
+
         } else {
           Swal.fire({
             title: 'Không có thay đổi',

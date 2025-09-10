@@ -52,8 +52,10 @@ export interface QuestionDto {
 export interface QuestionAdd {
   id?: string;
   content?: string;
+  contentMessage?: string;
   explain?: string;
   questionNumber?: number;
+  questionNumberMessage?: string;
   context?: Context;
   answerList?: Answer[];
 }
@@ -71,6 +73,7 @@ export interface Answer {
   value?: string;
   explain?: string;
   isCorrect?: boolean;
+  answerMessage?: string;
   questionId?: string;
 }
 

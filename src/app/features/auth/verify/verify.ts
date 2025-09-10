@@ -123,7 +123,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
     console.log(registerDto)
 
     this.authService.register(registerDto).subscribe({
-      next: res => {
+      next: (res) => {
         console.log('Đăng ký thành công:', res)
         Swal.fire({
           title: 'Đăng ký thành công!',
@@ -133,7 +133,11 @@ export class VerifyComponent implements OnInit, OnDestroy {
           timer: 2000,
           timerProgressBar: true
         }).then(() => {
-          this.router.navigate(['/auth']);
+          if (res && res.roles.includes("Admin")) {
+            this.router.navigate(['/admin']);
+          } else {
+            this.router.navigate(['/home-user']);
+          }
         });
       },
       error: err => {

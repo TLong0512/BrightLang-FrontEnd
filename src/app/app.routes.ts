@@ -1,20 +1,12 @@
 import { Router, Routes } from '@angular/router';
-import { LoginComponent } from './features/auth/login/login';
-import { RegisterComponent } from './features/auth/register/register';
-import { VerifyComponent } from './features/auth/verify/verify';
-import { ForgetPassword } from './features/auth/forget-password/forget-password';
-import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
+
 import { TopicsDetail } from './features/home/topics-detail/topics-detail';
 import { HomeComponent } from './features/home/home';
 import { HomePageComponent } from './features/home/home-page/home-page';
 import { UserHomeComponent } from './features/user/user-home/user-home';
-
-import { AuthComponent } from './shared/auth/auth';
-
 import { BookComponent } from './features/user/book-vocabulary/pages/book/book';
 import { VocabularyComponent } from './features/user/book-vocabulary/pages/vocabulary/vocab';
 import { FlashcardComponent } from './features/user/book-vocabulary/pages/flashcard/flashcard';
-
 import { UserComponent } from './features/user/user';
 import { LevelTestEntryComponent } from './features/user/level-test/pages/level-test-entry/level-test-entry';
 import { TestReadyComponent } from './features/user/level-test/pages/test-ready/test-ready';
@@ -24,9 +16,6 @@ import { QuestionTypesComponent } from './features/user/practive/pages/question-
 import { PracticeComponent } from './features/user/practive/pages/practice-screen/practice-screen';
 import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
 import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
-
-import { AdminComponent } from './shared/admin/admin';
-import { RoleGuard } from './guards/auth.guard';
 import { TestReviewComponent } from './features/user/level-test/pages/test-review/test-review';
 import { TestHistoryComponent } from './features/user/level-test/pages/test-history/test-history';
 import { UserState } from './features/auth/services/user.state';
@@ -34,15 +23,11 @@ import { inject } from '@angular/core';
 import { map } from 'rxjs';
 import { TopikSubLevelSelectionComponent } from './features/user/practive/pages/topik-SubLevel/topik-sub-level';
 import { ResultComponent } from './features/user/practive/pages/result-screen/result-screen';
-import { MyAccountComponent } from './features/my-account/my-account.component';
-import { MyAccountChangePasswordComponent } from './features/my-account/my-account-change-password.component';
-import { MyAccountUpdateAccountComponent } from './features/my-account/my-account-update-account.component';
+import { RoadmapComponent } from './features/user/roadmap/pages/roadmap/roadmap';
+import { RoadmapSelectionComponent } from './features/user/roadmap/pages/roadmap-selection/roadmap-selection';
+import { AdminGuard, AuthGuard } from './guards/guard';
 
 // 👇 import guards
-
-
-// private router = inject(Router)
-
 export const routes: Routes = [
 
   {
@@ -95,12 +80,12 @@ export const routes: Routes = [
       { path: 'test-ready', component: TestReadyComponent },
       { path: 'test-question', component: TestQuestionsComponent },
       { path: 'test-result', component: TestResultComponent },
-      { path: 'test-review/:testId', component: TestReviewComponent},
-      { path: 'test-history', component: TestHistoryComponent},
+      { path: 'test-review/:testId', component: TestReviewComponent },
+      { path: 'test-history', component: TestHistoryComponent },
       { path: '', component: UserHomeComponent },
       { path: 'topik-detail', component: TopicsDetail },
       { path: 'book', component: BookComponent },
-      { path: 'vocab/:id', component: VocabularyComponent },
+      { path: 'vocab/:bookId', component: VocabularyComponent },
       { path: 'flashcard/:bookId', component: FlashcardComponent },
 
       { path: 'result-screen', component: ResultComponent },
@@ -118,8 +103,6 @@ export const routes: Routes = [
         path: 'topik-sublevel/:examTypeId',
         component: TopikSubLevelSelectionComponent
       },
-
-      
       {
         path: '',
         component: UserHomeComponent
@@ -127,53 +110,24 @@ export const routes: Routes = [
       {
         path: 'topik-detail',
         component: TopicsDetail
+      },
+      { path: 'roadmap', component: RoadmapComponent },
+      {
+        path: 'roadmap-selection',
+        component: RoadmapSelectionComponent
       }
+
     ]
   },
 
   {
     path: 'auth',
-    canActivate: [() => {
-      const router = inject(Router);
-      const userState = inject(UserState);
-      return userState.currentUser$.pipe(
-        map(user => {
-          if (user == null) {
-            return true; // cho phép đi tiếp
-          }
-          return router.parseUrl('/home-user'); // redirect an toàn
-        })
-      )
-    }],
-    component: AuthComponent,
-    children: [
-      {
-        path: '',
-        component: LoginComponent
-      },
-      {
-        path: 'register',
-        component: RegisterComponent
-      },
-      {
-        path: 'verify',
-        component: VerifyComponent
-      },
-      {
-        path: 'forget-password',
-        component: ForgetPassword
-      },
-      {
-        path: 'reset-password',
-        component: ResetPasswordComponent
-      }
-    ]
+    loadChildren: () => import('./features/auth/auth.routes').then(m => m.authRoutes)
   },
 
   {
     path: 'admin',
-    canActivate: [RoleGuard], 
-    data: { roles: ['Admin'] },
+    canActivate: [AdminGuard],
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
   }
 ];

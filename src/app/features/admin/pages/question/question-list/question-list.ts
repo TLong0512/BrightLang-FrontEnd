@@ -1,4 +1,3 @@
-// question-list.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -9,275 +8,105 @@ import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-question-list',
-  templateUrl: './question-list.html',
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
-  styles: `
-  /* question-list.component.css */
-.question-list-container {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.header-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 3rem 0;
-  margin-bottom: 2rem;
-  border-radius: 0 0 30px 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.question-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-  margin-bottom: 2rem;
-}
-
-.question-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
-
-.question-number {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.question-content {
-  font-size: 1.2rem;
-  color: #2d3748;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  line-height: 1.6;
-}
-
-.explanation-section {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 15px;
-  padding: 1.5rem;
-  margin-top: 1rem;
-  border-left: 4px solid #667eea;
-}
-
-.explanation-text {
-  color: #6c757d;
-  font-style: italic;
-}
-
-.explanation-text.no-explanation {
-  color: #adb5bd;
-}
-
-.stats-card {
-  background: white;
-  border-radius: 15px;
-  padding: 1.5rem;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
-}
-
-.stats-card:hover {
-  transform: scale(1.05);
-}
-
-.stats-number {
-  font-size: 2.5rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.pulse-animation {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { 
-    transform: scale(1); 
-  }
-  50% { 
-    transform: scale(1.05); 
-  }
-  100% { 
-    transform: scale(1); 
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.8s ease-in forwards;
-}
-
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(30px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
-.search-box {
-  border-radius: 25px;
-  border: 2px solid #e9ecef;
-  padding: 0.75rem 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.search-box:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
-  outline: none;
-}
-
-.btn {
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.badge {
-  font-size: 0.85rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .header-section {
-    padding: 2rem 0;
-    text-align: center;
-  }
-  
-  .stats-card {
-    margin-top: 1rem;
-  }
-  
-  .question-number {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
-  }
-  
-  .question-content {
-    font-size: 1.1rem;
-  }
-  
-  .explanation-section {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .question-card {
-    margin-bottom: 1rem;
-  }
-  
-  .card-body {
-    padding: 1rem !important;
-  }
-  
-  .explanation-section {
-    padding: 0.75rem;
-  }
-  
-  .btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.7rem;
-  }
-}
-  `
+  templateUrl: './question-list.html',
+  styleUrl: './question-list.css'
 })
 export class QuestionListComponent implements OnInit {
-  currentPage: number = 1;
-  pageSize: number = 5;
-  pageSizes: number[] = [5, 10, 15, 20];
-
-  constructor(private adminService: QuestionBankApiService,
-    private router: Router,
-    private cd: ChangeDetectorRef
-  ) {}
   questionsData!: QuestionPage;
 
+  currentPage = 1;
+  pageSize = 10; // mặc định
+
+  pageSizeOptions = [5, 10, 15, 20];
+  constructor(
+    private adminService: QuestionBankApiService,
+    private router: Router,
+    private cd: ChangeDetectorRef
+  ) { }
+
   ngOnInit(): void {
-    // this.filterQuestions();
-    this.getQuestionsByPage()
-    console.log('2020',this.questionsData)
+    this.getAllQuestions(this.currentPage, this.pageSize);
   }
 
-  getQuestionsByPage() {
-    this.adminService.getAllQuestions(this.currentPage, this.pageSize).subscribe({
+  getAllQuestions(page: number, pageSize: number) {
+    this.adminService.getAllQuestions(page, pageSize).subscribe({
       next: (data) => {
-        this.questionsData = data
-        this.cd.detectChanges()
-      }, error: (err) => {
-        console.log(err)
+        this.questionsData = data;
+        this.cd.detectChanges();
+        console.log('Questions data:', data);
+      },
+      error: (err) => {
+        console.error('Error loading questions:', err);
+        Swal.fire({
+          title: 'Lỗi!',
+          text: 'Không thể tải danh sách câu hỏi',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       }
-    })
-    
+    });
   }
 
   editQuestion(questionId: string): void {
-    this.router.navigate(['/admin/question-update', questionId])
+    this.router.navigate(['/admin/question-update', questionId]);
   }
 
   deleteQuestion(questionId: string): void {
     Swal.fire({
-          title: 'Bạn có chắc muốn xoá?',
-          text: 'Dữ liệu sẽ không thể khôi phục!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Xoá',
-          cancelButtonText: 'Huỷ'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.adminService.deleteQuestion(questionId).subscribe({
-              next: () => {
-                Swal.fire({
-                  title: 'Đã xoá!',
-                  text: 'Câu hỏi đã được xoá.',
-                  icon: 'success',
-                  timer: 1500,
-                  showConfirmButton: false
-                }).then(() => {
-                  this.getQuestionsByPage()
-                })
+      title: 'Bạn có chắc muốn xóa?',
+      text: 'Dữ liệu sẽ không thể khôi phục!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#80D0C7',
+      cancelButtonColor: '#f56565',
+      confirmButtonText: 'Xóa',
+      cancelButtonText: 'Hủy',
+      customClass: {
+        popup: 'swal-custom-popup',
+        confirmButton: 'swal-confirm-btn',
+        cancelButton: 'swal-cancel-btn'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.adminService.deleteQuestion(questionId).subscribe({
+          next: () => {
+            Swal.fire({
+              title: 'Đã xóa!',
+              text: 'Câu hỏi đã được xóa thành công.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false,
+              customClass: {
+                popup: 'swal-success-popup'
               }
-            })
+            }).then(() => {
+              this.getAllQuestions(this.currentPage, this.pageSize);
+            });
+          },
+          error: (err) => {
+            console.error('Error deleting question:', err);
+            Swal.fire({
+              title: 'Lỗi!',
+              text: 'Không thể xóa câu hỏi',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
           }
         });
-  }
-  // Phân trang
-  
-
-  onPageSizeChange(event: any) {
-    this.pageSize = +event.target.value;
-    this.currentPage = 1; // reset về trang đầu khi thay đổi pageSize
+      }
+    });
   }
 
-  changePage(page: number) {
+  changePage(page: number): void {
     if (page < 1 || page > this.questionsData.totalPages) return;
-    this.currentPage = page;
+    this.getAllQuestions(page, this.pageSize);
+  }
+
+  changePageSize(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 1; // reset về trang 1
+    this.getAllQuestions(this.currentPage, this.pageSize);
   }
 }
-
-
-
-
-

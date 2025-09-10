@@ -1,7 +1,5 @@
 <div class="ms-auto">
   <ul class="list-unstyled">
-    
-
     <li>
       <div class="dropdown pc-h-item header-user-profile" ngbDropdown>
         <a
@@ -10,18 +8,19 @@
           href="javascript:"
           ngbDropdownToggle
         >
-          <img src="assets/images/logo.png" alt="user-image" class="user-avtar" />
+          <img src="assets/images/logos/logo.png" alt="user-image" class="user-avtar" />
           <span>
             <i class="ti ti-settings"></i>
           </span>
         </a>
         <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown" ngbDropdownMenu>
           <div class="dropdown-header">
-            <ng-scrollbar style="height: 100px" visibility="hover">
-              <!-- <a [routerLink]="['/guest/register']" class="dropdown-item">
+            <ng-scrollbar style="height: 150px" visibility="hover">
+              <a class="dropdown-item">
                 <i class="ti ti-settings"></i>
-                <span>Account Profile</span>
-              </a> -->
+                <span>Xin chào Admin</span>
+              </a> 
+              <hr/>
               <a (click)="onLogout()" class="dropdown-item">
                 <i class="ti ti-logout"></i>
                 <span>Đăng xuất</span>

@@ -49,6 +49,7 @@ export class AuthService {
       tap(() => this.userState._next(null)),
       map(() => true),
       catchError((err: HttpErrorResponse) => {
+        console.log(err)
         if (err.status === 400) return of(false);
         if (err.status === 401) return of(false);
         return throwError(() => err);

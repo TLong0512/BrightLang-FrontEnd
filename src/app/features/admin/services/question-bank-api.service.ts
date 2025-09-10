@@ -65,8 +65,8 @@ export class QuestionBankApiService {
   }
 
   // Question
-  getAllQuestions(currentPage: number, pageSize: number): Observable<QuestionPage> {
-    return this.http.get<QuestionPage>(`/Question/${currentPage}/${pageSize}`)
+  getAllQuestions(page: number, pageSize: number): Observable<QuestionPage> {
+    return this.http.get<QuestionPage>(`/Question/${page}/${pageSize}`)
   }
   getQuestionsByContextId(id: string): Observable<Question[]> {
     return this.http.get<Question[]>(`/Question/filter/context/${id}`, { withCredentials: true });

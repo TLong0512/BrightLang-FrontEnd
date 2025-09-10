@@ -7,6 +7,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import Swal from 'sweetalert2';
 import { AuthService } from '../services/auth.service';
 import { UserState } from '../services/user.state';
+import { take } from 'rxjs';
 
 
 @Component({
@@ -15,7 +16,7 @@ import { UserState } from '../services/user.state';
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   standalone: true
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   submitted = false;
 
@@ -30,6 +31,13 @@ export class LoginComponent {
       email: ['', [Validators.required]],
       password: ['', Validators.required],
       rememberMe: [false]
+    });
+  }
+  ngOnInit(): void {
+    this.userState.currentUser$.pipe(take(1)).subscribe(user => {
+      if (user) {
+        this.router.navigate(['/home-user']);
+      }
     });
   }
 
@@ -65,7 +73,7 @@ export class LoginComponent {
   Login(email: string, password: string) {
     this.authService.login(email, password).subscribe({
       next: (res) => {
-        if(res == null) {
+        if (res == null) {
           alert('Login failed. Please check your username and password!');
           return;
         }
@@ -80,7 +88,7 @@ export class LoginComponent {
         }).then(() => {
           // console.log(res)
           // this.authService.setRole(res.roles[0])
-      
+
           if (res.roles.includes("Admin")) {
             // console.log('ok')
             this.router.navigate(['/admin']);

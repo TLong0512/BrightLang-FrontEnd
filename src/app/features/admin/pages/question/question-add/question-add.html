@@ -34,10 +34,8 @@
                                 <i class="fas fa-layer-group me-1"></i>
                                 Chọn dạng bài thi
                             </label>
-                            <select id="examTypeSelect" class="form-select" 
-                            [(ngModel)]="selectedExamType"
-                            [ngModelOptions]="{standalone: true}"
-                                (ngModelChange)="onExamTypeChange()">
+                            <select id="examTypeSelect" class="form-select" [(ngModel)]="selectedExamType"
+                                [ngModelOptions]="{standalone: true}" (ngModelChange)="onExamTypeChange()">
                                 <option value="">-- Chọn dạng bài --</option>
                                 @for(examType of examTypes$ | async; track examType.id) {
                                 <option [value]="examType.id">{{ examType.name }}</option>
@@ -53,8 +51,7 @@
                                 Chọn cấp độ
                             </label>
                             <select id="levelSelect" class="form-select" [(ngModel)]="selectedLevel"
-                            [ngModelOptions]="{standalone: true}"
-                                (ngModelChange)="onLevelChange()">
+                                [ngModelOptions]="{standalone: true}" (ngModelChange)="onLevelChange()">
                                 <option value="">-- Chọn cấp độ --</option>
                                 @for(level of levels$ | async; track level.id) {
                                 <option [value]="level.id">{{ level.name }}</option>
@@ -71,8 +68,7 @@
                                     Chọn kỹ năng
                                 </label>
                                 <select id="skillSelect" class="form-select dropdown-with-space"
-                                    [(ngModel)]="selectedSkillLevel" 
-                                    (ngModelChange)="onSkillLevelChange()"
+                                    [(ngModel)]="selectedSkillLevel" (ngModelChange)="onSkillLevelChange()"
                                     [ngModelOptions]="{standalone: true}">
                                     <option value="">-- Chọn kỹ năng --</option>
                                     @for(skillLevel of skillLevels; track skillLevel.id) {
@@ -119,7 +115,8 @@
                                             Sử dụng câu hỏi này làm bài thi
                                         </label>
                                     </div>
-                                    <small class="text-muted ms-5">Đánh dấu nếu câu hỏi này có thể được dùng trong các bài
+                                    <small class="text-muted ms-5">Đánh dấu nếu câu hỏi này có thể được dùng trong các
+                                        bài
                                         kiểm tra</small>
                                 </div>
                             </div>
@@ -131,10 +128,12 @@
                                         <i class="fas fa-file-text text-success me-2"></i>
                                         Đoạn văn, hình ảnh, âm thanh:
                                     </label>
-                                    <editor apiKey="amy8k0ro3nc5wj01vdvtdgcu8wltaqzfnkw3da2arhsfz3tb" 
-                                    [init]="init" 
-                                    [(ngModel)]="content" 
-                                    [ngModelOptions]="{standalone: true}"/>
+                                    <editor apiKey="amy8k0ro3nc5wj01vdvtdgcu8wltaqzfnkw3da2arhsfz3tb" [init]="init"
+                                        [(ngModel)]="passage" [ngModelOptions]="{standalone: true}"
+                                        (onFocus)="onFocus('passage')" />
+                                    @if(contextMessage) {
+                                    <div class="text-danger">{{ contextMessage}}</div>
+                                    }
                                 </div>
                             </div>
 
@@ -159,30 +158,30 @@
                                         <i class="fas fa-question-circle me-2"></i>
                                         Danh sách câu hỏi ({{ questions.length }})
                                     </h4>
+                                    @if(questions.length < 4) {
                                     <button type="button" class="btn btn-success btn-lg" (click)="addQuestion()">
                                         <i class="fas fa-plus me-2"></i>
                                         Thêm câu hỏi
                                     </button>
+                                    }
+
                                 </div>
 
                                 <!-- Questions List -->
-                                 @for(question of questions; track question; let i = $index) {
-                                    <div class="mb-5" [@slideIn]="i"
-                                    style="animation: slideIn 0.5s ease-out;">
+                                @for(question of questions; track question; let i = $index) {
+                                <div class="mb-5" style="animation: slideIn 0.5s ease-out;">
                                     <div class="card border-start border-primary border-4 shadow-sm">
+                                        @if(questions.length > 1) {
                                         <div
                                             class="card-header bg-light d-flex justify-content-between align-items-center">
-                                            <h5 class="mb-0 text-primary">
-                                                <i class="fas fa-hashtag me-2"></i>
-                                                Câu hỏi {{ i + 1 }}
-                                                <span class="badge bg-primary ms-2">Mới</span>
-                                            </h5>
                                             <button type="button" class="btn btn-outline-danger btn-sm"
                                                 (click)="removeQuestion(i)">
                                                 <i class="fas fa-trash me-1"></i>
                                                 Xóa
                                             </button>
                                         </div>
+                                        }
+
 
                                         <div class="card-body">
                                             <!-- Question Text -->
@@ -194,7 +193,14 @@
                                                     </label>
                                                     <input type="number" class="form-control form-control-lg"
                                                         [(ngModel)]="question.questionNumber"
-                                                        [name]="'questionText' + i" placeholder="">
+                                                        [name]="'questionText' + i" placeholder="" [maxNumber]="50"
+                                                        [minNumber]="1" onlyDigits
+                                                        (focus)="onFocus('questionNumber', i)"
+                                                        (wheel)="onWheel($event)"
+                                                        >
+                                                    @if(question.questionNumberMessage) {
+                                                    <div class="text-danger">{{ question.questionNumberMessage}}</div>
+                                                    }
                                                 </div>
                                             </div>
                                             <!-- Question Text -->
@@ -234,7 +240,7 @@
 
                                                 <div class="row">
                                                     @for(answer of question.answerList!; track answer; let j = $index) {
-                                                        <div class="col-lg-6 mb-3">
+                                                    <div class="col-lg-6 mb-3">
                                                         <div class="card h-100"
                                                             [class.border-success]="answer.isCorrect"
                                                             [class.bg-light]="answer.isCorrect">
@@ -258,10 +264,16 @@
 
                                                                 <!-- Answer Text -->
                                                                 <div class="mb-2">
-                                                                    <editor apiKey="amy8k0ro3nc5wj01vdvtdgcu8wltaqzfnkw3da2arhsfz3tb" [init]="init" 
-                                                                    [(ngModel)]="answer.value"
-                                                                    [ngModelOptions]="{standalone: true}"
-                                                                    />
+                                                                    <editor
+                                                                        apiKey="amy8k0ro3nc5wj01vdvtdgcu8wltaqzfnkw3da2arhsfz3tb"
+                                                                        [init]="init" [(ngModel)]="answer.value"
+                                                                        [ngModelOptions]="{standalone: true}"
+                                                                        (onFocus)="onFocus('answer', i, j)" />
+
+                                                                    @if(answer.answerMessage) {
+                                                                    <div class="text-danger">{{answer.answerMessage}}
+                                                                    </div>
+                                                                    }
                                                                 </div>
 
                                                                 <!-- Answer Explanation -->
@@ -276,25 +288,25 @@
                                                         </div>
                                                     </div>
                                                     }
-                                                    
+
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                 }
-                                
+                                }
+
 
                                 <!-- Empty State -->
-                                 @if(questions.length === 0) {
-                                    <div class="text-center py-5">
+                                @if(questions.length === 0) {
+                                <div class="text-center py-5">
                                     <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted">Chưa có câu hỏi nào</h5>
                                     <p class="text-muted mb-4">Nhấn nút "Thêm câu hỏi" để bắt đầu tạo câu hỏi đầu tiên
                                     </p>
                                 </div>
-                                 }
-                                
+                                }
+
                             </div>
 
                             <!-- Action Buttons -->
@@ -306,10 +318,9 @@
                                     </button>
 
                                     <div class="d-flex gap-2">
-                                    
+
                                         <!-- [disabled]="!isFormValid()" -->
-                                        <button type="submit" class="btn btn-primary btn-lg" 
-                                            (click)="saveQuestions()">
+                                        <button type="submit" class="btn btn-primary btn-lg" (click)="saveQuestions()">
                                             <i class="fas fa-save me-2"></i>
                                             Lưu câu hỏi
                                         </button>
