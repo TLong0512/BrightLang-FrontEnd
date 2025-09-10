@@ -588,6 +588,6 @@ export class TestReviewComponent implements OnInit {
   }
 
   takeNewTest(): void {
-    this.router.navigate(['/home-user/test-questions']);
+    this.router.navigate(['/home-user/level-test']);
   }
 }
