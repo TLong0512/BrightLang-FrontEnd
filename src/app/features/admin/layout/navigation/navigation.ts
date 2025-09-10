@@ -18,15 +18,15 @@ export interface NavigationItem {
 
 export const NavigationItems: NavigationItem[] = [
   
-  {
-    id: 'default',
-    title: 'Tổng quan',
-    type: 'item',
-    classes: 'nav-item',
-    url: '/admin',
-    icon: 'ti ti-dashboard',
-    breadcrumbs: false
-  },
+  // {
+  //   id: 'default',
+  //   title: 'Tổng quan',
+  //   type: 'item',
+  //   classes: 'nav-item',
+  //   url: '/admin',
+  //   icon: 'ti ti-dashboard',
+  //   breadcrumbs: false
+  // },
   {
     id: 'elements',
     title: 'Quản lý',
@@ -39,7 +39,7 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         classes: 'nav-item',
         url: '/admin/exam-type',
-        icon: 'ti ti-typography'
+        icon: ''
       },
       {
         id: 'typography2',
@@ -47,15 +47,7 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         classes: 'nav-item',
         url: '/admin/level',
-        icon: 'ti ti-typography'
-      },
-      {
-        id: 'typography3',
-        title: 'Kỹ năng',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/admin/skill',
-        icon: 'ti ti-typography'
+        
       },
       {
         id: 'typography',
@@ -63,7 +55,7 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         classes: 'nav-item',
         url: '/admin/question-type',
-        icon: 'ti ti-typography'
+        
       },
       {
         id: 'color',
@@ -71,7 +63,6 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         classes: 'nav-item',
         url: '/admin/question-list',
-        icon: 'ti ti-brush'
       },
       {
         id: 'tabler',
@@ -79,7 +70,6 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         classes: 'nav-item',
         url: '/admin/roadmap',
-        icon: 'ti ti-plant-2',
       }
     ]
   }
