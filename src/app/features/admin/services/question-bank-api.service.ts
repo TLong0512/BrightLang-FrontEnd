@@ -2,17 +2,21 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { ExamType, Level, SkillLevel, Range, Context, Question, Answer, QuestionAdd, QuestionPage, QuestionDto, QuestionUpdate } from '../models/question-bank.model';
+import { ExamType, Level, SkillLevel, Range, Context, Question, Answer, QuestionAdd, QuestionPage, QuestionDto, QuestionUpdate, Skill } from '../models/question-bank.model';
 
 @Injectable({
   providedIn: 'root' // hoặc chỉ trong UserModule
 })
 export class QuestionBankApiService {
-  
+
   constructor(private http: HttpClient) { }
 
   getExamTypes(): Observable<ExamType[]> {
     return this.http.get<ExamType[]>(`/ExamType`);
+  }
+
+  getSkills(): Observable<Skill[]> {
+    return this.http.get<Skill[]>(`/Skill`);
   }
 
   getLevelsByExamTypeId(id: string): Observable<Level[]> {
@@ -72,7 +76,7 @@ export class QuestionBankApiService {
     return this.http.get<Question[]>(`/Question/filter/context/${id}`, { withCredentials: true });
   }
 
-  getQuestionById(id: string): Observable<QuestionDto> { 
+  getQuestionById(id: string): Observable<QuestionDto> {
     return this.http.get<QuestionDto>(`/Question/${id}`, { withCredentials: true });
   }
 

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Answer, ExamType, Level, Question, QuestionAdd, SkillLevel } from '../../../models/question-bank.model';
+import { Answer, ExamType, Level, Question, QuestionAdd, Skill, SkillLevel } from '../../../models/question-bank.model';
 import { ChangeDetectorRef, Component, DOCUMENT, Inject, Input, OnInit } from '@angular/core';
 import { QuestionBankApiService } from '../../../services/question-bank-api.service';
 import { Context } from 'vm';
@@ -92,13 +92,15 @@ export class AddQuestionComponent {
   selectedExamType: string = '';
   selectedLevel: string = '';
   selectedSkillLevel: string = '';
-  selectedRange: string = ''
+  selectedRange: string = '';
+  selectedSkill: string = '';
 
   // list
   examTypes$!: Observable<ExamType[]>
   levels$!: Observable<Level[]>
   skillLevels!: SkillLevel[]
   ranges$!: Observable<Range[]>;
+  skills$!: Observable<Skill[]>;
   content: string = '';
   init = {
     height: 500,
@@ -160,6 +162,7 @@ export class AddQuestionComponent {
     // });
     this.getExamTypes()
     this.addQuestion()
+    this.getSkills()
   }
 
   addQuestion(): void {
@@ -250,10 +253,52 @@ export class AddQuestionComponent {
     }
     this.questions.forEach(q => q.context = context)
 
-    let skillLevel = this.skillLevels.find(s => s.id == this.selectedSkillLevel)
+    console.log(this.skillLevels)
+    let skillLevel = this.skillLevels.find(s => s.id == this.selectedSkillLevel);
+    console.log(257, skillLevel, this.selectedSkillLevel);
 
     this.adminService.postQuestion(this.selectedExamType, skillLevel!.skillId || '', this.questions).subscribe({
       next: () => {
+        console.log(this.selectedExamType, skillLevel!.skillId);
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Thêm câu hỏi thành công.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          this.isForExam = false
+          this.passage = ''
+          this.passageExplanation = ''
+          this.questions = []
+          this.cd.detectChanges()
+          this.addQuestion()
+        });
+      },
+      error: (error) => {
+        console.log(error)
+      }
+    })
+  }
+
+  saveQuestions1(): void {
+    if (!this.isValid()) {
+      return;
+    }
+
+
+    const context: Context = {
+      content: this.content,
+      explain: this.passageExplanation,
+      isBelongTest: this.isForExam,
+      rangeId: this.rangeId
+    }
+    this.questions.forEach(q => q.context = context)
+
+
+    this.adminService.postQuestion(this.selectedExamType, this.selectedSkill || '', this.questions).subscribe({
+      next: () => {
+        console.log(this.selectedExamType, this.selectedSkill);
         Swal.fire({
           title: 'Thành công!',
           text: 'Thêm câu hỏi thành công.',
@@ -287,16 +332,21 @@ export class AddQuestionComponent {
     }
   }
 
+  getSkills() {
+    this.skills$ = this.adminService.getSkills();
+  }
+
   getSkillLevels() {
     if (this.selectedLevel) {
       this.adminService.getSkillLevelsByLevelId(this.selectedLevel).subscribe({
         next: (data) => {
 
           // FIX: Đảm bảo data clean và không có duplicate
-          this.skillLevels = data.filter((skill, index, self) =>
-            index === self.findIndex((s) => s.id === skill.id)
-          );
-          console.log('Loaded skillLevels:', this.skillLevels);
+          // this.skillLevels = data.filter((skill, index, self) =>
+          //   index === self.findIndex((s) => s.id === skill.id)
+          // );
+          this.skillLevels = data
+          console.log('Loaded skillLevels:', data);
           this.cd.detectChanges();
         },
         error: (error) => {
