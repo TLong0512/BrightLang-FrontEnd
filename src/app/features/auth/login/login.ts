@@ -82,9 +82,9 @@ export class LoginComponent implements OnInit {
           title: 'Đăng nhập thành công!',
           text: 'Chào mừng bạn!',
           icon: 'success',
-          confirmButtonText: 'OK',
           timer: 2000,       // tự đóng sau 2s (optional)
-          timerProgressBar: true
+          timerProgressBar: true,
+          showConfirmButton: false
         }).then(() => {
           // console.log(res)
           // this.authService.setRole(res.roles[0])
@@ -99,13 +99,11 @@ export class LoginComponent implements OnInit {
       },
       error: err => {
         console.log(err.status)
-        // if (err.status == 401) {
-        //   this.message = 'Bạn nhập sai email hoặc mật khẩu!'
-        //   this.cdr.detectChanges();
-        // }
-        if (err.status == 0) {
+        if (err.status == 400) {
+          this.message = 'Bạn nhập sai email hoặc mật khẩu!'
+          
+        } else if (err.status == 0) {
           this.message = 'Lỗi kết nối!'
-          this.cdr.detectChanges();
         }
         else this.message = "Lỗi không xác định.";
         this.cdr.detectChanges();

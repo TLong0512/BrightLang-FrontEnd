@@ -4,6 +4,11 @@ export interface ExamType {
   description: string;
 }
 
+export interface Skill {
+  id: string;
+  skillName: string;
+}
+
 export interface Level {
   id?: string;
   name?: string;

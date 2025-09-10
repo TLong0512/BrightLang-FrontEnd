@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TestService, PageResult, TestHistoryDto } from '../../services/exam.service';
 import { Subscription } from 'rxjs';
@@ -215,7 +215,7 @@ interface TestStatistics {
     .test-history-container {
       background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
       min-height: 100vh;
-      padding: 80px 0 60px;
+      padding: 120px 0 60px;
     }
 
     .container {
@@ -821,7 +821,8 @@ export class TestHistoryComponent implements OnInit, OnDestroy {
   constructor(
     private testService: TestService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -861,6 +862,7 @@ export class TestHistoryComponent implements OnInit, OnDestroy {
         });
         this.handleSuccessResponse(data);
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('❌ Error loading test history:', error);

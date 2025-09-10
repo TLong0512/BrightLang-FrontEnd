@@ -43,50 +43,28 @@
                             </select>
                         </div>
 
-                        <!-- Chọn Level -->
-                        @if(selectedExamType) {
+
                         <div class="col-md-4">
-                            <label for="levelSelect" class="form-label fw-semibold">
+                            <label for="skillSelect" class="form-label fw-semibold">
                                 <i class="fas fa-layer-group me-1"></i>
-                                Chọn cấp độ
+                                Chọn kỹ năng
                             </label>
-                            <select id="levelSelect" class="form-select" [(ngModel)]="selectedLevel"
-                                [ngModelOptions]="{standalone: true}" (ngModelChange)="onLevelChange()">
-                                <option value="">-- Chọn cấp độ --</option>
-                                @for(level of levels$ | async; track level.id) {
-                                <option [value]="level.id">{{ level.name }}</option>
+                            <select id="skillSelect" class="form-select" [(ngModel)]="selectedSkill"
+                                [ngModelOptions]="{standalone: true}">
+                                <option value="">-- Chọn kỹ năng --</option>
+                                @for(skill of skills$ | async; track skill.id) {
+                                <option [value]="skill.id">{{ skill.skillName }}</option>
                                 }
                             </select>
                         </div>
-                        }
-                        <!-- Row 2: Skill Level - Tách riêng để tránh overlap -->
-                        @if(selectedLevel) {
-                        <div class="col-md-4">
-                            <div>
-                                <label for="skillSelect" class="form-label fw-semibold">
-                                    <i class="fas fa-tools me-1"></i>
-                                    Chọn kỹ năng
-                                </label>
-                                <select id="skillSelect" class="form-select dropdown-with-space"
-                                    [(ngModel)]="selectedSkillLevel" (ngModelChange)="onSkillLevelChange()"
-                                    [ngModelOptions]="{standalone: true}">
-                                    <option value="">-- Chọn kỹ năng --</option>
-                                    @for(skillLevel of skillLevels; track skillLevel.id) {
-                                    <option [value]="skillLevel.id">
-                                        {{ skillLevel.skillName }}
-                                    </option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                        }
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    @if(selectedSkillLevel) {
+    @if(selectedSkill) {
     <!-- form nhập câu hỏi -->
     <div class="container-fluid">
         <div class="row justify-content-center">
@@ -158,12 +136,12 @@
                                         <i class="fas fa-question-circle me-2"></i>
                                         Danh sách câu hỏi ({{ questions.length }})
                                     </h4>
-                                    @if(questions.length < 4) {
-                                    <button type="button" class="btn btn-success btn-lg" (click)="addQuestion()">
+                                    @if(questions.length < 4) { <button type="button" class="btn btn-success btn-lg"
+                                        (click)="addQuestion()">
                                         <i class="fas fa-plus me-2"></i>
                                         Thêm câu hỏi
-                                    </button>
-                                    }
+                                        </button>
+                                        }
 
                                 </div>
 
@@ -320,7 +298,7 @@
                                     <div class="d-flex gap-2">
 
                                         <!-- [disabled]="!isFormValid()" -->
-                                        <button type="submit" class="btn btn-primary btn-lg" (click)="saveQuestions()">
+                                        <button type="submit" class="btn btn-primary btn-lg" (click)="saveQuestions1()">
                                             <i class="fas fa-save me-2"></i>
                                             Lưu câu hỏi
                                         </button>
