@@ -85,7 +85,7 @@
                         <div>Thêm dạng câu hỏi</div>
                         <div class="row g-3">
                             <!-- Các trường input chỉ hiện khi đã chọn skill -->
-                            <div class="col-md-4">
+                            <div class="col-md-12">
                                 <label for="typeNameInput" class="form-label fw-semibold">
                                     <i class="fas fa-tag me-1"></i>
                                     Tên dạng bài
@@ -133,14 +133,12 @@
                         <!-- Nút thêm -->
                         <div class="row mt-4">
                             <div class="col-12 text-center">
-                                <button type="button" class="btn btn-primary btn-lg px-5"
-                                (click)="onAddRange()">
+                                <button type="button" class="btn btn-primary btn-lg px-5" (click)="onAddRange()">
                                     <i class="fas fa-plus me-2"></i>
                                     Thêm dạng bài
                                 </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -201,7 +199,6 @@
                                         <button type="button" class="btn btn-danger btn-sm"
                                             (click)="onDeleteRange(item.id!)" title="Xóa dạng bài">
                                             <i class="fas fa-trash me-1"></i>
-                                            Xóa
                                         </button>
                                     </td>
                                 </tr>

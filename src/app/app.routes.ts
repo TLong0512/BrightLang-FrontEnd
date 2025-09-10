@@ -51,6 +51,16 @@ export const routes: Routes = [
   },
 
   {
+    path: 'my-account', component: UserComponent,
+    children: [
+      { path: '', pathMatch: 'full', component: MyAccountComponent },
+      { path: 'change-password', component: MyAccountChangePasswordComponent },
+      { path: 'update-account', component: MyAccountUpdateAccountComponent },
+
+    ],
+  },
+
+  {
     path: 'home-user',
 
     canActivate: [() => {

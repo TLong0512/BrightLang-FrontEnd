@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OnlyDigitsDirective } from '../../directive/only-number';
 import { MaxNumberDirective } from '../../directive/max-number';
@@ -775,9 +775,13 @@ import { map, Observable } from 'rxjs';
         padding: 1.5rem;
       }
     }
+      .error-message {
+    color: red;
+}
   `]
 })
 export class ExamQuestionTypeComponent implements OnInit {
+
   ranges: Range[] = [];
 
   // two way binding
@@ -870,6 +874,7 @@ export class ExamQuestionTypeComponent implements OnInit {
       endQuestionNumber: this.endQuestionNumber
     }
     // this.ranges.push(questionType);
+    console.log(range)
     this.adminService.postRange(range).subscribe({
       next: (res) => {
         Swal.fire({
