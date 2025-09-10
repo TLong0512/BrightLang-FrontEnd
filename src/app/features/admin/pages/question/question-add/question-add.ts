@@ -292,7 +292,7 @@ export class AddQuestionComponent {
   getLevels() {
     if (this.selectedExamType) {
       this.levels$ = this.adminService.getLevelsByExamTypeId(this.selectedExamType).pipe(
-        map((levels: Level[]) => levels.sort((a, b) => a.name.localeCompare(b.name))) // sort theo name
+        map((levels: Level[]) => levels.sort((a, b) => a.name!.localeCompare(b.name!))) // sort theo name
       );
     }
   }

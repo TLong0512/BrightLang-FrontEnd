@@ -27,11 +27,29 @@ export class RegisterComponent {
     private cdr: ChangeDetectorRef,
     private sharedService: SharedService) {
     this.registerForm = this.fb.group({
-      fullName: ['', [Validators.required, Validators.maxLength(50)]],
-      email: ['', [Validators.required, Validators.maxLength(50), Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(50), this.passwordStrengthValidator()],],
-      confirmPassword: ['', [Validators.required, this.passwordMatchValidator]]
+      fullName: this.fb.control('', {
+        validators: [Validators.required, Validators.maxLength(50)],
+        updateOn: 'blur'
+      }),
+      email: this.fb.control('', {
+        validators: [Validators.required, Validators.maxLength(50), Validators.email],
+        updateOn: 'blur'
+      }),
+      password: this.fb.control('', {
+        validators: [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(50),
+          this.passwordStrengthValidator()
+        ],
+        updateOn: 'blur'
+      }),
+      confirmPassword: this.fb.control('', {
+        validators: [Validators.required, this.passwordMatchValidator],
+        updateOn: 'blur'
+      })
     });
+
   }
 
   isTyping: { [key: string]: boolean } = {};
@@ -45,7 +63,7 @@ export class RegisterComponent {
   }
 
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.parent) return null; 
+    if (!control.parent) return null;
 
     const password = control.parent.get('password')?.value;
     const confirmPassword = control.value;
@@ -78,14 +96,14 @@ export class RegisterComponent {
 
     // Xử lý submit
     const { fullName, email, password, confirmPassword } = this.registerForm.value;
-    
+
     this.sharedService.updateData({
       fullName: fullName,
       email: email,
       password: password,
       confirmPassword: confirmPassword
     });
-    this.SendEmail({Email: email})
+    this.SendEmail({ Email: email })
   }
 
   get fullName() { return this.registerForm.get('fullName'); }

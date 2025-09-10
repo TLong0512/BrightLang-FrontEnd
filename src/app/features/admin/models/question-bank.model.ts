@@ -6,7 +6,8 @@ export interface ExamType {
 
 export interface Level {
   id?: string;
-  name: string;
+  name?: string;
+  examTypeId?: string;
 }
 
 export interface SkillLevel {

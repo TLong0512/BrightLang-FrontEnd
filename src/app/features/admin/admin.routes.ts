@@ -10,6 +10,7 @@ import { AddQuestionComponent } from "./pages/question/question-add/question-add
 import { UpdateQuestionComponent } from "./pages/question/question-update/question-update";
 import { RoadMapElementComponent } from "./pages/road-map-element/road-map-element";
 import { ExamTypeComponent } from "./pages/exam-type/exam-type";
+import { LevelComponent } from "./pages/level/level";
 
 export const adminRoutes: Routes = [
     {
@@ -24,12 +25,9 @@ export const adminRoutes: Routes = [
           {path: 'road-map-element', component: RoadMapElementComponent},
           {path: 'question-update/:id', component: UpdateQuestionComponent},
           {path: 'question-add', component: AddQuestionComponent},
-          {path: 'question', component: QuestionComponent,
-            children: [
-              
-            ]
-          },
+          {path: 'question', component: QuestionComponent },
           {path: 'exam-type', component: ExamTypeComponent},
+          {path: 'level', component: LevelComponent},
 
 
         ]

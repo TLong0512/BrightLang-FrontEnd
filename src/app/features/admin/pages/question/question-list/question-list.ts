@@ -34,6 +34,7 @@ export class QuestionListComponent implements OnInit {
     this.adminService.getAllQuestions(page, pageSize).subscribe({
       next: (data) => {
         this.questionsData = data;
+        console.log(data)
         this.cd.detectChanges();
         console.log('Questions data:', data);
       },
