@@ -280,7 +280,7 @@ export class UpdateQuestionComponent implements OnInit {
                 };
             }) || []
         }
-        console.log(questionUpdate)
+        console.log(283, questionUpdate);
         this.adminService.updateQuestion(this.questionDto.questionInformation!.id || '', questionUpdate).subscribe({
             next: () => {
                 Swal.fire({

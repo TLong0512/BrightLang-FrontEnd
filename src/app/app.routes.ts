@@ -12,20 +12,24 @@ import { LevelTestEntryComponent } from './features/user/level-test/pages/level-
 import { TestReadyComponent } from './features/user/level-test/pages/test-ready/test-ready';
 import { TestQuestionsComponent } from './features/user/level-test/pages/test-questions/test-questions';
 import { TestResultComponent } from './features/user/level-test/pages/test-result/test-result';
-import { QuestionTypesComponent } from './features/user/practive/pages/question-types/question-types';
-import { PracticeComponent } from './features/user/practive/pages/practice-screen/practice-screen';
-import { SkillSelectionComponent } from './features/user/practive/pages/skill-selection/skill-selection';
-import { TopikSelectionComponent } from './features/user/practive/pages/topik-selection/topik-selection';
+import { QuestionTypesComponent } from './features/user/practice/pages/question-types/question-types';
+import { PracticeComponent } from './features/user/practice/pages/practice-screen/practice-screen';
+import { SkillSelectionComponent } from './features/user/practice/pages/skill-selection/skill-selection';
+import { TopikSelectionComponent } from './features/user/practice/pages/topik-selection/topik-selection';
+
 import { TestReviewComponent } from './features/user/level-test/pages/test-review/test-review';
 import { TestHistoryComponent } from './features/user/level-test/pages/test-history/test-history';
 import { UserState } from './features/auth/services/user.state';
 import { inject } from '@angular/core';
 import { map } from 'rxjs';
-import { TopikSubLevelSelectionComponent } from './features/user/practive/pages/topik-SubLevel/topik-sub-level';
-import { ResultComponent } from './features/user/practive/pages/result-screen/result-screen';
 import { RoadmapComponent } from './features/user/roadmap/pages/roadmap/roadmap';
 import { RoadmapSelectionComponent } from './features/user/roadmap/pages/roadmap-selection/roadmap-selection';
 import { AdminGuard, AuthGuard } from './guards/guard';
+import { MyAccountComponent } from './features/my-account/my-account.component';
+import { MyAccountChangePasswordComponent } from './features/my-account/my-account-change-password.component';
+import { MyAccountUpdateAccountComponent } from './features/my-account/my-account-update-account.component';
+import { ResultComponent } from './features/user/practice/pages/result-screen/result-screen';
+import { TopikSubLevelSelectionComponent } from './features/user/practice/pages/topik-SubLevel/topik-sub-level';
 
 // 👇 import guards
 export const routes: Routes = [
