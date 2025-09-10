@@ -6,6 +6,7 @@ import { ExamStateService } from '../../services/exam-state.service';
 import { ContextDisplayComponent } from '../../components/context-display/context-display';
 import { Router } from '@angular/router';
 import { TestService } from '../../services/exam.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-test-questions',
@@ -18,15 +19,17 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   @Output() examFinished = new EventEmitter<void>();
 
-  
+
   examStateService = inject(ExamStateService);
   testService = inject(TestService);
-  
+
   showConfirmFinish = signal<boolean>(false);
   isLoading = signal<boolean>(true);
   isSubmitting = signal<boolean>(false);
   errorMessage = signal<string>('');
   timerSubscription: Subscription | null = null;
+
+  private sanitizer = inject(DomSanitizer);
 
   ngOnInit(): void {
     this.initializeTest();
@@ -39,7 +42,7 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
   public initializeTest(): void {
     this.isLoading.set(true);
     this.errorMessage.set('');
-    
+
     // Create test using backend API
     this.testService.createTest().subscribe({
       next: (testData) => {
@@ -106,63 +109,63 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
   }
 
   onAnswerChange(optionIndex: number, event: Event): void {
-  const input = event.target as HTMLInputElement;
-  const currentQuestion = this.examStateService.currentQuestion();
-  
-  if (!currentQuestion || !currentQuestion.answers) return;
+    const input = event.target as HTMLInputElement;
+    const currentQuestion = this.examStateService.currentQuestion();
 
-  const currentAnswers = this.examStateService.userAnswers().get(currentQuestion.id) || [];
-  let selectedAnswers: string[] = [];
+    if (!currentQuestion || !currentQuestion.answers) return;
 
-  // Determine question type based on correct answers count
-  const questionType = this.getQuestionType();
+    const currentAnswers = this.examStateService.userAnswers().get(currentQuestion.id) || [];
+    let selectedAnswers: string[] = [];
 
-  if (questionType === 'radio') {
-    // For single choice, store answer ID directly
-    if (input.checked && currentQuestion.answers[optionIndex]) {
-      selectedAnswers = [currentQuestion.answers[optionIndex].id];
-    }
-  } else {
-    // For multiple choice
-    selectedAnswers = [...currentAnswers];
-    if (input.checked) {
-      if (currentQuestion.answers[optionIndex]) {
-        const answerId = currentQuestion.answers[optionIndex].id;
-        if (!selectedAnswers.includes(answerId)) {
-          selectedAnswers.push(answerId);
-        }
+    // Determine question type based on correct answers count
+    const questionType = this.getQuestionType();
+
+    if (questionType === 'radio') {
+      // For single choice, store answer ID directly
+      if (input.checked && currentQuestion.answers[optionIndex]) {
+        selectedAnswers = [currentQuestion.answers[optionIndex].id];
       }
     } else {
-      if (currentQuestion.answers[optionIndex]) {
-        const answerId = currentQuestion.answers[optionIndex].id;
-        selectedAnswers = selectedAnswers.filter(x => x !== answerId);
+      // For multiple choice
+      selectedAnswers = [...currentAnswers];
+      if (input.checked) {
+        if (currentQuestion.answers[optionIndex]) {
+          const answerId = currentQuestion.answers[optionIndex].id;
+          if (!selectedAnswers.includes(answerId)) {
+            selectedAnswers.push(answerId);
+          }
+        }
+      } else {
+        if (currentQuestion.answers[optionIndex]) {
+          const answerId = currentQuestion.answers[optionIndex].id;
+          selectedAnswers = selectedAnswers.filter(x => x !== answerId);
+        }
       }
     }
-  }
 
-  // Update question answer - this will trigger auto-save
-  this.examStateService.updateQuestionAnswer(currentQuestion.id, selectedAnswers);
-}
+    // Update question answer - this will trigger auto-save
+    this.examStateService.updateQuestionAnswer(currentQuestion.id, selectedAnswers);
+  }
 
   isOptionSelected(optionIndex: number): boolean {
     const currentQuestion = this.examStateService.currentQuestion();
     if (!currentQuestion || !currentQuestion.answers) return false;
-    
+
     const userAnswers = this.examStateService.userAnswers().get(currentQuestion.id) || [];
     const answerId = currentQuestion.answers[optionIndex]?.id;
-    
+
     return answerId ? userAnswers.includes(answerId) : false;
   }
 
   getQuestionType(): string {
     const currentQuestion = this.examStateService.currentQuestion();
     if (!currentQuestion || !currentQuestion.answers) return 'radio';
-    
+
     // If we have explicit type, use it
     if (currentQuestion.type) {
       return currentQuestion.type === 'single' ? 'radio' : 'checkbox';
     }
-    
+
     // Otherwise, determine by number of correct answers
     const correctCount = currentQuestion.answers.filter(a => a.isCorrect).length;
     return correctCount > 1 ? 'checkbox' : 'radio';
@@ -208,7 +211,7 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
   confirmFinishExam(): void {
     this.showConfirmFinish.set(false);
     this.isSubmitting.set(true);
-    
+
     // Submit exam using the service
     this.examStateService.submitExam().subscribe({
       next: (response) => {
@@ -228,5 +231,9 @@ export class TestQuestionsComponent implements OnInit, OnDestroy {
   finishExam(): void {
     this.stopTimer();
     this.router.navigate(['/home-user/test-result']);
+  }
+
+  getSafeHtml(htmlContent: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
   }
 }
