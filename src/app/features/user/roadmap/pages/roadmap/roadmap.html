@@ -1,0 +1,57 @@
+<div class="body">
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="container">
+        <div class="header">
+            <a href="#" class="exit-main-btn" id="exitMainBtn">Thoát học lộ trình</a>
+            <h1 id="headerTitle">Bài tập theo lộ trình</h1>
+            <p id="headerSubtitle">Bạn đang ở ngày 1 trong lộ trình</p>
+        </div>
+
+        <div class="journey-container" id="journeyContainer">
+            <img src="assets/logo.png" id="mascotLogo" class="mascot-logo" />
+            <div class="journey-path" id="journeyPath">
+                <div class="path-line"></div>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            ← Vuốt để khám phá →
+        </div>
+
+        <button class="finish-button" id="finishButton">
+            Kết thúc lộ trình
+        </button>
+    </div>
+
+    <!-- Modal câu hỏi đã được tối ưu -->
+    <div class="modal" id="questionModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal">&times;</button>
+            <h2 id="modalTitle">Ngày 1</h2>
+            <!-- Loại bỏ question counter và progress bar không cần thiết -->
+            <div class="question" id="questionText"></div>
+            <div class="answers" id="answersContainer"></div>
+            <button class="next-btn" id="nextQuestionBtn">Câu tiếp theo</button>
+        </div>
+    </div>
+
+    <!-- Modal test khi hoàn thành -->
+    <div class="test-modal" id="testModal">
+        <div class="test-modal-content">
+            <button class="test-close-btn" id="testCloseModal">&times;</button>
+            <h2>Chúc mừng bạn!</h2>
+            <div class="test-description">
+                Bạn đã hoàn thành toàn bộ lộ trình học tập!<br>
+                Bây giờ bạn có muốn thử thách bản thân với bài test tổng hợp để kiểm tra kiến thức đã học không?
+            </div>
+            <div class="test-buttons">
+                <button class="test-btn decline" id="declineTestBtn">
+                    Không, cảm ơn
+                </button>
+                <button class="test-btn accept" id="acceptTestBtn">
+                    Thi ngay!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

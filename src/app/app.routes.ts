@@ -23,6 +23,8 @@ import { inject } from '@angular/core';
 import { map } from 'rxjs';
 import { TopikSubLevelSelectionComponent } from './features/user/practive/pages/topik-SubLevel/topik-sub-level';
 import { ResultComponent } from './features/user/practive/pages/result-screen/result-screen';
+import { RoadmapComponent } from './features/user/roadmap/pages/roadmap/roadmap';
+import { RoadmapSelectionComponent } from './features/user/roadmap/pages/roadmap-selection/roadmap-selection';
 import { AdminGuard, AuthGuard } from './guards/guard';
 
 // 👇 import guards
@@ -98,7 +100,13 @@ export const routes: Routes = [
       {
         path: 'topik-detail',
         component: TopicsDetail
+      },
+      { path: 'roadmap', component: RoadmapComponent },
+      {
+        path: 'roadmap-selection',
+        component: RoadmapSelectionComponent
       }
+
     ]
   },
 
