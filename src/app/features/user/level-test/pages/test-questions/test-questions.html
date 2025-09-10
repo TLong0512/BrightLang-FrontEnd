@@ -51,12 +51,11 @@
               <button class="btn btn-sm btn-outline-warning" (click)="showConfirmFinish.set(true)" title="Nộp bài">
                 <i class="fas fa-paper-plane"></i>
               </button>
-              <button class="btn btn-sm" 
-                      [class.btn-success]="examStateService.isExamPaused()"
-                      [class.btn-warning]="!examStateService.isExamPaused()"
-                      (click)="togglePause()" 
-                      [title]="examStateService.isExamPaused() ? 'Tiếp tục' : 'Tạm dừng'">
-                <i class="fas" [class.fa-play]="examStateService.isExamPaused()" [class.fa-pause]="!examStateService.isExamPaused()"></i>
+              <button class="btn btn-sm" [class.btn-success]="examStateService.isExamPaused()"
+                [class.btn-warning]="!examStateService.isExamPaused()" (click)="togglePause()"
+                [title]="examStateService.isExamPaused() ? 'Tiếp tục' : 'Tạm dừng'">
+                <i class="fas" [class.fa-play]="examStateService.isExamPaused()"
+                  [class.fa-pause]="!examStateService.isExamPaused()"></i>
               </button>
             </div>
           </div>
@@ -90,7 +89,8 @@
         <!-- Main Question Area -->
         <div class="col-lg-9">
           <!-- Context -->
-          <div *ngIf="examStateService.currentQuestion()?.contextContent" class="card border-0 shadow-sm context-card mb-4">
+          <div *ngIf="examStateService.currentQuestion()?.contextContent"
+            class="card border-0 shadow-sm context-card mb-4">
             <div class="card-header bg-light">
               <h6 class="mb-0">
                 <i class="fas fa-book-open me-2"></i>
@@ -98,8 +98,12 @@
               </h6>
             </div>
             <div class="card-body">
-              <div class="context-content">
+              <!-- <div class="context-content">
                 {{ examStateService.currentQuestion()?.contextContent }}
+              </div> -->
+
+              <div class="context-content"
+                [innerHTML]="getSafeHtml(examStateService.currentQuestion()?.contextContent || '')">
               </div>
             </div>
           </div>
@@ -123,18 +127,20 @@
               <!-- Answer Options -->
               <div *ngIf="examStateService.currentQuestion() as current">
                 <div class="answer-options" *ngIf="(current.answers?.length ?? 0) > 0">
-                  <div *ngFor="let answer of current.answers; let optIdx = index" class="form-check mb-2 d-flex align-items-center">
-                    <input
-                      class="form-check-input me-2"
-                      [type]="getQuestionType()"
-                      [name]="'question-' + current.id"
-                      [id]="'q' + current.id + '-option-' + optIdx"
-                      [checked]="isOptionSelected(optIdx)"
+                  <div *ngFor="let answer of current.answers; let optIdx = index"
+                    class="form-check mb-2 d-flex align-items-center">
+                    <input class="form-check-input me-2" [type]="getQuestionType()" [name]="'question-' + current.id"
+                      [id]="'q' + current.id + '-option-' + optIdx" [checked]="isOptionSelected(optIdx)"
                       (change)="onAnswerChange(optIdx, $event)">
+
+                    <!-- <label class="form-check-label w-100" [for]="'q' + current.id + '-option-' + optIdx">
+                      <span class="option-letter me-2">{{ getOptionLetter(optIdx) }}.</span>
+                      {{ answer.answerText }}
+                    </label> -->
 
                     <label class="form-check-label w-100" [for]="'q' + current.id + '-option-' + optIdx">
                       <span class="option-letter me-2">{{ getOptionLetter(optIdx) }}.</span>
-                      {{ answer.answerText }}
+                      <span [innerHTML]="getSafeHtml(answer.answerText)"></span>
                     </label>
                   </div>
                 </div>
@@ -144,9 +150,7 @@
 
           <!-- Navigation -->
           <div class="d-flex justify-content-between mb-4 question-navigation">
-            <button 
-              class="btn btn-outline-primary"
-              (click)="previousQuestion()" 
+            <button class="btn btn-outline-primary" (click)="previousQuestion()"
               [disabled]="examStateService.currentQuestionIndex() === 0">
               <i class="fas fa-chevron-left me-2"></i> Câu Trước
             </button>
@@ -157,11 +161,8 @@
               </small>
             </div>
 
-            <button 
-              class="btn"
-              [class.btn-danger]="examStateService.isLastQuestion()"
-              [class.btn-outline-primary]="!examStateService.isLastQuestion()"
-              (click)="nextQuestion()">
+            <button class="btn" [class.btn-danger]="examStateService.isLastQuestion()"
+              [class.btn-outline-primary]="!examStateService.isLastQuestion()" (click)="nextQuestion()">
               <ng-container *ngIf="examStateService.isLastQuestion(); else notLastQuestion">
                 <i class="fas fa-flag-checkered me-2"></i> Hoàn Thành
               </ng-container>
@@ -184,10 +185,8 @@
             <div class="card-body p-2">
               <div class="row g-1 question-grid-compact">
                 <div class="col-3" *ngFor="let questionStatus of examStateService.answeredQuestions(); let i = index">
-                  <button 
-                    class="btn btn-sm w-100 question-number-btn-compact"
-                    [class]="getQuestionButtonClass(questionStatus)"
-                    (click)="jumpToQuestion(questionStatus.index)"
+                  <button class="btn btn-sm w-100 question-number-btn-compact"
+                    [class]="getQuestionButtonClass(questionStatus)" (click)="jumpToQuestion(questionStatus.index)"
                     [title]="getQuestionTooltip(questionStatus)">
                     {{ questionStatus.index + 1 }}
                   </button>
@@ -231,7 +230,8 @@
                 </div>
                 <div class="d-flex justify-content-between">
                   <small class="text-muted">Còn lại:</small>
-                  <small class="fw-bold text-warning">{{ examStateService.totalQuestions() - getAnsweredCount() }}</small>
+                  <small class="fw-bold text-warning">{{ examStateService.totalQuestions() - getAnsweredCount()
+                    }}</small>
                 </div>
               </div>
             </div>
@@ -262,15 +262,10 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button 
-                class="btn btn-secondary"
-                (click)="showConfirmFinish.set(false)">
+              <button class="btn btn-secondary" (click)="showConfirmFinish.set(false)">
                 Hủy
               </button>
-              <button 
-                class="btn btn-danger"
-                (click)="confirmFinishExam()"
-                [disabled]="isSubmitting()">
+              <button class="btn btn-danger" (click)="confirmFinishExam()" [disabled]="isSubmitting()">
                 <span *ngIf="isSubmitting()" class="spinner-border spinner-border-sm me-2"></span>
                 <i *ngIf="!isSubmitting()" class="fas fa-paper-plane me-2"></i>
                 {{ isSubmitting() ? 'Đang nộp...' : 'Nộp bài' }}
