@@ -255,16 +255,11 @@ export class TestResultComponent implements OnInit {
 
   // Action handlers
   onCreateRoadmap(): void {
-    const roadmapData = {
-      level: this.getAssessedLevel(),
-      targetLevel: this.getTargetLevel()
-    };
-    this.createRoadmap.emit(roadmapData);
-    this.showRoadmapConfirm.set(true);
+    this.router.navigate(['/home-user/level-test']);
   }
 
   declineRoadmap(): void {
-    this.showRoadmapConfirm.set(true);
+    this.router.navigate(['/home-user']);
   }
 
   onViewDetailedResults(): void {
@@ -283,14 +278,14 @@ export class TestResultComponent implements OnInit {
     this.router.navigate(['/home-user/level-test']);
   }
 
-  onSaveResult(): void {
-    const result = this.examResult();
-    if (result) {
-      this.saveResult.emit(result);
-    }
-  }
+  // onSaveResult(): void {
+  //   const result = this.examResult();
+  //   if (result) {
+  //     this.saveResult.emit(result);
+  //   }
+  // }
 
-  onShareResult(): void {
-    this.shareResult.emit();
-  }
+  // onShareResult(): void {
+  //   this.shareResult.emit();
+  // }
 }

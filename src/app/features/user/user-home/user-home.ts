@@ -19,9 +19,10 @@ export class UserHomeComponent {
   }
 
   continueRoadmap() {
-    this.http.get<any>(`http://localhost:5000/api/UserRoadmap/GetMyRoadmaps?page=1&pageSize=1`)
+    this.http.get<any>(`/UserRoadmaps?page=1&pageSize=1`,  { withCredentials: true  })
       .subscribe({
         next: (res) => {
+          console.log('dddddddddddd', res.totalItem);
           if (res && res.totalItem > 0) {
             this.router.navigate(['/home-user/roadmap']); // Có lộ trình
           } else {

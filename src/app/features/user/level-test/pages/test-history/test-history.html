@@ -1,4 +1,4 @@
-<div class="test-history-container">
+<div class="test-history-container" >
   <div class="header">
     <h2>Lịch sử test</h2>
     <button class="refresh-btn" (click)="refreshHistory()" [disabled]="loading">
@@ -105,11 +105,11 @@
     </div>
 
     <!-- Pagination info -->
-    <div class="pagination-info" *ngIf="totalItems > 0">
+    <!-- <div class="pagination-info" *ngIf="totalItems > 0">
       Hiển thị {{ (currentPage - 1) * pageSize + 1 }} - 
       {{ Math.min(currentPage * pageSize, totalItems) }} 
       trong tổng số {{ totalItems }} kết quả
-    </div>
+    </div> -->
   </div>
 </div>
 
@@ -117,7 +117,7 @@
 .test-history-container {
   padding: 20px;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 100px auto;
 }
 
 .header {

@@ -43,7 +43,7 @@ export class LevelTestEntryComponent {
         this.roadmapService.getRoadmapsByName(selectedTopikLevel.roadmapName).subscribe({
           next: (roadmaps: RoadmapGeneralDto[]) => {
             // Navigate to roadmap selection page với data
-            this.router.navigate(['/roadmap-selection'], {
+            this.router.navigate(['/home-user/roadmap-selection'], {
               state: { roadmaps: roadmaps }
             });
           },

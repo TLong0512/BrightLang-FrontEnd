@@ -32,17 +32,22 @@ export class RoadmapSelectionComponent implements OnInit {
 
   ngOnInit(): void {
     // Lấy dữ liệu từ navigation state
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state) {
-      this.roadMaps = navigation.extras.state['roadmaps'] || [];
-      this.setupPricingPlans();
-    } else {
-      // Fallback: redirect về trang chọn level nếu không có data
-      this.router.navigate(['/level-test-entry']);
-    }
+    // const navigation = this.router.currentNavigation();
+    // if (navigation?.extras.state) {
+    //   this.roadMaps = navigation.extras.state['roadmaps'] || [];
+    //   this.setupPricingPlans();
+    // } 
+    // else {
+    //   // Fallback: redirect về trang chọn level nếu không có data
+    //   this.router.navigate(['/home-user/level-test']);
+    // }
+    this.roadMaps = window.history.state.roadmaps;
+    this.setupPricingPlans()
+    console.log(this.roadMaps)
   }
 
   private setupPricingPlans(): void {
+    console.log(this.roadMaps.length)
     if (this.roadMaps.length >= 3) {
       // Sắp xếp theo timeRequired tăng dần
       this.roadMaps.sort((a, b) => a.timeRequired - b.timeRequired);

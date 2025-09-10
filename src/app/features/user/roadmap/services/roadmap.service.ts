@@ -44,16 +44,16 @@ export interface UserRoadmapDetailDto {
   providedIn: 'root'
 })
 export class RoadmapService {
-  private baseUrl = `${environment.apiUrlRoadMap}`
+  // private baseUrl = `${environment.apiUrlRoadMap}`
 
   constructor(private http: HttpClient) {}
 
   getRoadmapsByName(roadmapName: string): Observable<RoadmapGeneralDto[]> {
     const params = new HttpParams().set('roadmapName', roadmapName);
-    return this.http.get<RoadmapGeneralDto[]>(`${this.baseUrl}/roadmaps/by-roadmap-name`, { params });
+    return this.http.get<RoadmapGeneralDto[]>(`/roadmaps/by-roadmap-name`, { params, withCredentials: true  }, );
   }
 
   createUserRoadmap(userRoadmapDto: UserRoadmapPostDto): Observable<UserRoadmapDetailDto> {
-    return this.http.post<UserRoadmapDetailDto>(`${this.baseUrl}/userroadmaps`, userRoadmapDto);
+    return this.http.post<UserRoadmapDetailDto>(`/userroadmaps`, userRoadmapDto, {withCredentials: true });
   }
 }
