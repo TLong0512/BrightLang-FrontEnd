@@ -181,7 +181,7 @@ export class QuestionComponent implements OnInit {
   getLevels() {
     if (this.selectedExamType) {
       this.levels$ = this.adminService.getLevelsByExamTypeId(this.selectedExamType).pipe(
-        map(levels => levels.sort((a, b) => a.name.localeCompare(b.name))) // sort theo name
+        map(levels => levels.sort((a, b) => a.name!.localeCompare(b.name!))) // sort theo name
       );
     }
   }

@@ -46,7 +46,15 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Cấp độ',
         type: 'item',
         classes: 'nav-item',
-        url: '/admin/question-type',
+        url: '/admin/level',
+        icon: 'ti ti-typography'
+      },
+      {
+        id: 'typography3',
+        title: 'Kỹ năng',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/admin/skill',
         icon: 'ti ti-typography'
       },
       {

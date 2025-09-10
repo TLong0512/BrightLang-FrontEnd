@@ -1,0 +1,80 @@
+<div class="exam-type-container">
+    <div class="header">
+        <h2>Quản lý cấp độ</h2>
+        @if(currentExamTypeId) {
+            <button class="btn btn-primary" (click)="openAddModal()">
+            <i class="fas fa-plus"></i> Thêm mới
+        </button>
+        }
+        
+    </div>
+
+    <div class="table-container">
+        <select name="" id="" [(ngModel)]="currentExamTypeId" (change)="onChange()">
+            <option value="">Chọn dạng bài thi</option>
+            @for(examType of examTypes; track examType) {
+                <option [value]="examType.id">{{ examType.name }}</option>
+            }
+        </select>
+        <table class="exam-type-table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(level of levels; track level; let i = $index) {
+                <tr>
+
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ level.name }}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" (click)="openEditModal(level)">
+                            <i class="fas fa-edit"></i> Sửa
+                        </button>
+                        <button class="btn btn-danger btn-sm" (click)="deleteLevel(level.id!)">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </td>
+
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    @if(showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>{{ isEditMode ? 'Sửa cấp độ' : 'Thêm cấp độ mới' }}</h3>
+                <button class="close-btn" (click)="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="name">Tên cấp độ:</label>
+                        <input type="text" id="name" class="form-control" [(ngModel)]="currentLevel.name" name="name"
+                            placeholder="Nhập cấp độ" (focus)="onFocus()">
+                        @if(errorMessage) {
+                        <div class="text-danger">{{ errorMessage }}</div>
+                        }
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+                <button class="btn btn-primary" (click)="saveLevel()">
+                    {{ isEditMode ? 'Cập nhật' : 'Thêm mới' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+</div>
