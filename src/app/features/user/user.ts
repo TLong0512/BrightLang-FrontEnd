@@ -8,8 +8,8 @@ import { UserFooterComponent } from '../../shared/user/footer/footer';
   selector: 'app-user',
   imports: [ RouterModule, UserFooterComponent, UserHeaderComponent
     ],
-  templateUrl: '../user/user.html',
-  
+  templateUrl: './user.html',
+  styleUrls: ['./user.css']
 })
 export class UserComponent {
 

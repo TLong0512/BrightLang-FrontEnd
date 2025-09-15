@@ -1,0 +1,190 @@
+<div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-12">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-gradient-primary text-white py-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-plus-circle fa-2x me-3"></i>
+                            <div>
+                                <h2 class="mb-1">Xem câu hỏi</h2>
+                                <p class="mb-0 opacity-75">Xem câu hỏi và đáp án chi tiết</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        
+                            <!-- Checkbox for Exam Usage -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="form-check form-switch form-check-lg">
+                                        <input class="form-check-input" type="checkbox" id="examUsage"
+                                            [(ngModel)]="questionDto.contextInformation!.isBelongTest" name="examUsage">
+                                        <label class="form-check-label fw-bold" for="examUsage">
+                                            <i class="fas fa-graduation-cap text-primary me-2"></i>
+                                            Sử dụng câu hỏi này làm bài thi
+                                        </label>
+                                    </div>
+                                    <small class="text-muted ms-5">Đánh dấu nếu câu hỏi này có thể được dùng trong các bài
+                                        kiểm tra</small>
+                                </div>
+                            </div>
+
+                            <!-- Passage Input -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <label for="passage" class="form-label fw-bold">
+                                        <i class="fas fa-file-text text-success me-2"></i>
+                                        Đoạn văn, hình ảnh, âm thanh:
+                                    </label>
+                                    <editor apiKey="amy8k0ro3nc5wj01vdvtdgcu8wltaqzfnkw3da2arhsfz3tb" 
+                                    [init]="init" 
+                                    [(ngModel)]="questionDto.contextInformation!.content" 
+                                    [ngModelOptions]="{standalone: true}"/>
+                                </div>
+                            </div>
+
+                            <!-- Passage Explanation -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <label for="passageExplanation" class="form-label fw-bold">
+                                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                                        Giải thích đoạn văn:
+                                    </label>
+                                    <textarea class="form-control" id="passageExplanation" rows="3"
+                                        [(ngModel)]="questionDto.contextInformation!.explain" name="passageExplanation"
+                                        placeholder="Nhập giải thích, hướng dẫn hoặc gợi ý cho đoạn văn...">
+                                    </textarea>
+                                </div>
+                            </div>
+
+                            <!-- Questions Section -->
+                            <div class="border-top pt-4">
+                                <!-- Question -->
+                                 
+                                <div class="mb-5">
+                                    <div class="card border-start border-primary border-4 shadow-sm">
+                                        
+                                        <div class="card-body">
+                                            <!-- Question Text -->
+                                            <div class="row mb-3">
+                                                <div class="col-12">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-question text-info me-2"></i>
+                                                        Câu số:
+                                                    </label>
+                                                    <input type="number" class="form-control form-control-lg"
+                                                        [(ngModel)]="questionDto.questionInformation!.questionNumber"
+                                                        [name]="questionTextNumber" placeholder="">
+                                                </div>
+                                            </div>
+                                            <!-- Question Text -->
+                                            <div class="row mb-3">
+                                                <div class="col-12">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-question text-info me-2"></i>
+                                                        Câu hỏi:
+                                                    </label>
+                                                    <input type="text" class="form-control form-control-lg"
+                                                        [(ngModel)]="questionDto.questionInformation!.content" [name]="'questionText'"
+                                                        placeholder="Nhập nội dung câu hỏi...">
+                                                </div>
+                                            </div>
+
+                                            <!-- Question Explanation -->
+                                            <div class="row mb-3">
+                                                <div class="col-12">
+                                                    <label class="form-label fw-bold">
+                                                        <i class="fas fa-comment-dots text-secondary me-2"></i>
+                                                        Giải thích câu hỏi:
+                                                    </label>
+                                                    <textarea class="form-control" rows="2"
+                                                        [(ngModel)]="questionDto.questionInformation!.explain"
+                                                        [name]="'questionExplanation'"
+                                                        placeholder="Nhập giải thích hoặc hướng dẫn cho câu hỏi...">
+                                                </textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Answers Section -->
+                                            <div class="border-top pt-3">
+                                                <h6 class="text-primary mb-3">
+                                                    <i class="fas fa-list-ul me-2"></i>
+                                                    Các đáp án:
+                                                </h6>
+
+                                                <div class="row">
+                                                    @for(answer of questionDto.answerDetails!; track answer; let j = $index) {
+                                                        <div class="col-lg-6 mb-3">
+                                                        <div class="card h-100"
+                                                            [class.border-success]="answer.isCorrect"
+                                                            [class.bg-light]="answer.isCorrect">
+                                                            <div class="card-body">
+                                                                <!-- Answer Selection -->
+                                                                <div class="form-check mb-2">
+                                                                    <input class="form-check-input" type="radio"
+                                                                        [name]="'correctAnswer'"
+                                                                        [id]="'answer' + j"
+                                                                        [checked]="answer.isCorrect"
+                                                                        (change)="setCorrectAnswer(j)">
+                                                                    <label class="form-check-label fw-bold"
+                                                                        [for]="'answer' + j">
+                                                                        <i class="fas fa-check-circle text-success me-1"
+                                                                            *ngIf="answer.isCorrect"></i>
+                                                                        Đáp án {{ j + 1 }}
+                                                                        <span *ngIf="answer.isCorrect"
+                                                                            class="badge bg-success ms-2">Đúng</span>
+                                                                    </label>
+                                                                </div>
+
+                                                                <!-- Answer Text -->
+                                                                <div class="mb-2">
+                                                                    <editor apiKey="amy8k0ro3nc5wj01vdvtdgcu8wltaqzfnkw3da2arhsfz3tb" [init]="init" 
+                                                                    [(ngModel)]="answer.value"
+                                                                    [ngModelOptions]="{standalone: true}"
+                                                                    />
+                                                                </div>
+
+                                                                <!-- Answer Explanation -->
+                                                                <div>
+                                                                    <textarea class="form-control form-control-sm"
+                                                                        rows="2" [(ngModel)]="answer.explain"
+                                                                        [name]="'answerExplanation' + j"
+                                                                        placeholder="Giải thích đáp án...">
+                                                                    </textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>              
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="border-top pt-4 mt-4">
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-times me-2"></i>
+                                        Hủy
+                                    </button>
+
+                                    <div class="d-flex gap-2">
+                                    
+                                        <!-- [disabled]="!isFormValid()" -->
+                                        <button type="submit" class="btn btn-primary btn-lg" 
+                                            (click)="updateQuestion()">
+                                            <i class="fas fa-save me-2"></i>
+                                            Cập nhật
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

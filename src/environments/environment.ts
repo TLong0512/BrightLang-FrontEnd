@@ -1,5 +1,9 @@
 export const environment = {
   production: false,
-  apiUrlAuth: 'https://localhost:7030/api',
-  apiUrlQuestionBank: 'https://localhost:7141/api'  
+  apiUrlPractice: '/Practice',
+  apiUrlVocabulary: '/Vocabulary',
+  apiUrlBook: '/Book',
+  apiUrlAuth: 'http://localhost:5000/api',
+  apiUrlQuestionBank: 'http://localhost:5000/api' ,
+  apiUrlRoadMap: '' ,
 };

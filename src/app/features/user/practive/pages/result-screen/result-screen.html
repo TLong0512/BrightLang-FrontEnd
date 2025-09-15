@@ -1,0 +1,300 @@
+<div class="result-screen-container">
+    <!-- Header -->
+    <div class="result-header">
+        <div class="header-content">
+            <h1 class="result-title">
+                <i class="bi bi-clipboard-check"></i>
+                Kết quả luyện tập
+            </h1>
+            <p class="result-subtitle">{{ performanceMessage }}</p>
+        </div>
+    </div>
+
+    <div class="result-content">
+        <!-- Summary Card -->
+        <div class="summary-card" [class.animate]="animateScore">
+            <div class="score-section">
+                <div class="score-circle" [style.border-color]="scoreColor">
+                    <i class="score-icon" [class]="scoreIcon" [style.color]="scoreColor"></i>
+                    <div class="score-value" [style.color]="scoreColor">{{ practiceResult.score }}%</div>
+                    <div class="score-label">{{ performanceText }}</div>
+                </div>
+            </div>
+
+            <div class="stats-section" [class.animate]="animateStats">
+                <div class="summary-stats">
+                    <div class="stat-item total">
+                        <div class="stat-icon">
+                            <i class="bi bi-list-ol"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ practiceResult.totalQuestions }}</div>
+                            <div class="stat-label">Tổng câu hỏi</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-item correct">
+                        <div class="stat-icon">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ practiceResult.correctAnswers }}</div>
+                            <div class="stat-label">Câu đúng</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-item wrong">
+                        <div class="stat-icon">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ practiceResult.wrongAnswers }}</div>
+                            <div class="stat-label">Câu sai</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-item unanswered">
+                        <div class="stat-icon">
+                            <i class="bi bi-dash-circle-fill"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ practiceResult.unanswered }}</div>
+                            <div class="stat-label">Bỏ qua</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="time-and-accuracy">
+                    <div class="info-item">
+                        <i class="bi bi-target"></i>
+                        <span class="info-label">Độ chính xác:</span>
+                        <span class="info-value">{{ practiceResult.score }}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="result-actions">
+            <button class="action-btn primary" (click)="retryPractice()">
+                <i class="bi bi-arrow-clockwise"></i>
+                Làm lại
+            </button>
+
+            <button class="action-btn secondary" (click)="toggleExplanations()">
+                <i class="bi" [class.bi-eye]="!showExplanations" [class.bi-eye-slash]="showExplanations"></i>
+                {{ showExplanations ? 'Ẩn giải thích' : 'Xem giải thích' }}
+            </button>
+
+            <button class="action-btn outline" (click)="startNewPractice()">
+                <i class="bi bi-plus-circle"></i>
+                Bài mới
+            </button>
+
+            <button class="action-btn success" (click)="goHome()">
+                <i class="bi bi-house-fill"></i>
+                Trang chủ
+            </button>
+        </div>
+
+        <!-- Detailed Results -->
+        <div *ngIf="showExplanations" class="detailed-results">
+            <!-- Question Navigation -->
+            <div class="results-navigation">
+                <div class="nav-header">
+                    <h3>
+                        <i class="bi bi-list-check"></i>
+                        Chi tiết từng câu hỏi
+                    </h3>
+                    <div class="nav-summary">
+                        <span class="correct-count">{{ practiceResult.correctAnswers }} đúng</span>
+                        <span class="wrong-count">{{ practiceResult.wrongAnswers }} sai</span>
+                        <span class="unanswered-count">{{ practiceResult.unanswered }} bỏ qua</span>
+                    </div>
+                </div>
+
+                <div class="question-selector">
+                    <button *ngFor="let question of practiceResult.questions; let i = index" class="question-nav-btn"
+                        [ngClass]="getQuestionNavClass(i)" (click)="selectQuestion(i)" [title]="'Câu ' + question.questionInformation.questionNumber + 
+                     (practiceResult.userAnswers[i].selectedAnswerId ? 
+                       (practiceResult.userAnswers[i].isCorrect ? ' (Đúng)' : ' (Sai)') : 
+                       ' (Bỏ qua)')">
+                        {{ question.questionInformation.questionNumber }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selected Question Detail -->
+            <div class="question-detail">
+                <div class="question-header-info">
+                    <div class="question-meta">
+                        <span class="skill-badge">
+                            <i class="bi bi-book"></i>
+                            {{ selectedQuestion.skillName }} - {{ selectedQuestion.levelName }}
+                        </span>
+                        <span class="range-badge">
+                            {{ selectedQuestion.rangeName }}
+                        </span>
+                    </div>
+
+                    <div class="question-status">
+                        <span class="status-badge" [class.correct]="selectedUserAnswer.isCorrect"
+                            [class.wrong]="selectedUserAnswer.selectedAnswerId && !selectedUserAnswer.isCorrect"
+                            [class.unanswered]="!selectedUserAnswer.selectedAnswerId">
+                            <i class="bi" [class.bi-check-circle-fill]="selectedUserAnswer.isCorrect"
+                                [class.bi-x-circle-fill]="selectedUserAnswer.selectedAnswerId && !selectedUserAnswer.isCorrect"
+                                [class.bi-dash-circle-fill]="!selectedUserAnswer.selectedAnswerId"></i>
+                            {{ selectedUserAnswer.isCorrect ? 'Đúng' :
+                            (selectedUserAnswer.selectedAnswerId ? 'Sai' : 'Bỏ qua') }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Context Section -->
+                <div *ngIf="selectedQuestion.contextInformation.content" class="context-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-info-circle"></i>
+                        Đề bài
+                    </h4>
+
+                    <!-- Audio Context -->
+                    <div *ngIf="hasAudioContent(selectedQuestion.contextInformation.content)" class="media-content">
+                        <div class="audio-player"
+                            [innerHTML]="getAudioHtml(selectedQuestion.contextInformation.content)"></div>
+                    </div>
+
+                    <!-- Image Context -->
+                    <div *ngIf="hasImageContent(selectedQuestion.contextInformation.content)" class="media-content">
+                        <img [src]="getImageUrl(selectedQuestion.contextInformation.content)" alt="Context Image"
+                            class="context-image" (error)="$event.target.style.display='none'">
+                    </div>
+
+                    <!-- Text Context -->
+                    <div *ngIf="getTextContent(selectedQuestion.contextInformation.content)" class="text-content">
+                        {{ getTextContent(selectedQuestion.contextInformation.content) }}
+                    </div>
+
+                    <!-- Context Explanation -->
+                    <div *ngIf="selectedQuestion.contextInformation.explain" class="explanation-content">
+                        <strong>Giải thích đề bài:</strong>
+                        {{ selectedQuestion.contextInformation.explain }}
+                    </div>
+                </div>
+
+                <!-- Question Section -->
+                <div class="question-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-question-circle"></i>
+                        Câu hỏi {{ selectedQuestion.questionInformation.questionNumber }}
+                    </h4>
+                    <div class="question-text">
+                        {{ selectedQuestion.questionInformation.content }}
+                    </div>
+                </div>
+
+                <!-- Answers Section -->
+                <div class="answers-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-list-ul"></i>
+                        Các lựa chọn và kết quả
+                    </h4>
+
+                    <div class="answer-list">
+                        <div *ngFor="let answer of selectedQuestion.answerDetails" class="answer-item"
+                            [ngClass]="getAnswerClass(answer.id)">
+
+                            <div class="answer-content">
+                                <div class="answer-text-section">
+                                    <div class="answer-option-text">
+                                        <span class="option-marker">{{ answer.value.charAt(0) }}</span>
+
+                                        <!-- Audio trong answer -->
+                                        <div *ngIf="hasAudioContent(answer.value)" class="option-audio">
+                                            <div [innerHTML]="getAudioHtml(answer.value)"></div>
+                                        </div>
+
+                                        <!-- Image trong answer -->
+                                        <div *ngIf="hasImageContent(answer.value)" class="option-image">
+                                            <img [src]="getImageUrl(answer.value)" alt="Answer Image"
+                                                class="answer-image">
+                                        </div>
+
+                                        <!-- Text trong answer -->
+                                        <div class="option-content">
+                                            <span class="option-text" [innerHTML]="getSafeHtml(answer.value)"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="answer-indicators">
+                                        <!-- Correct Answer Indicator -->
+                                        <span *ngIf="answer.isCorrect" class="indicator correct-indicator">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            Đáp án đúng
+                                        </span>
+
+                                        <!-- User Selected Indicator -->
+                                        <span
+                                            *ngIf="selectedUserAnswer.selectedAnswerId === answer.id && !answer.isCorrect"
+                                            class="indicator selected-indicator">
+                                            <i class="bi bi-person-fill"></i>
+                                            Bạn đã chọn
+                                        </span>
+
+                                        <!-- User Selected + Correct -->
+                                        <span
+                                            *ngIf="selectedUserAnswer.selectedAnswerId === answer.id && answer.isCorrect"
+                                            class="indicator selected-correct-indicator">
+                                            <i class="bi bi-trophy-fill"></i>
+                                            Bạn chọn đúng
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Answer Explanation -->
+                            <div *ngIf="answer.explain" class="answer-explanation">
+                                <div class="explanation-header">
+                                    <i class="bi bi-lightbulb"></i>
+                                    <strong>Giải thích:</strong>
+                                </div>
+                                <div class="explanation-text">{{ answer.explain }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Explanation -->
+                <div *ngIf="selectedQuestion.questionInformation.explain" class="explanation-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-chat-text"></i>
+                        Giải thích câu hỏi
+                    </h4>
+                    <div class="explanation-content">
+                        {{ selectedQuestion.questionInformation.explain }}
+                    </div>
+                </div>
+
+                <!-- Navigation Between Questions -->
+                <div class="question-navigation">
+                    <button class="nav-question-btn" [disabled]="selectedQuestionIndex === 0"
+                        (click)="selectQuestion(selectedQuestionIndex - 1)">
+                        <i class="bi bi-chevron-left"></i>
+                        Câu trước
+                    </button>
+
+                    <div class="current-question-info">
+                        {{ selectedQuestionIndex + 1 }} / {{ practiceResult.questions.length }}
+                    </div>
+
+                    <button class="nav-question-btn"
+                        [disabled]="selectedQuestionIndex === practiceResult.questions.length - 1"
+                        (click)="selectQuestion(selectedQuestionIndex + 1)">
+                        Câu tiếp
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

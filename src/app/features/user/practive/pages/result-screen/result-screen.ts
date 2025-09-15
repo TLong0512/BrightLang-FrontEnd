@@ -1,398 +1,240 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+// result.component.ts
+import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { PracticeResult, Question, UserAnswer } from '../../../../../models/practice.model';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { PracticeResult } from '../../../../../models/topik.model';
+import { PracticeService } from '../../services/practice.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
-  selector: 'app-result-screen',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="result-screen-container">
-      <div class="result-card">
-        <div class="result-header">
-          <div class="success-icon">
-            <i class="fas fa-trophy"></i>
-          </div>
-          <h1>Kết quả luyện tập</h1>
-          <p>Chúc mừng bạn đã hoàn thành bài thi!</p>
-        </div>
-        
-        @if (result(); as res) {
-          <div class="score-section">
-            <div class="main-score">
-              <span class="score-number">{{ res.score }}</span>
-              <span class="score-divider">/</span>
-              <span class="total-number">{{ res.totalQuestions }}</span>
-            </div>
-            
-            <div class="accuracy-circle">
-              <div class="circle-progress" [style]="getCircleStyle(res.accuracy)">
-                <span class="accuracy-text">{{ res.accuracy }}%</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="result-details">
-            <div class="detail-item correct">
-              <div class="detail-icon">
-                <i class="fas fa-check-circle"></i>
-              </div>
-              <div class="detail-content">
-                <span class="detail-label">Số câu đúng</span>
-                <span class="detail-value">{{ res.correctAnswers }}</span>
-              </div>
-            </div>
-            
-            <div class="detail-item wrong">
-              <div class="detail-icon">
-                <i class="fas fa-times-circle"></i>
-              </div>
-              <div class="detail-content">
-                <span class="detail-label">Số câu sai</span>
-                <span class="detail-value">{{ res.wrongAnswers }}</span>
-              </div>
-            </div>
-            
-            <div class="detail-item time">
-              <div class="detail-icon">
-                <i class="fas fa-clock"></i>
-              </div>
-              <div class="detail-content">
-                <span class="detail-label">Thời gian</span>
-                <span class="detail-value">{{ formatTime(res.timeElapsed) }}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="action-buttons">
-            <button class="action-btn review-btn" (click)="showReview()">
-              <i class="fas fa-eye"></i>
-              Xem lại bài
-            </button>
-            <button class="action-btn restart-btn" (click)="restartPractice()">
-              <i class="fas fa-redo"></i>
-              Làm lại
-            </button>
-            <button class="action-btn home-btn" (click)="backToHome()">
-              <i class="fas fa-home"></i>
-              Trang chủ
-            </button>
-          </div>
-        }
-      </div>
-    </div>
-  `,
-  styles: [`
-    .result-screen-container {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #80d0c7 0%, #13547a 100%);
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .result-card {
-      background: rgba(255, 255, 255, 0.98);
-      border-radius: 25px;
-      padding: 50px;
-      max-width: 600px;
-      width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-      border: 3px solid #80d0c7;
-      text-align: center;
-    }
-
-    .result-header {
-      margin-bottom: 40px;
-    }
-
-    .success-icon {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 25px;
-      font-size: 2.5rem;
-      color: white;
-      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
-    }
-
-    .result-header h1 {
-      color: #13547a;
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .result-header p {
-      color: #666;
-      font-size: 1.2rem;
-      margin: 0;
-    }
-
-    .score-section {
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      margin: 40px 0;
-      padding: 30px;
-      background: #f8f9fa;
-      border-radius: 20px;
-      border: 2px solid #e0f2f1;
-    }
-
-    .main-score {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-    }
-
-    .score-number {
-      font-size: 4rem;
-      font-weight: 700;
-      color: #80d0c7;
-    }
-
-    .score-divider {
-      font-size: 2rem;
-      color: #666;
-    }
-
-    .total-number {
-      font-size: 2rem;
-      color: #666;
-      font-weight: 600;
-    }
-
-    .accuracy-circle {
-      position: relative;
-      width: 120px;
-      height: 120px;
-    }
-
-    .circle-progress {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      background: conic-gradient(#80d0c7 var(--progress, 0%), #e9ecef 0%);
-    }
-
-    .circle-progress::before {
-      content: '';
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      background: white;
-      border-radius: 50%;
-    }
-
-    .accuracy-text {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #13547a;
-      position: relative;
-      z-index: 1;
-    }
-
-    .result-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 20px;
-      margin: 40px 0;
-    }
-
-    .detail-item {
-      background: white;
-      border-radius: 15px;
-      padding: 25px 20px;
-      border: 2px solid;
-      transition: transform 0.3s ease;
-    }
-
-    .detail-item:hover {
-      transform: translateY(-5px);
-    }
-
-    .detail-item.correct {
-      border-color: #28a745;
-    }
-
-    .detail-item.wrong {
-      border-color: #dc3545;
-    }
-
-    .detail-item.time {
-      border-color: #17a2b8;
-    }
-
-    .detail-icon {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-
-    .detail-item.correct .detail-icon {
-      color: #28a745;
-    }
-
-    .detail-item.wrong .detail-icon {
-      color: #dc3545;
-    }
-
-    .detail-item.time .detail-icon {
-      color: #17a2b8;
-    }
-
-    .detail-content {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .detail-label {
-      font-size: 0.9rem;
-      color: #666;
-      font-weight: 600;
-    }
-
-    .detail-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #13547a;
-    }
-
-    .action-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 30px;
-    }
-
-    .action-btn {
-      padding: 15px 25px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 140px;
-      justify-content: center;
-    }
-
-    .review-btn {
-      background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-      color: white;
-    }
-
-    .restart-btn {
-      background: linear-gradient(135deg, #80d0c7 0%, #13547a 100%);
-      color: white;
-    }
-
-    .home-btn {
-      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-      color: white;
-    }
-
-    .action-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-
-    @media (max-width: 768px) {
-      .result-card {
-        padding: 30px 20px;
-        margin: 10px;
-      }
-      
-      .result-header h1 {
-        font-size: 2rem;
-      }
-      
-      .score-section {
-        flex-direction: column;
-        gap: 30px;
-        padding: 25px;
-      }
-      
-      .result-details {
-        grid-template-columns: 1fr;
-        gap: 15px;
-      }
-      
-      .action-buttons {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .action-btn {
-        width: 100%;
-      }
-    }
-  `]
+    selector: 'app-result',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './result-screen.html',
+    styleUrls: ['./result-screen.css']
 })
-export class ResultScreenComponent implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  
-  protected result = signal<PracticeResult | null>(null);
+export class ResultComponent implements OnInit {
+    practiceResult!: PracticeResult;
+    showExplanations = false;
+    selectedQuestionIndex = 0;
+    private practiceResultService = inject(PracticeService);
+    private sanitizer = inject(DomSanitizer);
 
-  ngOnInit() {
-  this.route.params.subscribe(params => {
-    const sessionId = params['sessionId'];
-    this.loadResult(sessionId);
-  });
-}
+    // Animation states
+    animateScore = true;
+    animateStats = true;
 
-  private loadResult(sessionId: string) {
-    // Mock result for demo
-    const mockResult: PracticeResult = {
-      sessionId,
-      userAnswers: [],
-      score: 8,
-      totalQuestions: 10,
-      correctAnswers: 8,
-      wrongAnswers: 2,
-      accuracy: 80,
-      timeElapsed: 600000 // 10 minutes
-    };
-    this.result.set(mockResult);
-  }
+    constructor(private router: Router) { }
 
-  getCircleStyle(accuracy: number) {
-    return {
-      '--progress': `${(accuracy / 100) * 360}deg`
-    };
-  }
+    ngOnInit() {
+        this.practiceResult = this.practiceResultService.getResult()!;
 
-  formatTime(milliseconds: number): string {
-    const minutes = Math.floor(milliseconds / 60000);
-    const seconds = Math.floor((milliseconds % 60000) / 1000);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  }
+        if (!this.practiceResult) {
+            // Nếu không có dữ liệu thì redirect về practice
+            this.router.navigate(['/practice/default']);
+        } else {
+            // Trigger animations
+            setTimeout(() => { this.animateScore = true; }, 500);
+            setTimeout(() => { this.animateStats = true; }, 1000);
+        }
+    }
 
-  showReview() {
-    this.router.navigate(['/practice/review', this.result()?.sessionId]);
-  }
+    get scoreColor(): string {
+        if (this.practiceResult.score >= 80) return '#28a745';
+        if (this.practiceResult.score >= 60) return '#ffc107';
+        return '#dc3545';
+    }
 
-  restartPractice() {
-    this.router.navigate(['/practice']);
-  }
+    get performanceText(): string {
+        if (this.practiceResult.score >= 90) return 'Xuất sắc';
+        if (this.practiceResult.score >= 80) return 'Tốt';
+        if (this.practiceResult.score >= 70) return 'Khá';
+        if (this.practiceResult.score >= 60) return 'Trung bình';
+        return 'Cần cải thiện';
+    }
 
-  backToHome() {
-    this.router.navigate(['/practice']);
-  }
+    get performanceMessage(): string {
+        if (this.practiceResult.score >= 80) return 'Chúc mừng! Bạn đã hoàn thành xuất sắc bài luyện tập này.';
+        if (this.practiceResult.score >= 60) return 'Kết quả khá tốt! Hãy tiếp tục luyện tập để đạt điểm cao hơn.';
+        return 'Đừng nản lòng! Hãy xem lại các câu hỏi và luyện tập thêm.';
+    }
+
+    get scoreIcon(): string {
+        if (this.practiceResult.score >= 80) return 'bi-trophy-fill';
+        if (this.practiceResult.score >= 60) return 'bi-award-fill';
+        return 'bi-bookmark-fill';
+    }
+
+    toggleExplanations() {
+        this.showExplanations = !this.showExplanations;
+        if (this.showExplanations) {
+            // Scroll to explanations section
+            setTimeout(() => {
+                const element = document.querySelector('.detailed-results');
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+    }
+
+    selectQuestion(index: number) {
+        this.selectedQuestionIndex = index;
+    }
+
+    get selectedQuestion(): Question {
+        return this.practiceResult.questions[this.selectedQuestionIndex];
+    }
+
+    get selectedUserAnswer(): UserAnswer {
+        return this.practiceResult.userAnswers[this.selectedQuestionIndex];
+    }
+
+    getSelectedAnswer() {
+        if (!this.selectedUserAnswer.selectedAnswerId) return null;
+        return this.selectedQuestion.answerDetails.find(
+            answer => answer.id === this.selectedUserAnswer.selectedAnswerId
+        );
+    }
+
+    getCorrectAnswer() {
+        return this.selectedQuestion.answerDetails.find(answer => answer.isCorrect);
+    }
+
+    getAnswerClass(answerId: string): string {
+        const userAnswer = this.selectedUserAnswer;
+        const isSelected = userAnswer.selectedAnswerId === answerId;
+        const isCorrect = this.selectedQuestion.answerDetails.find(a => a.id === answerId)?.isCorrect;
+
+        if (isCorrect) return 'correct-answer';
+        if (isSelected && !isCorrect) return 'wrong-answer';
+        return 'default-answer';
+    }
+
+    getQuestionNavClass(index: number): string {
+        const userAnswer = this.practiceResult.userAnswers[index];
+
+        if (index === this.selectedQuestionIndex) return 'active';
+        if (!userAnswer.selectedAnswerId) return 'unanswered';
+        if (userAnswer.isCorrect) return 'correct';
+        return 'wrong';
+    }
+
+    goHome() {
+        this.router.navigate(['/home-user']);
+    }
+
+    retryPractice() {
+        // Extract rangeId from the first question if available
+        const rangeId = 'default'; // You might want to store this in the result
+        this.router.navigate(['/practice', rangeId]);
+    }
+
+    startNewPractice() {
+        this.router.navigate(['/home-user/topik-selection']);
+    }
+
+    hasAudioContent(content: string): boolean {
+        if (!content) return false;
+        return content.includes('<audio');
+    }
+
+    hasImageContent(content: string): boolean {
+        if (!content) return false;
+        return content.includes('<img');
+    }
+
+    getAudioHtml(content?: string): SafeHtml | null {
+        if (!content) return null;
+
+        // match src trong <audio ...>
+        const match = content.match(/<audio[^>]*src=["']([^"']+)["'][^>]*>/i);
+        if (match) {
+            const src = match[1];
+            // Tạo lại thẻ audio với source
+            const audioHtml = `
+          <audio controls preload="none">
+            <source src="${src}" type="audio/mpeg">
+            <p>Trình duyệt không hỗ trợ audio.</p>
+          </audio>
+        `;
+            return this.getSafeHtml(audioHtml);
+        }
+
+        return null;
+    }
+
+    getImageUrl(content?: string): string | null {
+        if (!content || !this.hasImageContent(content)) return null;
+
+        // Tìm thẻ img và extract src
+        const imgMatch = content.match(/<img[^>]*src=["']([^"']+)["'][^>]*>/);
+        return imgMatch ? imgMatch[1] : null;
+    }
+
+    getTextContent(content?: string): string {
+        if (!content) return '';
+
+        // Loại bỏ tất cả HTML tags và trả về text thuần
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    }
+
+    getAnswerText(value: string): string {
+        if (!value) return '';
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = value;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    }
+
+    getSafeHtml(html: string) {
+        return this.sanitizer.bypassSecurityTrustHtml(html);
+    }
+
+    shareResult() {
+        const text = `Tôi vừa hoàn thành bài luyện tập tiếng Hàn với kết quả ${this.practiceResult.score}% (${this.practiceResult.correctAnswers}/${this.practiceResult.totalQuestions} câu đúng)! 🎯`;
+
+        if (navigator.share) {
+            navigator.share({
+                title: 'Kết quả luyện tập tiếng Hàn',
+                text: text,
+                url: window.location.href
+            });
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Đã sao chép kết quả vào clipboard!');
+            });
+        }
+    }
+
+    downloadResult() {
+        const resultData = {
+            date: new Date().toISOString(),
+            score: this.practiceResult.score,
+            totalQuestions: this.practiceResult.totalQuestions,
+            correctAnswers: this.practiceResult.correctAnswers,
+            wrongAnswers: this.practiceResult.wrongAnswers,
+            unanswered: this.practiceResult.unanswered,
+            details: this.practiceResult.questions.map((q, index) => ({
+                questionNumber: q.questionInformation.questionNumber,
+                question: q.questionInformation.content,
+                selectedAnswer: this.getSelectedAnswer()?.value,
+                correctAnswer: this.getCorrectAnswer()?.value,
+                isCorrect: this.practiceResult.userAnswers[index].isCorrect
+            }))
+        };
+
+        const dataStr = JSON.stringify(resultData, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+        const exportFileDefaultName = `korean-practice-result-${new Date().toISOString().split('T')[0]}.json`;
+
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+    }
 }

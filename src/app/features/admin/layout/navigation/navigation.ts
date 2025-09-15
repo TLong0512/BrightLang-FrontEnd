@@ -17,6 +17,7 @@ export interface NavigationItem {
 }
 
 export const NavigationItems: NavigationItem[] = [
+  
   {
     id: 'default',
     title: 'Tổng quan',
@@ -33,6 +34,22 @@ export const NavigationItems: NavigationItem[] = [
     icon: 'icon-navigation',
     children: [
       {
+        id: 'typography1',
+        title: 'Dạng bài thi',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/admin/exam-type',
+        icon: 'ti ti-typography'
+      },
+      {
+        id: 'typography2',
+        title: 'Cấp độ',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/admin/question-type',
+        icon: 'ti ti-typography'
+      },
+      {
         id: 'typography',
         title: 'Dạng câu hỏi',
         type: 'item',
@@ -45,7 +62,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Câu hỏi',
         type: 'item',
         classes: 'nav-item',
-        url: '/admin/question',
+        url: '/admin/question-list',
         icon: 'ti ti-brush'
       },
       {
@@ -55,8 +72,6 @@ export const NavigationItems: NavigationItem[] = [
         classes: 'nav-item',
         url: '/admin/roadmap',
         icon: 'ti ti-plant-2',
-        target: true,
-        external: true
       }
     ]
   }

@@ -1,0 +1,272 @@
+<div class="practice-screen-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <div class="spinner-wrapper">
+      <div class="spinner"></div>
+      <div class="loading-text">Đang tải câu hỏi...</div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError()" class="error-container">
+    <div class="error-message">
+      <h3>Có lỗi xảy ra</h3>
+      <p>{{ errorMessage }}</p>
+      <button class="btn btn-primary" (click)="retry()">Thử lại</button>
+    </div>
+  </div>
+
+  <!-- Practice Content -->
+  <div *ngIf="!isLoading() && !hasError() && currentQuestion">
+    <!-- Navigation Header -->
+    <div class="practice-navigation">
+      <div class="nav-left">
+        <button class="exit-btn" (click)="exitPractice()">
+          <i class="bi bi-arrow-left"></i>
+          Thoát
+        </button>
+      </div>
+
+      <div class="nav-center">
+        <div class="question-counter">
+          <span class="current">{{ currentQuestionIndex + 1 }}</span>
+          <span class="divider">/</span>
+          <span class="total">{{ questions.length }}</span>
+        </div>
+
+        <div class="progress-info">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="progress"></div>
+          </div>
+          <div class="stats">
+            Đã trả lời: {{ answeredCount }}/{{ questions.length }}
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <button class="submit-btn" (click)="submitPractice()">
+          <i class="bi bi-check2-circle"></i>
+          Nộp bài
+        </button>
+      </div>
+    </div>
+
+    <div class="practice-content">
+      <!-- Main Question Panel -->
+      <div class="left-panel">
+        <!-- Skill and Level Indicator -->
+        <div class="skill-indicator">
+          <span class="skill-badge">
+            <i class="bi bi-book"></i>
+            {{ currentQuestion?.skillName }} - {{ currentQuestion?.levelName }}
+          </span>
+          <span class="range-badge">
+            {{ currentQuestion?.rangeName }}
+          </span>
+        </div>
+
+        <!-- Context Content -->
+        <div *ngIf="currentQuestion.contextInformation.content" class="context-content">
+          <h4 class="context-title">
+            <i class="bi bi-info-circle"></i>
+            Đề bài
+          </h4>
+
+          <!-- Text Context -->
+          <div *ngIf="getTextContent(currentQuestion?.contextInformation?.content) as textContent" class="text-context">
+            {{ textContent }}
+          </div>
+
+          <!-- Audio Context -->
+          <div class="audio-container"
+            *ngIf="getAudioHtml(currentQuestion?.contextInformation?.content) as safeAudioHtml">
+            <div class="audio-player" [innerHTML]="safeAudioHtml"></div>
+          </div>
+
+          <!-- Image Context -->
+          <div class="image-container" *ngIf="getImageUrl(currentQuestion?.contextInformation?.content) as imageUrl">
+            <img [src]="imageUrl" alt="Context Image" class="context-image"
+              (error)="$event.target.style.display='none'">
+          </div>
+        </div>
+
+        <!-- Question -->
+        <div class="question-container">
+          <div class="question-header">
+            <h3 class="question-title">
+              <i class="bi bi-question-circle"></i>
+              Câu hỏi {{ currentQuestion?.questionInformation?.questionNumber }}
+            </h3>
+          </div>
+
+          <div class="question-text">
+            {{ currentQuestion?.questionInformation?.content }}
+          </div>
+
+          <!-- Answer Options -->
+          <div class="answers-container">
+            <div class="answers-title">
+              <i class="bi bi-list-check"></i>
+              Chọn đáp án:
+            </div>
+
+            <div class="answers-list">
+              <div *ngFor="let answer of currentQuestion.answerDetails; let i = index" class="answer-item">
+                <button class="answer-option" [class.selected]="selectedAnswerId === answer.id"
+                  (click)="selectAnswer(answer.id)">
+                  <div class="option-marker">
+                    <span class="option-number">{{ (i+1) }}</span>
+                  </div>
+                  <div class="option-content">
+                    <span class="option-text" [innerHTML]="getSafeHtml(answer.value)"></span>
+                  </div>
+                  <div class="option-indicator" *ngIf="selectedAnswerId === answer.id">
+                    <i class="bi bi-check-circle-fill"></i>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="navigation-controls">
+          <button class="nav-btn prev-btn" [disabled]="currentQuestionIndex === 0" (click)="previousQuestion()">
+            <i class="bi bi-chevron-left"></i>
+            Câu trước
+          </button>
+
+          <div class="question-info">
+            <span class="current-question">{{ currentQuestionIndex + 1 }} / {{ questions.length }}</span>
+          </div>
+
+          <button class="nav-btn next-btn" [disabled]="currentQuestionIndex === questions.length - 1"
+            (click)="nextQuestion()">
+            Câu tiếp
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Question Grid Panel -->
+      <div class="right-panel">
+        <div class="question-grid-container">
+          <div class="grid-header">
+            <h4 class="grid-title">
+              <i class="bi bi-grid-3x3"></i>
+              Danh sách câu hỏi
+            </h4>
+          </div>
+
+          <div class="question-grid">
+            <button *ngFor="let question of questions; let i = index" class="question-grid-item"
+              [class.current]="i === currentQuestionIndex" [class.answered]="isQuestionAnswered(i)"
+              [class.unanswered]="!isQuestionAnswered(i) && i !== currentQuestionIndex" (click)="goToQuestion(i)"
+              [title]="'Câu ' + (i + 1) + (isQuestionAnswered(i) ? ' (Đã trả lời)' : ' (Chưa trả lời)')">
+              {{ i + 1 }}
+            </button>
+          </div>
+
+          <div class="legend">
+            <div class="legend-header">
+              <h5>Chú thích:</h5>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color current"></div>
+              <span>Câu hiện tại</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color answered"></div>
+              <span>Đã trả lời</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color unanswered"></div>
+              <span>Chưa trả lời</span>
+            </div>
+          </div>
+
+          <!-- Progress Summary -->
+          <div class="progress-summary">
+            <div class="summary-item">
+              <span class="summary-label">Tiến độ:</span>
+              <span class="summary-value">{{ answeredCount }}/{{ questions.length }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Confirmation Modal -->
+  <div class="modal-backdrop" *ngIf="showSubmitModal" (click)="cancelSubmit()">
+    <div class="confirmation-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon submit-icon">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <button class="close-btn" (click)="cancelSubmit()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <h3 class="modal-title">Nộp bài luyện tập</h3>
+        <p class="modal-message" *ngIf="answeredCount < questions.length">
+          Bạn còn {{ questions.length - answeredCount }} câu chưa trả lời.
+          Bạn có chắc chắn muốn nộp bài không?
+        </p>
+        <p class="modal-message" *ngIf="answeredCount === questions.length">
+          Bạn đã hoàn thành tất cả câu hỏi. Bạn có muốn nộp bài không?
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn cancel-btn" (click)="cancelSubmit()">
+          <i class="bi bi-x-circle"></i>
+          Tiếp tục làm
+        </button>
+        <button class="modal-btn confirm-btn submit" (click)="confirmSubmit()">
+          <i class="bi bi-check-circle"></i>
+          Nộp bài
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exit Confirmation Modal -->
+  <div class="modal-backdrop" *ngIf="showExitModal" (click)="cancelExit()">
+    <div class="confirmation-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon exit-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <button class="close-btn" (click)="cancelExit()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <h3 class="modal-title">Thoát luyện tập</h3>
+        <p class="modal-message" *ngIf="answeredCount > 0">
+          Bạn đã trả lời {{ answeredCount }}/{{ questions.length }} câu hỏi.
+          Nếu thoát, tiến trình sẽ không được lưu. Bạn có chắc chắn muốn thoát?
+        </p>
+        <p class="modal-message" *ngIf="answeredCount === 0">
+          Bạn có chắc chắn muốn thoát? Tiến trình sẽ không được lưu.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn cancel-btn" (click)="cancelExit()">
+          <i class="bi bi-x-circle"></i>
+          Ở lại
+        </button>
+        <button class="modal-btn confirm-btn exit" (click)="confirmExit()">
+          <i class="bi bi-exclamation-triangle"></i>
+          Thoát
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -41,13 +41,31 @@ export interface Question {
   answerList?: Answer[];
 }
 
+export interface QuestionDto {
+  questionInformation?: Question;
+  contextInformation?: Context;
+  rangeName?: string;
+  skillName?: string;
+  levelName?: string;
+  answerDetails?: Answer[];
+}
 export interface QuestionAdd {
   id?: string;
   content?: string;
+  contentMessage?: string;
   explain?: string;
   questionNumber?: number;
+  questionNumberMessage?: string;
   context?: Context;
   answerList?: Answer[];
+}
+
+export interface QuestionUpdate {
+  questionNumber: number
+  content: string
+  explain: string
+  contextUpdate: Context
+  listAnswers: Answer[];
 }
 
 export interface Answer {
@@ -55,5 +73,14 @@ export interface Answer {
   value?: string;
   explain?: string;
   isCorrect?: boolean;
+  answerMessage?: string;
   questionId?: string;
+}
+
+export interface QuestionPage {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  items: Question[];
 }

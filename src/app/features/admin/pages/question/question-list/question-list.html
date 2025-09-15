@@ -1,130 +1,127 @@
-<!-- Nút thêm
-<div class="row mt-4">
-    <div class="col-12 text-center">
-        <button type="button" class="btn btn-primary btn-lg px-5">
-            <i class="fas fa-plus me-2"></i>
-            Thêm câu hỏi
-        </button>
-    </div>
-</div>
-<div class="card shadow-sm">
-    <div class="card-header bg-secondary text-white">
-        <h2 class="card-title mb-0 h5">
-            <i class="fas fa-list me-2"></i>
-            Danh sách câu hỏi
-        </h2>
-    </div>
+<!-- Pagination Controls -->
 
-    <div class="card-body p-0">
-        
-        <div class="text-center py-5">
-            <div class="mb-3">
-                <i class="fas fa-inbox text-muted" style="font-size: 4rem;"></i>
-            </div>
-            <h5 class="text-muted">Chưa có câu hỏi nào được thêm</h5>
-            <p class="text-muted mb-0">Hãy thêm dạng bài đầu tiên của bạn!</p>
-        </div>
-
-        
-    </div>
-</div> -->
-
-<!-- question-list.component.html -->
-<div class="question-list-container">
+<div class="question-list-wrapper">
     <!-- Header Section -->
     <div class="header-section">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="display-4 mb-0 text-white">
+                    <h1 class="page-title">
                         <i class="fas fa-question-circle me-3"></i>
                         Danh sách câu hỏi
                     </h1>
-                    <p class="lead mt-3 mb-0 text-white">Quản lý và xem chi tiết các câu hỏi</p>
+                    <p class="page-subtitle">Quản lý tất cả câu hỏi trong ngân hàng đề</p>
                 </div>
-                <div class="col-md-4 text-end">
-                    <div class="stats-card d-inline-block pulse-animation">
-                        <div class="stats-number">{{ questionsData.length }}</div>
-                        <div class="text-muted">Tổng câu hỏi</div>
+                <div class="col-md-4 text-md-end">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ questionsData?.totalItems }}</div>
+                        <div class="stats-label">Tổng câu hỏi</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="container">
-        <!-- Search and Filter Section -->
-        <!-- <div class="row mb-4">
-      <div class="col-md-8">
-        <div class="position-relative">
-          <input 
-            type="text" 
-            class="form-control search-box" 
-            placeholder="Tìm kiếm câu hỏi..." 
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()">
-          <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+        
+        <div class="add-question-section">
+            <button type="button" class="btn-add-question" routerLink="/admin/question-add">
+                <i class="fas fa-plus me-2"></i>
+                Thêm câu hỏi mới
+            </button>
         </div>
-      </div>
-      <div class="col-md-4">
-        <select 
-          class="form-select search-box" 
-          [(ngModel)]="sortBy"
-          (change)="onSortChange()">
-          <option value="number">Sắp xếp theo số thứ tự</option>
-          <option value="content">Sắp xếp theo nội dung</option>
-        </select>
-      </div>
-    </div> -->
 
-        <!-- Questions Container -->
-        <div class="row" *ngIf="questionsData.length > 0">
-            <div class="col-12 mb-4 fade-in" *ngFor="let question of questionsData; let i = index"
-                [style.animation-delay.s]="i * 0.1">
-                <div class="card question-card h-100 border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between">
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="question-number me-3">
-                                    {{ question.questionNumber }}
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="question-content">
-                                        {{ question.content || 'Nội dung câu hỏi' }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="btn-group" role="group" style="height: 30px;">
-                                <button type="button" class="btn btn-outline-primary btn-sm" title="Chỉnh sửa"
-                                    (click)="editQuestion(question.id!)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-danger btn-sm ms-3" title="Xóa"
-                                    (click)="deleteQuestion(question.id!)" >
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
+        <!-- Questions Content -->
+        @if(!questionsData?.items) {
+            <!-- Add Button Section -->
+        
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-clipboard-question"></i>
+            </div>
+            <h3 class="empty-title">Chưa có câu hỏi nào</h3>
+            <p class="empty-description">Hãy tạo câu hỏi đầu tiên để bắt đầu xây dựng ngân hàng đề</p>
+            <button type="button" class="btn-primary-custom" routerLink="/admin/question-add">
+                <i class="fas fa-plus me-2"></i>
+                Tạo câu hỏi đầu tiên
+            </button>
+        </div>
+        } @else {
+            <div class="pagination-controls mb-5">
+            <!-- Page size selector -->
+            <div class="page-size-selector">
+                <label for="pageSize">Hiển thị:</label>
+                <select id="pageSize" [(ngModel)]="pageSize" (change)="changePageSize(pageSize)">
+                    <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span>mỗi trang</span>
+            </div>
+        </div>
+        <div class="questions-grid">
+            @for(question of questionsData?.items!; track question; let i = $index) {
+            <div class="question-card" [style.animation-delay.s]="i * 0.1">
+                <div class="card-header">
+                    <div class="question-number">
+                        <span>{{ question.questionNumber }}</span>
+                    </div>
+                    <div class="card-actions">
+                        <button type="button" class="action-btn edit-btn" title="Chỉnh sửa"
+                            (click)="editQuestion(question.id!)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="action-btn delete-btn" title="Xóa"
+                            (click)="deleteQuestion(question.id!)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="question-content">
+                        {{ question.content || 'Nội dung câu hỏi' }}
+                    </div>
+
+                    <div class="explanation-section">
+                        <div class="explanation-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Giải thích</span>
                         </div>
-
-                        <div class="explanation-section">
-                            <h6 class="mb-2">
-                                <i class="fas fa-lightbulb me-2 text-warning"></i>
-                                Giải thích
-                            </h6>
-                            <p class="explanation-text mb-0" [class.no-explanation]="!question.explain">
-                                {{ question.explain || 'Chưa có giải thích cho câu hỏi này' }}
-                            </p>
+                        <div class="explanation-content" [class.no-explanation]="!question.explain">
+                            {{ question.explain || 'Chưa có giải thích cho câu hỏi này' }}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            }
 
-        <!-- No results message -->
-        <div class="text-center py-5" *ngIf="questionsData.length === 0">
-            <i class="fas fa-search display-1 text-muted mb-3"></i>
-            <h4 class="text-muted">Không tìm thấy câu hỏi nào</h4>
-            <p class="text-muted">Hãy thử tìm kiếm với từ khóa khác</p>
+            <!-- Pagination -->
+            @if (questionsData!.totalPages > 0) {
+            <nav class="pagination-container d-flex justify-content-center">
+                <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+                    « Trước
+                </button>
+
+                @for(page of [].constructor(questionsData.totalPages); track page; let i = $index) {
+                <button class="page-btn" [class.active]="currentPage === i + 1" (click)="changePage(i + 1)">
+                    {{ i + 1 }}
+                </button>
+                }
+
+                <button class="page-btn" [disabled]="currentPage === questionsData.totalPages"
+                    (click)="changePage(currentPage + 1)">
+                    Sau »
+                </button>
+            </nav>
+            }
+            @if(questionsData?.items!.length === 0) {
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h4>Không tìm thấy câu hỏi nào</h4>
+                <p>Thử điều chỉnh bộ lọc hoặc tạo câu hỏi mới</p>
+            </div>
+            }
         </div>
+        }
     </div>
 </div>

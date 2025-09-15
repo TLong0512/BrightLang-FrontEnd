@@ -1,5 +1,56 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { ExamData, ExamResult, Question, ExamContext } from '../../../../models/exam.model';
+import { Observable, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { TestService, TestInProgressDto, SubmitTestRequestDto, QuestionDetailDto, AnswerSummaryDto } from './exam.service';
+
+// Updated models to match backend structure
+export interface Question {
+  id: string;
+  questionText: string;
+  type: 'single' | 'multiple';
+  userAnswers?: string[];
+  correctAnswers?: string[];
+  answers?: Answer[];
+  questionNumber?: number;
+  contextContent?: string;
+  skillName?: string;
+}
+
+export interface Answer {
+  id: string; 
+  answerText: string;
+  isCorrect?: boolean;
+  explain?: string;
+}
+
+export interface ExamContext {
+  id: number;
+  type: 'reading' | 'listening' | 'mixed';
+  title?: string;
+  content?: string;
+  audioUrl?: string;
+  imageUrl?: string;
+  questions: Question[];
+}
+
+export interface ExamData {
+  id: string;
+  testId: string;
+  level: string;
+  duration: number;
+  contexts: ExamContext[];
+  listQuestion?: Question[];
+}
+
+export interface ExamResult {
+  examId: string;
+  correct: number;
+  total: number;
+  percentage: number;
+  listeningScore: number;
+  readingScore: number;
+  timeSpent: number;
+  level: string;
+}
 
 export interface FlatQuestion extends Question {
   contextId: number;
@@ -22,7 +73,13 @@ export class ExamStateService {
   private readonly _examResult = signal<ExamResult | null>(null);
   private readonly _isExamStarted = signal<boolean>(false);
   private readonly _isExamPaused = signal<boolean>(false);
+  private readonly _userAnswers = signal<Map<string, string[]>>(new Map());
+  private readonly _hasUnsavedChanges = signal<boolean>(false);
+  private readonly _currentContextId = signal<number>(0);
 
+  // Auto-save subject
+  // private autoSaveSubject = new Subject<{questionId: string, answerIds: string[]}>();
+  private autoSaveSubject = new Subject<{testId: string, answerIds: string[]}>();
   // Readonly signals
   readonly examData = this._examData.asReadonly();
   readonly flatQuestions = this._flatQuestions.asReadonly();
@@ -31,12 +88,21 @@ export class ExamStateService {
   readonly examResult = this._examResult.asReadonly();
   readonly isExamStarted = this._isExamStarted.asReadonly();
   readonly isExamPaused = this._isExamPaused.asReadonly();
+  readonly userAnswers = this._userAnswers.asReadonly();
+  readonly hasUnsavedChanges = this._hasUnsavedChanges.asReadonly();
 
   // Computed signals
   readonly currentQuestion = computed(() => {
     const questions = this._flatQuestions();
     const index = this._currentQuestionIndex();
-    return questions[index] || null;
+    const question = questions[index] || null;
+    
+    if (question) {
+      const answers = this._userAnswers().get(question.id) || [];
+      return { ...question, userAnswers: answers };
+    }
+    
+    return question;
   });
 
   readonly currentContext = computed(() => {
@@ -44,7 +110,7 @@ export class ExamStateService {
     if (!question) return null;
 
     const examData = this._examData();
-    if (!examData) return null;
+    if (!examData || !examData.contexts) return null;
 
     return examData.contexts.find(context => context.id === question.contextId) || null;
   });
@@ -61,13 +127,15 @@ export class ExamStateService {
 
   readonly answeredQuestions = computed(() => {
     const questions = this._flatQuestions();
+    const userAnswers = this._userAnswers();
+    
     if (!questions.length) return [];
     
     return questions.map((question, index) => ({
       index,
       questionId: question.id,
       contextId: question.contextId,
-      isAnswered: question.userAnswers && question.userAnswers.length > 0,
+      isAnswered: userAnswers.has(question.id) && (userAnswers.get(question.id)?.length || 0) > 0,
       isCurrent: index === this._currentQuestionIndex(),
       contextType: question.contextType
     }));
@@ -107,22 +175,124 @@ export class ExamStateService {
   readonly questionsByContext = computed(() => {
     const questions = this._flatQuestions();
     const contexts = this._examData()?.contexts || [];
+    const userAnswers = this._userAnswers();
     
     return contexts.map(context => ({
       context,
       questions: questions.filter(q => q.contextId === context.id),
-      answered: questions.filter(q => q.contextId === context.id && (q.userAnswers ?? []).length > 0).length
+      answered: questions.filter(q => 
+        q.contextId === context.id && 
+        userAnswers.has(q.id) && 
+        (userAnswers.get(q.id)?.length || 0) > 0
+      ).length
     }));
   });
 
-  // Auto-save effect
-  private autoSaveEffect = effect(() => {
-    const data = this._examData();
-    if (data && this._isExamStarted()) {
-      // Auto-save logic here
-      this.saveExamProgress();
+  constructor(private testService: TestService) {
+    this.setupAutoSave();
+    this.setupBeforeUnloadWarning();
+  }
+
+  
+  private setupAutoSave(): void {
+    this.autoSaveSubject.pipe(
+      debounceTime(1000), // Wait 1 second after user stops selecting
+      distinctUntilChanged((a, b) => 
+        a.testId === b.testId && 
+        JSON.stringify(a.answerIds.sort()) === JSON.stringify(b.answerIds.sort())
+      )
+    ).subscribe(({testId, answerIds}) => {
+      this.performAutoSave(testId, answerIds);
+    });
+  }
+
+  private setupBeforeUnloadWarning(): void {
+    // window.addEventListener('beforeunload', (event) => {
+    //   if (this._isExamStarted() && this._hasUnsavedChanges()) {
+    //     event.preventDefault();
+    //     event.returnValue = 'Bạn có thay đổi chưa được lưu. Bạn có chắc chắn muốn thoát không?';
+    //     return event.returnValue;
+    //   }
+    // });
+  }
+
+
+  private performAutoSave(testId: string, answerIds: string[]): void {
+    if (!testId || answerIds.length === 0) return;
+
+    this.testService.autoSaveAnswer(testId, answerIds).subscribe({
+      next: () => {
+        console.log(`Auto-saved ${answerIds.length} answers for test ${testId}`);
+        this._hasUnsavedChanges.set(false);
+      },
+      error: (error) => {
+        console.warn('Auto-save failed:', error);
+        // Keep unsaved changes flag as true
+      }
+    });
+  }
+
+  /**
+   * Initialize exam from backend TestInProgressDto - FIXED MAPPING
+   */
+  setExamDataFromTest(testData: TestInProgressDto): void {
+    console.log('Setting exam data from test:', testData);
+
+    // Reset user answers trước khi set dữ liệu mới
+    this._userAnswers.set(new Map());
+    this._hasUnsavedChanges.set(false);
+
+    const examData: ExamData = {
+      id: testData.id,
+      testId: testData.id,
+      level: 'intermediate',
+      duration: testData.duration || 3600,
+      contexts: [],
+      listQuestion: testData.questionDetails.map(q => ({
+        id: q.id,
+        questionText: q.questionText || q.content || '',
+        type: this.determineQuestionType(q.answerContents || q.answers || []),
+        userAnswers: [],
+        questionNumber: q.questionNumber,
+        contextContent: q.contextContent,
+        skillName: q.skillName,
+        answers: (q.answerContents || q.answers || []).map(answer => ({
+          id: answer.id,
+          answerText: answer.answerText,
+          isCorrect: answer.isCorrect
+        }))
+      }))
+    };
+
+    if (testData.choseAnswerIds && testData.choseAnswerIds.length > 0) {
+      this.loadPreviousAnswers(testData.choseAnswerIds, examData.listQuestion || []);
     }
-  });
+
+    this.setExamData(examData);
+  }
+
+
+  private determineQuestionType(answers: AnswerSummaryDto[]): 'single' | 'multiple' {
+    const correctAnswers = answers.filter(a => a.isCorrect);
+    return correctAnswers.length > 1 ? 'multiple' : 'single';
+  }
+
+  private loadPreviousAnswers(choseAnswerIds: string[], questions: Question[]): void {
+    const answerMap = new Map<string, string[]>();
+    
+    // Group answer IDs by question
+    questions.forEach(question => {
+      const questionAnswerIds = choseAnswerIds.filter(answerId => 
+        question.answers?.some(answer => answer.id === answerId)
+      );
+      
+      if (questionAnswerIds.length > 0) {
+        answerMap.set(question.id, questionAnswerIds);
+      }
+    });
+    
+    this._userAnswers.set(answerMap);
+  }
 
   setExamData(data: ExamData): void {
     this._examData.set(data);
@@ -130,30 +300,50 @@ export class ExamStateService {
     this._currentQuestionIndex.set(0);
     this._isExamStarted.set(false);
     this._examResult.set(null);
+    this._hasUnsavedChanges.set(false);
     
-    // Flatten questions from contexts
+    // Flatten questions
     this.flattenQuestions(data);
   }
 
   private flattenQuestions(data: ExamData): void {
     const flatQuestions: FlatQuestion[] = [];
     
-    data.contexts.forEach(context => {
-      context.questions.forEach(question => {
+    // Process direct list of questions (from TestInProgressDto)
+    if (data.listQuestion && data.listQuestion.length > 0) {
+      data.listQuestion.forEach((question, index) => {
+        // Group questions by skill/context to create virtual contexts
+        const contextId = this.getContextIdForQuestion(question, index);
+        
         flatQuestions.push({
           ...question,
           userAnswers: question.userAnswers ?? [],
-          contextId: context.id,
-          contextType: context.type,
-          contextTitle: context.title,
-          contextContent: context.content,
-          contextAudioUrl: context.audioUrl,
-          contextImageUrl: context.imageUrl
+          contextId: contextId,
+          contextType: 'mixed',
+          contextTitle: question.skillName || `Câu hỏi ${question.questionNumber || index + 1}`,
+          contextContent: question.contextContent,
+          contextAudioUrl: undefined,
+          contextImageUrl: undefined
         });
       });
-    });
+    }
     
     this._flatQuestions.set(flatQuestions);
+  }
+
+  private getContextIdForQuestion(question: Question, index: number): number {
+    // Group by skillName to create virtual contexts
+    if (question.skillName) {
+      // Create a simple hash of skill name to get consistent context IDs
+      let hash = 0;
+      for (let i = 0; i < question.skillName.length; i++) {
+        const char = question.skillName.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return Math.abs(hash);
+    }
+    return index + 1;
   }
 
   startExam(): void {
@@ -206,7 +396,6 @@ export class ExamStateService {
     const questions = this._flatQuestions();
     const currentIndex = this._currentQuestionIndex();
     
-    // Find next question from different context
     for (let i = currentIndex + 1; i < questions.length; i++) {
       if (questions[i].contextId !== currentQuestion.contextId) {
         this.setCurrentQuestionIndex(i);
@@ -220,13 +409,9 @@ export class ExamStateService {
     if (!currentQuestion) return;
 
     const questions = this._flatQuestions();
-    const currentIndex = this._currentQuestionIndex();
-    
-    // Find first question of current context
     const firstQuestionOfCurrentContext = questions.findIndex(q => q.contextId === currentQuestion.contextId);
     
     if (firstQuestionOfCurrentContext > 0) {
-      // Find the context before current context
       const prevContextQuestion = questions[firstQuestionOfCurrentContext - 1];
       const firstQuestionOfPrevContext = questions.findIndex(q => q.contextId === prevContextQuestion.contextId);
       this.setCurrentQuestionIndex(firstQuestionOfPrevContext);
@@ -237,38 +422,25 @@ export class ExamStateService {
     this._timeRemaining.set(Math.max(0, time));
   }
 
-  updateQuestionAnswer(questionIndex: number, answers: number[]): void {
-    const flatQuestions = this._flatQuestions();
-    if (questionIndex >= 0 && questionIndex < flatQuestions.length) {
-      const updatedQuestions = [...flatQuestions];
-      updatedQuestions[questionIndex] = {
-        ...updatedQuestions[questionIndex],
-        userAnswers: [...answers]
-      };
-      
-      this._flatQuestions.set(updatedQuestions);
-      
-      // Update original exam data as well
-      this.syncBackToExamData(updatedQuestions);
-    }
-  }
+  
 
-  private syncBackToExamData(flatQuestions: FlatQuestion[]): void {
+  updateQuestionAnswer(questionId: string, answerIds: string[]): void {
+    const currentAnswers = new Map(this._userAnswers());
+    currentAnswers.set(questionId, [...answerIds]);
+    this._userAnswers.set(currentAnswers);
+    this._hasUnsavedChanges.set(true);
+    
+    // Get all currently selected answers across all questions
+    const allSelectedAnswers = Array.from(currentAnswers.values()).flat();
     const examData = this._examData();
-    if (!examData) return;
-
-    const updatedContexts = examData.contexts.map(context => ({
-      ...context,
-      questions: context.questions.map(question => {
-        const flatQuestion = flatQuestions.find(fq => fq.id === question.id && fq.contextId === context.id);
-        return flatQuestion ? { ...question, userAnswers: flatQuestion.userAnswers } : question;
-      })
-    }));
-
-    this._examData.set({
-      ...examData,
-      contexts: updatedContexts
-    });
+    
+    if (examData?.testId && allSelectedAnswers.length > 0) {
+      // Trigger auto-save with all selected answers
+      this.autoSaveSubject.next({ 
+        testId: examData.testId, 
+        answerIds: allSelectedAnswers 
+      });
+    }
   }
 
   setExamResult(result: ExamResult): void {
@@ -283,11 +455,66 @@ export class ExamStateService {
     this._examResult.set(null);
     this._isExamStarted.set(false);
     this._isExamPaused.set(false);
+    this._userAnswers.set(new Map());
+    this._hasUnsavedChanges.set(false);
+    this._currentContextId.set(0);
+  }
+
+  /**
+   * Resume exam from existing test ID
+   */
+  resumeExamFromTestId(testId: string): Observable<void> {
+    return new Observable(observer => {
+      this.testService.resumeTest(testId).subscribe({
+        next: (testData) => {
+          this.setExamDataFromTest(testData);
+          this.startExam();
+          observer.next();
+          observer.complete();
+        },
+        error: (error) => observer.error(error)
+      });
+    });
+  }
+
+  /**
+   * Submit exam using the backend API
+   */
+  submitExam(): Observable<string> {
+    const examData = this._examData();
+    if (!examData?.testId) {
+      throw new Error('No exam data available');
+    }
+
+    const userAnswers = this._userAnswers();
+    const listAnswerIds = Array.from(userAnswers.values()).flat();
+    
+    // Get correct answers from questions
+    const flatQuestions = this._flatQuestions();
+    const listTrueAnswerIds: string[] = [];
+    
+    flatQuestions.forEach(question => {
+      if (question.answers) {
+        const correctAnswers = question.answers
+          .filter(answer => answer.isCorrect)
+          .map(answer => answer.id);
+        listTrueAnswerIds.push(...correctAnswers);
+      }
+    });
+
+    const submitRequest: SubmitTestRequestDto = {
+      listAnswerIds,
+      listTrueAnswerIds
+    };
+
+    return this.testService.submitTest(examData.testId, submitRequest);
   }
 
   calculateResult(): ExamResult | null {
     const data = this._examData();
     const flatQuestions = this._flatQuestions();
+    const userAnswers = this._userAnswers();
+    
     if (!data || !flatQuestions.length) return null;
 
     let correct = 0;
@@ -297,7 +524,8 @@ export class ExamStateService {
     let readingTotal = 0;
 
     flatQuestions.forEach(question => {
-      const isCorrect = this.isAnswerCorrect(question);
+      const questionAnswers = userAnswers.get(question.id) || [];
+      const isCorrect = this.isAnswerCorrect(question, questionAnswers);
       
       if (question.contextType === 'listening') {
         listeningTotal++;
@@ -327,17 +555,21 @@ export class ExamStateService {
     };
   }
 
-  private isAnswerCorrect(question: Question): boolean {
-    if (!question.userAnswers || question.userAnswers.length === 0) {
+  private isAnswerCorrect(question: FlatQuestion, userAnswers: string[]): boolean {
+    if (!userAnswers || userAnswers.length === 0 || !question.answers) {
       return false;
     }
 
+    const correctAnswers = question.answers
+      .filter(answer => answer.isCorrect)
+      .map(answer => answer.id);
+
     if (question.type === 'single') {
-      return question.userAnswers.length === 1 && 
-             question.correctAnswers.includes(question.userAnswers[0]);
+      return userAnswers.length === 1 && 
+             correctAnswers.includes(userAnswers[0]);
     } else if (question.type === 'multiple') {
-      const userSet = new Set(question.userAnswers);
-      const correctSet = new Set(question.correctAnswers);
+      const userSet = new Set(userAnswers);
+      const correctSet = new Set(correctAnswers);
       return userSet.size === correctSet.size && 
              [...userSet].every(answer => correctSet.has(answer));
     }
@@ -345,34 +577,48 @@ export class ExamStateService {
     return false;
   }
 
-  private saveExamProgress(): void {
-    // Implementation for auto-saving exam progress
-    const data = this._examData();
-    if (data) {
-      const progress = {
-        examId: data.id,
-        currentIndex: this._currentQuestionIndex(),
-        timeRemaining: this._timeRemaining(),
-        answers: this._flatQuestions().map(q => ({
-          id: q.id,
-          contextId: q.contextId,
-          userAnswers: q.userAnswers
-        }))
-      };
-      
-      try {
-        // Note: In Claude.ai artifacts, localStorage is not supported
-        // In a real application, you would use localStorage or an API call
-        console.log('Exam progress would be saved:', progress);
-      } catch (error) {
-        console.error('Failed to save exam progress:', error);
-      }
-    }
+  /**
+   * Check if user can safely leave the exam
+   */
+  canLeaveExam(): boolean {
+    return !this._isExamStarted() || !this._hasUnsavedChanges();
   }
 
-  loadExamProgress(): void {
-    // Note: In Claude.ai artifacts, localStorage is not supported
-    // In a real application, you would load from localStorage or an API
-    console.log('Exam progress loading not supported in this environment');
+  /**
+   * Force save all current answers
+   */
+  forceSaveAllAnswers(): Observable<boolean> {
+    return new Observable(observer => {
+      const examData = this._examData();
+      const userAnswers = this._userAnswers();
+      
+      if (!examData?.testId) {
+        observer.next(false);
+        observer.complete();
+        return;
+      }
+      
+      // Collect all selected answers
+      const allSelectedAnswers = Array.from(userAnswers.values()).flat();
+      
+      if (allSelectedAnswers.length === 0) {
+        observer.next(true);
+        observer.complete();
+        return;
+      }
+
+      this.testService.autoSaveAnswer(examData.testId, allSelectedAnswers).subscribe({
+        next: () => {
+          this._hasUnsavedChanges.set(false);
+          observer.next(true);
+          observer.complete();
+        },
+        error: (error) => {
+          console.error('Failed to save all answers:', error);
+          observer.next(false);
+          observer.complete();
+        }
+      });
+    });
   }
 }

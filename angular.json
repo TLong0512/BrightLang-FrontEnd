@@ -18,7 +18,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
-              "src/favicon.ico"
+              "src/favicon.ico",
+              { "glob": "**/*", "input": "node_modules/tinymce", "output": "/tinymce/" }
             ],
             "styles": [
       "src/styles.scss",
@@ -85,10 +86,19 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "assets": ["src/assets"],
+            "assets": ["src/assets",
+          { "glob": "**/*", "input": "node_modules/tinymce", "output": "/tinymce/" }],
             "styles": [
               "src/styles.scss"
-            ]
+            ],
+            "scripts": [
+      
+      "src/assets/js/jquery.min.js",
+      "src/assets/js/bootstrap.bundle.min.js",
+      "src/assets/js/jquery.sticky.js",
+      "src/assets/js/click-scroll.js",
+      "src/assets/js/custom.js"
+    ]
           }
         }
       }

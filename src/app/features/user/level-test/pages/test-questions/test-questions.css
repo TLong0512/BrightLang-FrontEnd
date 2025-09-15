@@ -29,7 +29,7 @@
 
 .quick-actions .btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Compact Timer */
@@ -55,13 +55,28 @@
 }
 
 @keyframes flash {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0.4; }
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0.4;
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 /* Progress Compact */
@@ -96,7 +111,7 @@
 
 .question-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
 }
 
 .question-title {
@@ -122,7 +137,7 @@
   transform: translateX(2px);
 }
 
-.form-check-input:checked ~ .form-check-label {
+.form-check-input:checked~.form-check-label {
   color: #007bff;
   font-weight: 500;
 }
@@ -161,7 +176,7 @@
 
 .context-nav-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .context-indicator {
@@ -179,7 +194,7 @@
 
 /* Sidebar Cards */
 .question-status-card,
-.question-status-card + .card {
+.question-status-card+.card {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.95);
 }
@@ -244,6 +259,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -261,20 +277,20 @@
     order: 3;
     margin-top: 10px;
   }
-  
+
   .quick-actions {
     justify-content: center !important;
   }
-  
+
   .context-nav-btn {
     min-width: 120px;
     font-size: 14px;
   }
-  
+
   .timer-display-small {
     font-size: 16px;
   }
-  
+
   .question-grid-compact .col-2 {
     flex: 0 0 16.666667%;
     max-width: 16.666667%;
@@ -285,22 +301,22 @@
   .top-header {
     padding: 8px 0;
   }
-  
+
   .container-fluid {
     padding-left: 10px;
     padding-right: 10px;
   }
-  
+
   .context-navigation {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .context-nav-btn {
     width: 100%;
     min-width: auto;
   }
-  
+
   .question-grid-compact .col-2 {
     flex: 0 0 20%;
     max-width: 20%;
@@ -360,4 +376,21 @@
   align-items: center;
   justify-content: center;
   z-index: 1;
+}
+
+.context-content audio,
+.question-title audio,
+.form-check-label audio {
+  width: 100%;
+  max-width: 400px;
+  margin: 10px 0;
+}
+
+.context-content img,
+.question-title img,
+.form-check-label img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 4px;
 }

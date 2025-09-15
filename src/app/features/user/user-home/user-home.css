@@ -1,0 +1,11 @@
+.featured-section {
+  background-color: var(--secondary-color);
+  border-radius: 0 0 100px 100px;
+  padding-bottom: 100px;
+}
+
+.featured-section .row {
+  position: relative;
+  bottom: 100px;
+  margin-bottom: -100px;
+}

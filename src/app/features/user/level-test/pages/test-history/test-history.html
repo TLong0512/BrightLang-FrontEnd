@@ -1,0 +1,382 @@
+<div class="test-history-container" >
+  <div class="header">
+    <h2>Lịch sử test</h2>
+    <button class="refresh-btn" (click)="refreshHistory()" [disabled]="loading">
+      <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+      Làm mới
+    </button>
+  </div>
+
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Đang tải dữ liệu...</p>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="error && !loading" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+    <button class="retry-btn" (click)="loadTestHistory()">Thử lại</button>
+  </div>
+
+  <!-- Test history content -->
+  <div *ngIf="!loading && !error" class="content">
+    <!-- Page size selector -->
+    <div class="controls">
+      <div class="page-size-selector">
+        <label>Hiển thị:</label>
+        <select [value]="pageSize" (change)="changePageSize(+$event.target.value)">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select>
+        <span>bản ghi</span>
+      </div>
+      
+      <div class="total-info">
+        <span>Tổng cộng: {{ totalItems }} test</span>
+      </div>
+    </div>
+
+    <!-- Test history table -->
+    <div class="table-container">
+      <table class="test-history-table" *ngIf="testHistory.length > 0">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Ngày tạo</th>
+            <th>Thời gian làm bài</th>
+            <th>Thời gian tối đa</th>
+            <th>Kết quả</th>
+            <th>Điểm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let test of testHistory; trackBy: trackByTestId; let i = index">
+            <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td>{{ formatDate(test.createdDate) }}</td>
+            <td>{{ formatDuration(test.actualDuration || 0) }}</td>
+            <td>{{ formatDuration(test.duration) }}</td>
+            <td>
+              <span class="score-badge" [class]="getScoreBadgeClass(test.score)">
+                {{ getScoreText(test.score) }}
+              </span>
+            </td>
+            <td class="score-cell">{{ test.score }}/2</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty state -->
+      <div *ngIf="testHistory.length === 0" class="empty-state">
+        <i class="fas fa-clipboard-list"></i>
+        <h3>Chưa có lịch sử test</h3>
+        <p>Bạn chưa thực hiện test nào. Hãy bắt đầu test đầu tiên của bạn!</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button 
+        class="page-btn" 
+        [disabled]="currentPage <= 1"
+        (click)="previousPage()">
+        <i class="fas fa-chevron-left"></i>
+        Trước
+      </button>
+
+      <button 
+        *ngFor="let page of getPageNumbers()"
+        class="page-btn"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)">
+        {{ page }}
+      </button>
+
+      <button 
+        class="page-btn" 
+        [disabled]="currentPage >= totalPages"
+        (click)="nextPage()">
+        Sau
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Pagination info -->
+    <!-- <div class="pagination-info" *ngIf="totalItems > 0">
+      Hiển thị {{ (currentPage - 1) * pageSize + 1 }} - 
+      {{ Math.min(currentPage * pageSize, totalItems) }} 
+      trong tổng số {{ totalItems }} kết quả
+    </div> -->
+  </div>
+</div>
+
+<style>
+.test-history-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 100px auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.refresh-btn {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.retry-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.page-size-selector select {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.total-info {
+  font-weight: 500;
+  color: #666;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.test-history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.test-history-table th {
+  background: #f8f9fa;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.test-history-table td {
+  padding: 12px;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+}
+
+.test-history-table tr:hover {
+  background: #f8f9fa;
+}
+
+.score-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.score-failed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.score-average {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.score-good {
+  background: #d4edda;
+  color: #155724;
+}
+
+.score-default {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.score-cell {
+  font-weight: 600;
+  color: #333;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #ccc;
+}
+
+.empty-state h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.page-btn {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination-info {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .controls {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .test-history-table {
+    font-size: 14px;
+  }
+  
+  .test-history-table th,
+  .test-history-table td {
+    padding: 8px;
+  }
+  
+  .pagination {
+    flex-wrap: wrap;
+  }
+}
+</style>
